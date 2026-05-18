@@ -48,7 +48,7 @@ class _ForumPostCardState extends State<ForumPostCard> {
         imageUrl: widget.imageUrl!,
         fit: fit,
         errorWidget: Container(
-          color: AppTheme.primaryGreen.withOpacity(0.1),
+          color: AppTheme.primaryGreen.withValues(alpha: 0.1),
           child: const Center(
             child: ImagePlaceholder(borderRadius: 8),
           ),
@@ -60,7 +60,7 @@ class _ForumPostCardState extends State<ForumPostCard> {
         fit: fit,
         errorBuilder: (context, error, stack) {
           return Container(
-            color: AppTheme.primaryGreen.withOpacity(0.1),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.1),
             child: const Center(
               child: ImagePlaceholder(borderRadius: 8),
             ),
@@ -183,7 +183,7 @@ class _ForumPostCardState extends State<ForumPostCard> {
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.7),
+                              color: Colors.black.withValues(alpha: 0.7),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -255,12 +255,12 @@ class _ForumPostCardState extends State<ForumPostCard> {
                             horizontal: hPad, vertical: vPad),
                         decoration: BoxDecoration(
                           color: (subtle
-                              ? AppTheme.primaryGreen.withOpacity(0.08)
-                              : AppTheme.primaryGreen.withOpacity(0.1)),
+                              ? AppTheme.primaryGreen.withValues(alpha: 0.08)
+                              : AppTheme.primaryGreen.withValues(alpha: 0.1)),
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: AppTheme.primaryGreen
-                                .withOpacity(subtle ? 0.25 : 0.3),
+                                .withValues(alpha: subtle ? 0.25 : 0.3),
                           ),
                         ),
                         child: Text(

@@ -118,7 +118,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   Text(
                     'Enter your username or email, the reset code, and a new password.',
                     style: TextStyle(
-                        fontSize: 14, color: Colors.white.withOpacity(0.9)),
+                        fontSize: 14, color: Colors.white.withValues(alpha: 0.9)),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
@@ -182,8 +182,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               ),
                               validator: (v) {
                                 if (v == null || v.isEmpty) return 'Required';
-                                if (v.length < 6)
+                                if (v.length < 6) {
                                   return 'At least 6 characters';
+                                }
                                 return null;
                               },
                             ),
@@ -207,8 +208,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                                 border: const OutlineInputBorder(),
                               ),
                               validator: (v) {
-                                if (v != _newPasswordController.text)
+                                if (v != _newPasswordController.text) {
                                   return 'Passwords do not match';
+                                }
                                 return null;
                               },
                             ),

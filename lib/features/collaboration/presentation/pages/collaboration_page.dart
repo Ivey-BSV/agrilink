@@ -124,8 +124,8 @@ class _CollaborationPageState extends State<CollaborationPage>
   }) {
     final Color accent = color;
     final Color startColor =
-        accent.withOpacity(accent == Colors.grey[600] ? 0.14 : 0.22);
-    final Color endColor = accent.withOpacity(0.05);
+        accent.withValues(alpha: accent == Colors.grey[600] ? 0.14 : 0.22);
+    final Color endColor = accent.withValues(alpha: 0.05);
     final bool isMuted = accent == Colors.grey[600];
 
     final card = Card(
@@ -156,7 +156,7 @@ class _CollaborationPageState extends State<CollaborationPage>
               child: Icon(
                 icon,
                 size: 140,
-                color: accent.withOpacity(0.08),
+                color: accent.withValues(alpha: 0.08),
               ),
             ),
             Padding(
@@ -202,7 +202,7 @@ class _CollaborationPageState extends State<CollaborationPage>
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: accent.withOpacity(0.1),
+                              color: accent.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Icon(
@@ -243,7 +243,7 @@ class _CollaborationPageState extends State<CollaborationPage>
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: const Text(
@@ -470,7 +470,7 @@ class _CollaborationPageState extends State<CollaborationPage>
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -483,7 +483,7 @@ class _CollaborationPageState extends State<CollaborationPage>
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: accent.withOpacity(0.1),
+                        color: accent.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
@@ -530,7 +530,7 @@ class _CollaborationPageState extends State<CollaborationPage>
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.black,
                           side:
-                              BorderSide(color: Colors.black.withOpacity(0.12)),
+                              BorderSide(color: Colors.black.withValues(alpha: 0.12)),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),

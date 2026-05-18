@@ -24,7 +24,7 @@ class SharePostBottomSheet extends StatefulWidget {
 class _SharePostBottomSheetState extends State<SharePostBottomSheet> {
   List<UserProfile> _following = [];
   List<UserProfile> _filteredFollowing = [];
-  Set<String> _selectedUserIds = {};
+  final Set<String> _selectedUserIds = {};
   bool _isLoading = true;
   bool _isSending = false;
   final TextEditingController _searchController = TextEditingController();
@@ -147,7 +147,7 @@ class _SharePostBottomSheetState extends State<SharePostBottomSheet> {
             SnackBar(
               content: Text(
                 successCount == _selectedUserIds.length
-                    ? 'Post shared with ${successCount} ${successCount == 1 ? 'person' : 'people'}!'
+                    ? 'Post shared with $successCount ${successCount == 1 ? 'person' : 'people'}!'
                     : 'Post shared with $successCount of ${_selectedUserIds.length} ${_selectedUserIds.length == 1 ? 'person' : 'people'}.',
               ),
               backgroundColor: AppTheme.primaryGreen,
@@ -301,7 +301,7 @@ class _SharePostBottomSheetState extends State<SharePostBottomSheet> {
                                   CircleAvatar(
                                     radius: 24,
                                     backgroundColor:
-                                        AppTheme.primaryGreen.withOpacity(0.1),
+                                        AppTheme.primaryGreen.withValues(alpha: 0.1),
                                     backgroundImage: user.avatarUrl != null
                                         ? CachedNetworkImageProvider(
                                             user.avatarUrl!,

@@ -72,8 +72,9 @@ class ProfileProvider extends ChangeNotifier {
         'updated_at': DateTime.now().toUtc().toIso8601String(),
       };
 
-      if (username != null)
+      if (username != null) {
         updateData['username'] = normalizeUsername(username);
+      }
       updateData['full_name'] = fullName;
       updateData['bio'] = bio;
       updateData['location'] = location;

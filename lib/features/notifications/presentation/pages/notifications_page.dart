@@ -239,7 +239,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         label: Text(_filterLabel(k)),
                         selected: selected,
                         onSelected: (_) => setState(() => _filter = k),
-                        selectedColor: AppTheme.primaryGreen.withOpacity(0.2),
+                        selectedColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
                         checkmarkColor: AppTheme.primaryGreen,
                       );
                     }).toList(),
@@ -304,7 +304,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                                       color: read
                                           ? Colors.white
                                           : AppTheme.primaryGreen
-                                              .withOpacity(0.06),
+                                              .withValues(alpha: 0.06),
                                     ),
                                     padding: const EdgeInsets.all(16),
                                     child: Row(

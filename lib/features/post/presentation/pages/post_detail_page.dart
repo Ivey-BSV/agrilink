@@ -160,6 +160,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   Future<void> _deleteComment(String commentId) async {
+    final postProvider = context.read<PostProvider>();
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -181,22 +182,23 @@ class _PostDetailPageState extends State<PostDetailPage> {
       ),
     );
 
-    if (confirm == true) {
-      setState(() {
-        _isLoading = true;
-      });
+    if (confirm != true) return;
 
-      final postProvider = context.read<PostProvider>();
-      await postProvider.deleteComment(commentId, widget.postId);
-      if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+    });
 
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    await postProvider.deleteComment(commentId, widget.postId);
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _deletePost() async {
+    final postProvider = context.read<PostProvider>();
+    final navigator = Navigator.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -219,36 +221,35 @@ class _PostDetailPageState extends State<PostDetailPage> {
       ),
     );
 
-    if (confirm == true) {
+    if (confirm != true) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await postProvider.deletePost(widget.postId);
+
+      if (!mounted) return;
+
+      await postProvider.loadPostsFromSupabase();
+
+      if (!mounted) return;
+
+      navigator.pop();
+    } catch (e) {
+      if (!mounted) return;
+
       setState(() {
-        _isLoading = true;
+        _isLoading = false;
       });
 
-      try {
-        final postProvider = context.read<PostProvider>();
-        await postProvider.deletePost(widget.postId);
-
-        if (!mounted) return;
-
-        await postProvider.loadPostsFromSupabase();
-
-        if (!mounted) return;
-
-        Navigator.pop(context);
-      } catch (e) {
-        if (!mounted) return;
-
-        setState(() {
-          _isLoading = false;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to delete post: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete post: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -392,10 +393,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.1),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: AppTheme.primaryGreen.withOpacity(0.3),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Text(
@@ -812,7 +813,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                       ),
                                       decoration: BoxDecoration(
                                         color: AppTheme.primaryGreen
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
@@ -900,7 +901,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                         horizontal: 12, vertical: 6),
                                     decoration: BoxDecoration(
                                       color: AppTheme.primaryGreen
-                                          .withOpacity(0.1),
+                                          .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Row(

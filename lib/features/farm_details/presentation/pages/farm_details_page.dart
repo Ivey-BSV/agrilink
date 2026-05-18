@@ -309,7 +309,7 @@ class _FarmDetailsPageState extends State<FarmDetailsPage> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _saveFarmDetails,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.mintGreen.withOpacity(0.2),
+                  backgroundColor: AppTheme.mintGreen.withValues(alpha: 0.2),
                   foregroundColor: AppTheme.primaryGreen,
                   elevation: 0,
                   padding:
@@ -317,7 +317,7 @@ class _FarmDetailsPageState extends State<FarmDetailsPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                      color: AppTheme.primaryGreen.withOpacity(0.3),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -399,7 +399,7 @@ class _FarmDetailsPageState extends State<FarmDetailsPage> {
                             padding: const EdgeInsets.only(
                                 left: 0, top: 8, bottom: 8, right: 16),
                             child: DropdownButtonFormField<String>(
-                              value: _selectedFarmSizeUnit,
+                              initialValue: _selectedFarmSizeUnit,
                               isExpanded: true,
                               style: const TextStyle(
                                 fontWeight: FontWeight.normal,
@@ -662,7 +662,7 @@ class _FarmDetailsPageState extends State<FarmDetailsPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: DropdownButtonFormField<String>(
-        value: normalizedValue,
+        initialValue: normalizedValue,
         isExpanded: true,
         style: const TextStyle(
           fontWeight: FontWeight.normal,
@@ -817,7 +817,7 @@ class _FarmDetailsPageState extends State<FarmDetailsPage> {
                           });
                         }
                       : null,
-                  selectedColor: AppTheme.primaryGreen.withOpacity(0.2),
+                  selectedColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
                   checkmarkColor: AppTheme.primaryGreen,
                   disabledColor: Colors.grey[300],
                 );

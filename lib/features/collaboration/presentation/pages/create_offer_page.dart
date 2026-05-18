@@ -225,10 +225,10 @@ class _CreateOfferPageState extends State<CreateOfferPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.1),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppTheme.primaryGreen.withOpacity(0.3),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -303,7 +303,7 @@ class _CreateOfferPageState extends State<CreateOfferPage> {
               ButtonTheme(
                 alignedDropdown: true,
                 child: DropdownButtonFormField<String>(
-                  value: _selectedWindowPreset,
+                  initialValue: _selectedWindowPreset,
                   isExpanded: true,
                   decoration: InputDecoration(
                     labelText: 'Availability window *',
@@ -374,7 +374,7 @@ class _CreateOfferPageState extends State<CreateOfferPage> {
               ButtonTheme(
                 alignedDropdown: true,
                 child: DropdownButtonFormField<String>(
-                  value: _locationController.text.isNotEmpty
+                  initialValue: _locationController.text.isNotEmpty
                       ? _locationController.text
                       : null,
                   isExpanded: true,
@@ -444,7 +444,7 @@ class _CreateOfferPageState extends State<CreateOfferPage> {
                         }
                       });
                     },
-                    selectedColor: AppTheme.primaryGreen.withOpacity(0.2),
+                    selectedColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
                     checkmarkColor: AppTheme.primaryGreen,
                     labelStyle: TextStyle(
                       color:

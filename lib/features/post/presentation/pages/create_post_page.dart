@@ -366,7 +366,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _createPost,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.mintGreen.withOpacity(0.2),
+                backgroundColor: AppTheme.mintGreen.withValues(alpha: 0.2),
                 foregroundColor: AppTheme.primaryGreen,
                 elevation: 0,
                 padding:
@@ -374,7 +374,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(
-                    color: AppTheme.primaryGreen.withOpacity(0.3),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -451,7 +451,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _locationController.text.isNotEmpty
+              initialValue: _locationController.text.isNotEmpty
                   ? _locationController.text
                   : null,
               isExpanded: false,
@@ -534,7 +534,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               label: const Text('Add Video'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    AppTheme.primaryGreen.withOpacity(0.1),
+                                    AppTheme.primaryGreen.withValues(alpha: 0.1),
                                 foregroundColor: AppTheme.primaryGreen,
                                 elevation: 0,
                                 padding: const EdgeInsets.symmetric(
@@ -543,7 +543,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   borderRadius: BorderRadius.circular(8),
                                   side: BorderSide(
                                     color:
-                                        AppTheme.primaryGreen.withOpacity(0.3),
+                                        AppTheme.primaryGreen.withValues(alpha: 0.3),
                                     width: 1,
                                   ),
                                 ),
@@ -773,7 +773,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                   });
                                 },
                                 selectedColor:
-                                    AppTheme.primaryGreen.withOpacity(0.2),
+                                    AppTheme.primaryGreen.withValues(alpha: 0.2),
                                 checkmarkColor: AppTheme.primaryGreen,
                                 materialTapTargetSize:
                                     MaterialTapTargetSize.shrinkWrap,
@@ -798,7 +798,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.black.withOpacity(0.05)),
+                border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -50,7 +50,7 @@ class MarketplaceCard extends StatelessWidget {
                     AspectRatio(
                       aspectRatio: 4 / 3,
                       child: Container(
-                        color: AppTheme.primaryGreen.withOpacity(0.1),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                         child: imageUrl != null && imageUrl!.isNotEmpty
                             ? (imageUrl!.startsWith('http')
                                 ? CachedImageWidget(
@@ -84,7 +84,7 @@ class MarketplaceCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
+                          color: Colors.black.withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -157,7 +157,7 @@ class MarketplaceCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: AppTheme.primaryGreen.withOpacity(0.1),
+        color: AppTheme.primaryGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppTheme.primaryGreen, width: 1),
       ),

@@ -18,7 +18,7 @@ class NotificationProvider extends ChangeNotifier {
   RealtimeChannel? _realtimeChannel;
 
   int _unreadCount = 0;
-  bool _loading = false;
+  final bool _loading = false;
   String? _error;
 
   int get unreadCount => _unreadCount;

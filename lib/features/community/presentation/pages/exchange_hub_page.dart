@@ -146,7 +146,7 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                                       setLocalState(() {});
                                     },
                                     selectedColor:
-                                        AppTheme.primaryGreen.withOpacity(0.2),
+                                        AppTheme.primaryGreen.withValues(alpha: 0.2),
                                     checkmarkColor: AppTheme.primaryGreen,
                                     materialTapTargetSize:
                                         MaterialTapTargetSize.shrinkWrap,
@@ -546,8 +546,10 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const CreateListingPage()),
-          ).then((_) =>
-              context.read<MarketplaceProvider>().loadListingsFromSupabase());
+          ).then((_) {
+            if (!context.mounted) return;
+            context.read<MarketplaceProvider>().loadListingsFromSupabase();
+          });
         },
         backgroundColor: AppTheme.primaryGreen,
         foregroundColor: Colors.white,

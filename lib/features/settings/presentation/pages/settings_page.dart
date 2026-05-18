@@ -294,7 +294,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     try {
       await DefaultCacheManager().emptyCache();
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
 
     await authProvider.logout();
     if (context.mounted) {
@@ -326,7 +326,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
 
-    if (firstConfirm != true || !mounted) return;
+    if (firstConfirm != true || !context.mounted) return;
 
     final secondConfirm = await showDialog<bool>(
       context: context,
@@ -352,7 +352,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
 
-    if (secondConfirm != true || !mounted) return;
+    if (secondConfirm != true || !context.mounted) return;
     await _deleteAccount(context);
   }
 
@@ -370,7 +370,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     final error = await authProvider.deleteAccount();
 
-    if (!mounted) return;
+    if (!context.mounted) return;
 
     if (error == null) {
       chatProvider.clearChats();
@@ -381,9 +381,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
       try {
         await DefaultCacheManager().emptyCache();
-      } catch (_) {}
+      } catch (_) { /* ignored */ }
 
-      if (mounted) {
+      if (context.mounted) {
         context.go('/');
       }
       return;
@@ -392,6 +392,7 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       _isDeletingAccount = false;
     });
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(error),

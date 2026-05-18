@@ -179,6 +179,7 @@ Future<bool> uploadSharedDocumentBytes({
         prof != null && (prof['account_kind'] as String?) == 'staff';
 
     if (!isStaff) {
+      if (!context.mounted) return false;
       var consentChecked = false;
       final confirmed = await showDialog<bool>(
         context: context,

@@ -136,7 +136,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           _participantAvatarUrl = profileResponse['avatar_url'] as String?;
         });
       }
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<void> _loadCurrentUserProfile() async {
@@ -159,7 +159,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           _currentUserAvatarUrl = profileResponse['avatar_url'] as String?;
         });
       }
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<void> _checkIfMessageRequest() async {
@@ -203,7 +203,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           _isMessageRequest = isRequest;
         });
       }
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<void> _followBack() async {
@@ -498,12 +498,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           color: isMe ? Colors.white : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isMe ? Colors.white.withOpacity(0.5) : Colors.grey[300]!,
+            color: isMe ? Colors.white.withValues(alpha: 0.5) : Colors.grey[300]!,
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -519,7 +519,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryGreen.withOpacity(0.1),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -622,12 +622,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           color: isMe ? Colors.white : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isMe ? Colors.white.withOpacity(0.5) : Colors.grey[300]!,
+            color: isMe ? Colors.white.withValues(alpha: 0.5) : Colors.grey[300]!,
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),
@@ -1507,10 +1507,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                         style: IconButton.styleFrom(
                           backgroundColor: AppTheme.primaryGreen,
                           disabledBackgroundColor:
-                              AppTheme.primaryGreen.withOpacity(0.55),
+                              AppTheme.primaryGreen.withValues(alpha: 0.55),
                           foregroundColor: Colors.white,
                           disabledForegroundColor:
-                              Colors.white.withOpacity(0.95),
+                              Colors.white.withValues(alpha: 0.95),
                           padding: const EdgeInsets.all(12),
                         ),
                       ),

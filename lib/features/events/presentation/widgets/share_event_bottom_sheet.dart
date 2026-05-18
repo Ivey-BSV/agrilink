@@ -37,7 +37,7 @@ class ShareEventBottomSheet extends StatefulWidget {
 class _ShareEventBottomSheetState extends State<ShareEventBottomSheet> {
   List<UserProfile> _following = [];
   List<UserProfile> _filteredFollowing = [];
-  Set<String> _selectedUserIds = {};
+  final Set<String> _selectedUserIds = {};
   bool _isLoading = true;
   bool _isSending = false;
   final TextEditingController _searchController = TextEditingController();
@@ -145,7 +145,7 @@ class _ShareEventBottomSheetState extends State<ShareEventBottomSheet> {
             recipientUserId: userId,
           );
           successCount++;
-        } catch (e) {}
+        } catch (e) { /* ignored */ }
       }
 
       if (mounted) {
@@ -154,7 +154,7 @@ class _ShareEventBottomSheetState extends State<ShareEventBottomSheet> {
           SnackBar(
             content: Text(
               successCount == _selectedUserIds.length
-                  ? 'Event shared with ${successCount} ${successCount == 1 ? 'person' : 'people'}!'
+                  ? 'Event shared with $successCount ${successCount == 1 ? 'person' : 'people'}!'
                   : 'Event shared with $successCount of ${_selectedUserIds.length} ${_selectedUserIds.length == 1 ? 'person' : 'people'}.',
             ),
             backgroundColor: AppTheme.primaryGreen,
@@ -291,7 +291,7 @@ class _ShareEventBottomSheetState extends State<ShareEventBottomSheet> {
                                   CircleAvatar(
                                     radius: 24,
                                     backgroundColor:
-                                        AppTheme.primaryGreen.withOpacity(0.1),
+                                        AppTheme.primaryGreen.withValues(alpha: 0.1),
                                     backgroundImage: user.avatarUrl != null
                                         ? CachedNetworkImageProvider(
                                             user.avatarUrl!)

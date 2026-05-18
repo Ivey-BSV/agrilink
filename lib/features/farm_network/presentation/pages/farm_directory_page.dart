@@ -176,7 +176,7 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
                 'profile': profile,
               });
             }
-          } catch (e) {}
+          } catch (e) { /* ignored */ }
         }
       } else {
         final allProfiles = await profileProvider.searchProfiles(limit: 100);
@@ -198,7 +198,7 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
               'farm': farm,
               'profile': profile,
             });
-          } catch (e) {}
+          } catch (e) { /* ignored */ }
         }
       }
 
@@ -601,7 +601,7 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryGreen.withOpacity(0.1),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -620,7 +620,7 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: Colors.blue.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -977,7 +977,7 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
                   onChanged(newSelected);
                 }
               },
-              selectedColor: AppTheme.primaryGreen.withOpacity(0.2),
+              selectedColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
               checkmarkColor: AppTheme.primaryGreen,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               visualDensity: const VisualDensity(

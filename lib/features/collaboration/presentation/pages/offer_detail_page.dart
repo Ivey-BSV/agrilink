@@ -101,7 +101,7 @@ class _OfferDetailPageState extends State<OfferDetailPage> {
                               CircleAvatar(
                                 radius: 18,
                                 backgroundColor:
-                                    AppTheme.primaryGreen.withOpacity(0.15),
+                                    AppTheme.primaryGreen.withValues(alpha: 0.15),
                                 child: Text(
                                   widget.offer['avatar'] as String,
                                   style: const TextStyle(
@@ -138,7 +138,7 @@ class _OfferDetailPageState extends State<OfferDetailPage> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.12),
+                                  color: Colors.red.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: Text(
@@ -213,7 +213,7 @@ class _OfferDetailPageState extends State<OfferDetailPage> {
                           size: 20, color: Colors.grey[700]),
                       const SizedBox(width: 8),
                       Text(
-                        '${_interestPeopleCount} ${_interestPeopleCount == 1 ? 'person interested' : 'people interested'}',
+                        '$_interestPeopleCount ${_interestPeopleCount == 1 ? 'person interested' : 'people interested'}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -326,7 +326,7 @@ class _OfferDetailPageState extends State<OfferDetailPage> {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: AppTheme.primaryGreen.withOpacity(0.15),
+              backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
               child: Text(
                 interest['avatar'] as String,
                 style: const TextStyle(

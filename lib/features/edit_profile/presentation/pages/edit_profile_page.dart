@@ -194,7 +194,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _saveProfile,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.mintGreen.withOpacity(0.2),
+                  backgroundColor: AppTheme.mintGreen.withValues(alpha: 0.2),
                   foregroundColor: AppTheme.primaryGreen,
                   elevation: 0,
                   padding:
@@ -202,7 +202,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                      color: AppTheme.primaryGreen.withOpacity(0.3),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -273,7 +273,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: DropdownButtonFormField<String>(
-                  value: _selectedCounty,
+                  initialValue: _selectedCounty,
                   isExpanded: true,
                   style: const TextStyle(
                     fontWeight: FontWeight.normal,
@@ -329,7 +329,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.black.withOpacity(0.05)),
+                border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -418,7 +418,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       gradient: AppTheme.primaryGradient,
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primaryGreen.withOpacity(0.3),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -454,7 +454,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                       ),
                       child: const Center(
                         child: CircularProgressIndicator(
@@ -584,7 +584,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       padding: outerPadding ??
           const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: DropdownButtonFormField<String>(
-        value: value,
+        initialValue: value,
         isExpanded: true,
         style: const TextStyle(
           fontWeight: FontWeight.normal,

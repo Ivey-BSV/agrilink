@@ -356,7 +356,7 @@ class _CommunityPageState extends State<CommunityPage>
                                       setLocalState(() {});
                                     },
                                     selectedColor:
-                                        AppTheme.primaryGreen.withOpacity(0.2),
+                                        AppTheme.primaryGreen.withValues(alpha: 0.2),
                                     checkmarkColor: AppTheme.primaryGreen,
                                     materialTapTargetSize:
                                         MaterialTapTargetSize.shrinkWrap,

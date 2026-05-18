@@ -64,7 +64,7 @@ class FileBrowseGalleryGrid extends StatelessWidget {
                                 height: 28,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: AppTheme.primaryGreen.withOpacity(0.6),
+                                  color: AppTheme.primaryGreen.withValues(alpha: 0.6),
                                 ),
                               ),
                             ),
@@ -84,7 +84,7 @@ class FileBrowseGalleryGrid extends StatelessWidget {
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            Colors.black.withOpacity(0.65),
+                            Colors.black.withValues(alpha: 0.65),
                             Colors.transparent,
                           ],
                         ),

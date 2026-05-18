@@ -111,8 +111,7 @@ class PostProvider extends ChangeNotifier {
       }).toList();
 
       _posts = fetched;
-    } catch (_) {
-    } finally {
+    } catch (_) { /* ignored */ } finally {
       _isLoading = false;
       notifyListeners();
     }
@@ -206,7 +205,7 @@ class PostProvider extends ChangeNotifier {
       _postComments[postId] = comments;
       _updateCommentCounts();
       notifyListeners();
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<void> addComment(String postId, String content,
@@ -224,7 +223,7 @@ class PostProvider extends ChangeNotifier {
       });
 
       await loadCommentsForPost(postId);
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<void> deleteComment(String commentId, String postId) async {
@@ -233,7 +232,7 @@ class PostProvider extends ChangeNotifier {
       await supabase.from('comments').delete().eq('id', commentId);
 
       await loadCommentsForPost(postId);
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<void> deletePost(String postId) async {
@@ -264,7 +263,7 @@ class PostProvider extends ChangeNotifier {
 
                   await supabase.storage.from(bucket).remove([path]);
                 }
-              } catch (e) {}
+              } catch (e) { /* ignored */ }
             }
           }
         }

@@ -248,10 +248,10 @@ class _AllAsksPageState extends State<AllAsksPage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryGreen.withOpacity(0.15),
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: AppTheme.primaryGreen.withOpacity(0.3),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -437,7 +437,7 @@ class _AllAsksPageState extends State<AllAsksPage> {
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: AppTheme.primaryGreen.withOpacity(0.15),
+                    backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
                     child: Text(
                       ask['avatar'] as String,
                       style: const TextStyle(
@@ -474,7 +474,7 @@ class _AllAsksPageState extends State<AllAsksPage> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.12),
+                      color: Colors.red.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(

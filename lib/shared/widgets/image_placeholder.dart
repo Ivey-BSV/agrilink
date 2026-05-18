@@ -18,7 +18,7 @@ class ImagePlaceholder extends StatelessWidget {
     final Color accent = tint ?? AppTheme.primaryGreen;
     return Container(
       decoration: BoxDecoration(
-        color: accent.withOpacity(0.1),
+        color: accent.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(borderRadius),
       ),
       child: Center(

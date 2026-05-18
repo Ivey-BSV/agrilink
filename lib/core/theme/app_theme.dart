@@ -77,12 +77,11 @@ class AppTheme {
         secondary: earthBrown,
         tertiary: skyBlue,
         surface: cardBackground,
-        background: backgroundLight,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: textPrimary,
-        onBackground: textPrimary,
       ),
+      scaffoldBackgroundColor: backgroundLight,
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
@@ -108,7 +107,7 @@ class AppTheme {
           backgroundColor: primaryGreen,
           foregroundColor: Colors.white,
           elevation: 2,
-          shadowColor: primaryGreen.withOpacity(0.3),
+          shadowColor: primaryGreen.withValues(alpha: 0.3),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
@@ -125,11 +124,11 @@ class AppTheme {
         fillColor: cardBackground,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: textHint.withOpacity(0.3)),
+          borderSide: BorderSide(color: textHint.withValues(alpha: 0.3)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: textHint.withOpacity(0.3)),
+          borderSide: BorderSide(color: textHint.withValues(alpha: 0.3)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -273,12 +272,11 @@ class AppTheme {
         primary: lightGreen,
         secondary: sunsetOrange,
         surface: surfaceDark,
-        background: backgroundDark,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: Colors.white,
-        onBackground: Colors.white,
       ),
+      scaffoldBackgroundColor: backgroundDark,
       appBarTheme: AppBarTheme(
         backgroundColor: backgroundDark,
         foregroundColor: Colors.white,

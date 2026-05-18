@@ -199,10 +199,10 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     try {
       await PushNotificationService.clearForLogout();
-    } catch (_) {}
+    } catch (_) { /* ignored */ }
     try {
       await Supabase.instance.client.auth.signOut();
-    } catch (_) {}
+    } catch (_) { /* ignored */ }
     _isAuthenticated = false;
     _userId = null;
     _userName = null;
@@ -278,9 +278,12 @@ class AuthProvider extends ChangeNotifier {
       if (body is Map && body.containsKey('error')) {
         return body['error'] as String? ?? 'Reset failed';
       }
-      if (res.status == 404)
+      if (res.status == 404) {
         return 'No account found for that email or username';
-      if (res.status >= 500) return 'Server error. Try again later.';
+      }
+      if (res.status >= 500) {
+        return 'Server error. Try again later.';
+      }
       return 'Could not reset password';
     } catch (e) {
       final msg = e.toString();

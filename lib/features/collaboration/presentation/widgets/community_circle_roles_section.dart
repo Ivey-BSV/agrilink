@@ -44,7 +44,7 @@ class CommunityCircleRolesSection extends StatelessWidget {
         const SizedBox(height: 12),
         Card(
           elevation: 4,
-          shadowColor: Colors.black.withOpacity(0.15),
+          shadowColor: Colors.black.withValues(alpha: 0.15),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -122,7 +122,7 @@ class _RoleRow extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 22,
-                backgroundColor: AppTheme.primaryGreen.withOpacity(0.12),
+                backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.12),
                 backgroundImage: !isVacant &&
                         profile is Map &&
                         (profile['avatar_url'] as String?)?.isNotEmpty == true

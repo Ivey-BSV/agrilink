@@ -116,7 +116,7 @@ class _CreatePollPageState extends State<CreatePollPage> {
               style: TextStyle(fontSize: 12),
             ),
             value: _allowsMultiple,
-            activeColor: AppTheme.primaryGreen,
+            activeThumbColor: AppTheme.primaryGreen,
             onChanged: (v) => setState(() => _allowsMultiple = v),
           ),
           const SizedBox(height: 8),

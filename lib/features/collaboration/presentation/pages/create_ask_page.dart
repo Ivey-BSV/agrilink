@@ -220,10 +220,10 @@ class _CreateAskPageState extends State<CreateAskPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.1),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: AppTheme.primaryGreen.withOpacity(0.3),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Row(
@@ -279,7 +279,7 @@ class _CreateAskPageState extends State<CreateAskPage> {
               ButtonTheme(
                 alignedDropdown: true,
                 child: DropdownButtonFormField<String>(
-                  value: _selectedTimingPreset,
+                  initialValue: _selectedTimingPreset,
                   isExpanded: true,
                   decoration: InputDecoration(
                     labelText: 'Deadline or timing *',
@@ -349,7 +349,7 @@ class _CreateAskPageState extends State<CreateAskPage> {
               ButtonTheme(
                 alignedDropdown: true,
                 child: DropdownButtonFormField<String>(
-                  value: _locationController.text.isNotEmpty
+                  initialValue: _locationController.text.isNotEmpty
                       ? _locationController.text
                       : null,
                   isExpanded: true,
@@ -419,7 +419,7 @@ class _CreateAskPageState extends State<CreateAskPage> {
                         }
                       });
                     },
-                    selectedColor: AppTheme.primaryGreen.withOpacity(0.2),
+                    selectedColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
                     checkmarkColor: AppTheme.primaryGreen,
                     labelStyle: TextStyle(
                       color:

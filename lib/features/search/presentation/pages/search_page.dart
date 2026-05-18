@@ -62,7 +62,7 @@ class _SearchPageState extends State<SearchPage>
       setState(() {
         _recentSearches = uniqueSearches;
       });
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<void> _saveSearch(String query) async {
@@ -88,7 +88,7 @@ class _SearchPageState extends State<SearchPage>
       });
 
       _loadRecentSearches();
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   @override
@@ -357,7 +357,7 @@ class _SearchPageState extends State<SearchPage>
       setState(() {
         _recentSearches = [];
       });
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<void> _deleteRecentSearch(String query) async {
@@ -373,7 +373,7 @@ class _SearchPageState extends State<SearchPage>
           .eq('search_query', query);
 
       _loadRecentSearches();
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Widget _buildSearchResults() {
@@ -473,7 +473,7 @@ class _SearchPageState extends State<SearchPage>
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: _getTypeColor(result['type']).withOpacity(0.1),
+                      color: _getTypeColor(result['type']).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(

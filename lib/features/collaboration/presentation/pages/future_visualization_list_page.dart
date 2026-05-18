@@ -240,7 +240,7 @@ class _FutureVisualizationListPageState
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.15),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -270,7 +270,7 @@ class _FutureVisualizationListPageState
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.15),
+                        color: Colors.blue.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -300,8 +300,8 @@ class _FutureVisualizationListPageState
                         ),
                         decoration: BoxDecoration(
                           color: isPrivate
-                              ? Colors.blue.withOpacity(0.15)
-                              : AppTheme.grainGold.withOpacity(0.15),
+                              ? Colors.blue.withValues(alpha: 0.15)
+                              : AppTheme.grainGold.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(

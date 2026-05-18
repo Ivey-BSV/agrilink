@@ -289,13 +289,13 @@ class _PollDetailPageState extends State<PollDetailPage> {
               ),
         ),
         const SizedBox(height: 8),
-        ...options.map((opt) {
-          final id = opt['id'] as String;
-          final label = opt['label'] as String? ?? '';
-          final c = counts[id] ?? 0;
-          final pct = total > 0 ? (100 * c / total).round() : 0;
+        if (multi)
+          ...options.map((opt) {
+            final id = opt['id'] as String;
+            final label = opt['label'] as String? ?? '';
+            final c = counts[id] ?? 0;
+            final pct = total > 0 ? (100 * c / total).round() : 0;
 
-          if (multi) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: CheckboxListTile(
@@ -317,32 +317,50 @@ class _PollDetailPageState extends State<PollDetailPage> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 tileColor: Colors.white,
-                activeColor: AppTheme.primaryGreen,
+                fillColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return AppTheme.primaryGreen;
+                  }
+                  return null;
+                }),
               ),
             );
-          }
+          })
+        else
+          RadioGroup<String>(
+            groupValue: _selected.length == 1 ? _selected.first : null,
+            onChanged: (v) {
+              if (!_canVote || v == null) return;
+              setState(() => _selected = {v});
+            },
+            child: Column(
+              children: options.map((opt) {
+                final id = opt['id'] as String;
+                final label = opt['label'] as String? ?? '';
+                final c = counts[id] ?? 0;
+                final pct = total > 0 ? (100 * c / total).round() : 0;
 
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: RadioListTile<String>(
-              value: id,
-              groupValue: _selected.length == 1 ? _selected.first : null,
-              onChanged: _canVote
-                  ? (v) {
-                      if (v == null) return;
-                      setState(() => _selected = {v});
-                    }
-                  : null,
-              title: Text(label),
-              subtitle: Text('$c votes · $pct%'),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              tileColor: Colors.white,
-              activeColor: AppTheme.primaryGreen,
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: RadioListTile<String>(
+                    value: id,
+                    title: Text(label),
+                    subtitle: Text('$c votes · $pct%'),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    tileColor: Colors.white,
+                    fillColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return AppTheme.primaryGreen;
+                      }
+                      return null;
+                    }),
+                  ),
+                );
+              }).toList(),
             ),
-          );
-        }),
+          ),
         if (uid == null) ...[
           const SizedBox(height: 16),
           Text(

@@ -124,7 +124,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       if (widget.type == 'Community') {
         try {
           await _goalService.ensureCommunityCircleRoles(widget.goalId);
-        } catch (_) {}
+        } catch (_) { /* ignored */ }
         try {
           final circle =
               await _goalService.getCommunityGoalCircleRoles(widget.goalId);
@@ -695,7 +695,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
           children: [
             Card(
               elevation: 4,
-              shadowColor: Colors.black.withOpacity(0.15),
+              shadowColor: Colors.black.withValues(alpha: 0.15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -729,8 +729,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                     ),
                                     decoration: BoxDecoration(
                                       color: isCommunityGoal
-                                          ? AppTheme.grainGold.withOpacity(0.12)
-                                          : Colors.blue.withOpacity(0.12),
+                                          ? AppTheme.grainGold.withValues(alpha: 0.12)
+                                          : Colors.blue.withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
@@ -798,7 +798,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             const SizedBox(height: 12),
             Card(
               elevation: 4,
-              shadowColor: Colors.black.withOpacity(0.15),
+              shadowColor: Colors.black.withValues(alpha: 0.15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -864,7 +864,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             const SizedBox(height: 12),
             Card(
               elevation: 4,
-              shadowColor: Colors.black.withOpacity(0.15),
+              shadowColor: Colors.black.withValues(alpha: 0.15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -944,7 +944,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
             const SizedBox(height: 12),
             Card(
               elevation: 4,
-              shadowColor: Colors.black.withOpacity(0.15),
+              shadowColor: Colors.black.withValues(alpha: 0.15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
@@ -995,7 +995,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               const SizedBox(height: 12),
               Card(
                 elevation: 4,
-                shadowColor: Colors.black.withOpacity(0.15),
+                shadowColor: Colors.black.withValues(alpha: 0.15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -1072,7 +1072,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                           : _canComplete() && _isCreator
                               ? AppTheme.primaryGreen
                               : (_localIsJoined
-                                  ? AppTheme.primaryGreen.withOpacity(0.1)
+                                  ? AppTheme.primaryGreen.withValues(alpha: 0.1)
                                   : AppTheme.primaryGreen),
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -1341,8 +1341,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
               : null,
           child: CircleAvatar(
             backgroundColor: isCreator
-                ? AppTheme.primaryGreen.withOpacity(0.1)
-                : Colors.grey.withOpacity(0.1),
+                ? AppTheme.primaryGreen.withValues(alpha: 0.1)
+                : Colors.grey.withValues(alpha: 0.1),
             backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
                 ? CachedNetworkImageProvider(avatarUrl)
                 : null,
@@ -1388,7 +1388,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: AppTheme.primaryGreen.withOpacity(0.1),
+            color: AppTheme.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(

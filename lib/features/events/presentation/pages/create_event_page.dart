@@ -299,7 +299,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _createEvent,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.mintGreen.withOpacity(0.2),
+                backgroundColor: AppTheme.mintGreen.withValues(alpha: 0.2),
                 foregroundColor: AppTheme.primaryGreen,
                 elevation: 0,
                 padding:
@@ -307,7 +307,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(
-                    color: AppTheme.primaryGreen.withOpacity(0.3),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -349,7 +349,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _selectedCategory,
+              initialValue: _selectedCategory,
               decoration: const InputDecoration(
                 labelText: 'Category *',
                 border: OutlineInputBorder(),

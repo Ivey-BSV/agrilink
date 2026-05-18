@@ -341,7 +341,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _submitListing,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.mintGreen.withOpacity(0.2),
+                backgroundColor: AppTheme.mintGreen.withValues(alpha: 0.2),
                 foregroundColor: AppTheme.primaryGreen,
                 elevation: 0,
                 padding:
@@ -349,7 +349,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(
-                    color: AppTheme.primaryGreen.withOpacity(0.3),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -620,7 +620,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
                                         });
                                       },
                                       selectedColor: AppTheme.primaryGreen
-                                          .withOpacity(0.2),
+                                          .withValues(alpha: 0.2),
                                       checkmarkColor: AppTheme.primaryGreen,
                                       materialTapTargetSize:
                                           MaterialTapTargetSize.shrinkWrap,
@@ -731,7 +731,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.black.withOpacity(0.05)),
+                      border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

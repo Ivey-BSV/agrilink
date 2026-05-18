@@ -221,7 +221,7 @@ class _FutureVisualizationPageState extends State<FutureVisualizationPage> {
               onPressed: _isCreating ? null : _back,
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.black,
-                side: BorderSide(color: Colors.black.withOpacity(0.12)),
+                side: BorderSide(color: Colors.black.withValues(alpha: 0.12)),
                 padding:
                     const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                 shape: RoundedRectangleBorder(
@@ -306,11 +306,19 @@ class _FutureVisualizationPageState extends State<FutureVisualizationPage> {
           ],
         ),
         const SizedBox(height: 12),
-        _radio('Community impact'),
-        _radio('Improve soil health'),
-        _radio('Boost yield'),
-        _radio('Reduce costs'),
-        _radio('Other'),
+        RadioGroup<String?>(
+          groupValue: _intent,
+          onChanged: (v) => setState(() => _intent = v),
+          child: Column(
+            children: [
+              _radio('Community impact'),
+              _radio('Improve soil health'),
+              _radio('Boost yield'),
+              _radio('Reduce costs'),
+              _radio('Other'),
+            ],
+          ),
+        ),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -343,10 +351,13 @@ class _FutureVisualizationPageState extends State<FutureVisualizationPage> {
     return RadioListTile<String?>(
       contentPadding: EdgeInsets.zero,
       title: Text(label),
-      activeColor: AppTheme.primaryGreen,
       value: label,
-      groupValue: _intent,
-      onChanged: (v) => setState(() => _intent = v),
+      fillColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return AppTheme.primaryGreen;
+        }
+        return null;
+      }),
     );
   }
 
@@ -390,7 +401,7 @@ class _FutureVisualizationPageState extends State<FutureVisualizationPage> {
                 divisions: 30,
                 label: '${_months.round()} months',
                 activeColor: AppTheme.primaryGreen,
-                inactiveColor: AppTheme.primaryGreen.withOpacity(0.2),
+                inactiveColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
               ),
             ),
             const SizedBox(width: 12),
@@ -447,7 +458,7 @@ class _FutureVisualizationPageState extends State<FutureVisualizationPage> {
                     _focus.remove(opt);
                   }
                 }),
-                selectedColor: AppTheme.primaryGreen.withOpacity(0.15),
+                selectedColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
               ),
           ],
         ),
@@ -562,7 +573,7 @@ class _FutureVisualizationPageState extends State<FutureVisualizationPage> {
                 SizedBox(
                   width: 120,
                   child: DropdownButtonFormField<int>(
-                    value: milestone.monthOffset.clamp(1, _months.round()),
+                    initialValue: milestone.monthOffset.clamp(1, _months.round()),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -853,7 +864,7 @@ class _StepDot extends StatelessWidget {
       height: 16,
       decoration: BoxDecoration(
         color: completed
-            ? AppTheme.primaryGreen.withOpacity(0.15)
+            ? AppTheme.primaryGreen.withValues(alpha: 0.15)
             : Colors.transparent,
         shape: BoxShape.circle,
         border: Border.all(color: color, width: 2),

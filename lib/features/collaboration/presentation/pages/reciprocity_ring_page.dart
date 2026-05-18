@@ -180,7 +180,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryGreen.withOpacity(0.15),
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: const Text(
@@ -199,7 +199,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
             const SizedBox(height: 16),
             Container(
               height: 1,
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
             ),
             const SizedBox(height: 16),
             Row(
@@ -270,7 +270,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
       width: 1,
       height: 36,
       margin: const EdgeInsets.symmetric(horizontal: 12),
-      color: Colors.black.withOpacity(0.08),
+      color: Colors.black.withValues(alpha: 0.08),
     );
   }
 
@@ -318,7 +318,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
-              side: BorderSide(color: AppTheme.primaryGreen.withOpacity(0.4)),
+              side: BorderSide(color: AppTheme.primaryGreen.withValues(alpha: 0.4)),
               foregroundColor: AppTheme.primaryGreen,
             ),
             icon: const Icon(Icons.volunteer_activism_outlined),
@@ -394,7 +394,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black.withOpacity(0.05), width: 1),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -620,7 +620,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          side: BorderSide(color: AppTheme.primaryGreen.withOpacity(0.3)),
+          side: BorderSide(color: AppTheme.primaryGreen.withValues(alpha: 0.3)),
         ),
         child: Text(
           text,
@@ -657,7 +657,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: AppTheme.primaryGreen.withOpacity(0.15),
+                    backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
                     child: Text(
                       ask['avatar'] as String,
                       style: const TextStyle(
@@ -694,7 +694,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.12),
+                      color: Colors.red.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
@@ -781,7 +781,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: AppTheme.primaryGreen.withOpacity(0.15),
+                    backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
                     child: Text(
                       offer['avatar'] as String,
                       style: const TextStyle(
@@ -818,7 +818,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.12),
+                      color: Colors.red.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
@@ -877,7 +877,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.05)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -935,7 +935,7 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
                 width: 38,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),

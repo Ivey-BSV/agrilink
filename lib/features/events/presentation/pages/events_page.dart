@@ -123,7 +123,10 @@ class _EventsPageState extends State<EventsPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => const CreateEventPage()),
-                    ).then((_) => context.read<EventProvider>().loadEvents());
+                    ).then((_) {
+                      if (!context.mounted) return;
+                      context.read<EventProvider>().loadEvents();
+                    });
                   },
                 ),
               ],
@@ -311,7 +314,7 @@ class _EventsPageState extends State<EventsPage> {
                         _selectedCategory = category;
                       });
                     },
-                    selectedColor: AppTheme.primaryGreen.withOpacity(0.2),
+                    selectedColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
                     checkmarkColor: AppTheme.primaryGreen,
                   ),
                 );
@@ -354,7 +357,7 @@ class _EventsPageState extends State<EventsPage> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.1),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -372,7 +375,7 @@ class _EventsPageState extends State<EventsPage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppTheme.infoBlue.withOpacity(0.1),
+                        color: AppTheme.infoBlue.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(

@@ -253,10 +253,10 @@ class _FutureVisualizationDetailPageState
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryGreen.withOpacity(0.1),
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: AppTheme.primaryGreen.withOpacity(0.3)),
+                              color: AppTheme.primaryGreen.withValues(alpha: 0.3)),
                         ),
                         child: Text(
                           f,
@@ -284,7 +284,7 @@ class _FutureVisualizationDetailPageState
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
+                      color: Colors.orange.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(Icons.help_outline,
@@ -318,7 +318,7 @@ class _FutureVisualizationDetailPageState
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withOpacity(0.1),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(Icons.handshake,
@@ -425,7 +425,7 @@ class _FutureVisualizationDetailPageState
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withOpacity(0.15),
+                color: AppTheme.primaryGreen.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(Icons.flag, size: 18, color: AppTheme.primaryGreen),

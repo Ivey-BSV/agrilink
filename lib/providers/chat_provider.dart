@@ -277,7 +277,7 @@ class ChatProvider extends ChangeNotifier {
         _mutualFollowCache['follows_${otherUserId}_$currentUserId'] =
             otherUsersFollowSet.contains(otherUserId);
       }
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<List<Message>> _loadMessagesForChat(String chatId) async {
@@ -475,7 +475,7 @@ class ChatProvider extends ChangeNotifier {
 
       _chatMessages.remove(chatId);
       await loadChats();
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<void> refreshChat(String chatId) async {
@@ -517,7 +517,7 @@ class ChatProvider extends ChangeNotifier {
           otherUserFollowsResponse != null;
 
       await loadChats();
-    } catch (e) {}
+    } catch (e) { /* ignored */ }
   }
 
   Future<void> preloadFollowEdgesForUserIds(List<String> otherUserIds) async {

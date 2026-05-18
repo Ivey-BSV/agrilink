@@ -294,9 +294,9 @@ class _ResourcesPageState extends State<ResourcesPage>
     final Color accent = color;
     final bool isMuted = accent == Colors.grey[600];
     final Color startColor =
-        isMuted ? Colors.grey[200]! : accent.withOpacity(0.22);
+        isMuted ? Colors.grey[200]! : accent.withValues(alpha: 0.22);
     final Color endColor =
-        isMuted ? Colors.grey[100]! : accent.withOpacity(0.05);
+        isMuted ? Colors.grey[100]! : accent.withValues(alpha: 0.05);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
@@ -324,7 +324,7 @@ class _ResourcesPageState extends State<ResourcesPage>
               child: Icon(
                 icon,
                 size: 140,
-                color: accent.withOpacity(0.08),
+                color: accent.withValues(alpha: 0.08),
               ),
             ),
             Padding(
@@ -340,7 +340,7 @@ class _ResourcesPageState extends State<ResourcesPage>
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: accent.withOpacity(0.1),
+                          color: accent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(14),
                         ),
                         child: Icon(
@@ -379,7 +379,7 @@ class _ResourcesPageState extends State<ResourcesPage>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: const Text(

@@ -371,7 +371,7 @@ class _GoalSettingPageState extends State<GoalSettingPage>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.grainGold.withOpacity(0.15),
+                    color: AppTheme.grainGold.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -636,7 +636,7 @@ class _GoalSettingPageState extends State<GoalSettingPage>
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(

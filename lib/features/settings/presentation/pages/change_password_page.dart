@@ -193,10 +193,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppTheme.errorRed.withOpacity(0.1),
+                    color: AppTheme.errorRed.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                     border:
-                        Border.all(color: AppTheme.errorRed.withOpacity(0.3)),
+                        Border.all(color: AppTheme.errorRed.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     _errorMessage!,

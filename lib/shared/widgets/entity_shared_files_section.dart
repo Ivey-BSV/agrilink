@@ -275,7 +275,7 @@ class _EntitySharedFilesSectionState extends State<EntitySharedFilesSection> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.12),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(

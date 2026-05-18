@@ -128,7 +128,7 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: AppTheme.primaryGreen.withOpacity(0.1),
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
@@ -156,7 +156,7 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
                                     fit: BoxFit.cover,
                                     errorWidget: Container(
                                       color: AppTheme.primaryGreen
-                                          .withOpacity(0.1),
+                                          .withValues(alpha: 0.1),
                                       child: const Center(
                                         child: Icon(
                                           Icons.inventory_2,
@@ -172,7 +172,7 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
                                     errorBuilder: (context, error, stackTrace) {
                                       return Container(
                                         color: AppTheme.primaryGreen
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         child: const Center(
                                           child: Icon(
                                             Icons.inventory_2,
@@ -498,7 +498,7 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Close',
-      barrierColor: Colors.black.withOpacity(0.6),
+      barrierColor: Colors.black.withValues(alpha: 0.6),
       pageBuilder: (context, animation, secondaryAnimation) {
         return SafeArea(
           child: Stack(
@@ -551,7 +551,7 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
@@ -593,8 +593,8 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: isFree
-            ? Colors.green.withOpacity(0.1)
-            : AppTheme.primaryGreen.withOpacity(0.1),
+            ? Colors.green.withValues(alpha: 0.1)
+            : AppTheme.primaryGreen.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
             color: isFree ? Colors.green : AppTheme.primaryGreen, width: 1),

@@ -95,7 +95,7 @@ class _AskDetailPageState extends State<AskDetailPage> {
                               CircleAvatar(
                                 radius: 18,
                                 backgroundColor:
-                                    AppTheme.primaryGreen.withOpacity(0.15),
+                                    AppTheme.primaryGreen.withValues(alpha: 0.15),
                                 child: Text(
                                   widget.ask['avatar'] as String,
                                   style: const TextStyle(
@@ -132,7 +132,7 @@ class _AskDetailPageState extends State<AskDetailPage> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.12),
+                                  color: Colors.red.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: Text(
@@ -301,7 +301,7 @@ class _AskDetailPageState extends State<AskDetailPage> {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundColor: AppTheme.primaryGreen.withOpacity(0.15),
+              backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
               child: Text(
                 response['avatar'] as String,
                 style: const TextStyle(
