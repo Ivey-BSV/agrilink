@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
-    await bootstrapCapApp();
+    await bootstrapCapApp(envFileName: '.env.test');
   });
 
   testWidgets('App launches smoke test', (WidgetTester tester) async {

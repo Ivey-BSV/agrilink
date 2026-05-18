@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:cap/core/config/supabase_config.dart';
 import 'package:cap/core/routes/app_router.dart';
 import 'package:cap/core/theme/app_theme.dart';
@@ -15,15 +17,25 @@ import 'package:cap/services/push_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-Future<void> bootstrapCapApp() async {
+Future<void> bootstrapCapApp({String envFileName = '.env'}) async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (SupabaseConfig.supabaseUrl != 'YOUR_SUPABASE_URL_HERE' &&
-      SupabaseConfig.supabaseAnonKey != 'YOUR_SUPABASE_ANON_KEY_HERE') {
-    await Supabase.initialize(
-      url: SupabaseConfig.supabaseUrl,
-      anonKey: SupabaseConfig.supabaseAnonKey,
-    );
+  if (!dotenv.isInitialized) {
+    await dotenv.load(fileName: envFileName);
   }
+  if (!SupabaseConfig.isConfigured) {
+    final message =
+        'Missing SUPABASE_URL or SUPABASE_ANON_KEY in $envFileName. '
+        'Copy .env.example to .env and add your Supabase credentials.';
+    if (kDebugMode) {
+      debugPrint(message);
+      return;
+    }
+    throw StateError(message);
+  }
+  await Supabase.initialize(
+    url: SupabaseConfig.supabaseUrl,
+    anonKey: SupabaseConfig.supabaseAnonKey,
+  );
   await PushNotificationService.initialize();
 }
 

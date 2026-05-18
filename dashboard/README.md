@@ -19,7 +19,7 @@ Account creation is intentionally mobile-first. The sign-in page directs new use
 1. Copy env vars:
 
 ```bash
-cp .env.example .env.local
+cp .env.example .env.local   # from the dashboard/ directory
 ```
 
 2. Fill in:
