@@ -17,14 +17,14 @@ import 'package:cap/services/push_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-Future<void> bootstrapCapApp({String envFileName = '.env'}) async {
+Future<void> bootstrapCapApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (!dotenv.isInitialized) {
-    await dotenv.load(fileName: envFileName);
+    await dotenv.load(fileName: '.env');
   }
   if (!SupabaseConfig.isConfigured) {
-    final message =
-        'Missing SUPABASE_URL or SUPABASE_ANON_KEY in $envFileName. '
+    const message =
+        'Missing SUPABASE_URL or SUPABASE_ANON_KEY in .env. '
         'Copy .env.example to .env and add your Supabase credentials.';
     if (kDebugMode) {
       debugPrint(message);

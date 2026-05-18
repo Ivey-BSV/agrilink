@@ -76,6 +76,8 @@ SUPABASE_ANON_KEY=your-anon-public-key
 
 Get both from Supabase → **Project Settings** → **API** (use the **anon / public** key, never the service role key).
 
+This **one file** is used by the Flutter app and the web dashboard.
+
 ### 3. Install Flutter dependencies
 
 From the project root:
@@ -150,25 +152,24 @@ flutter analyze
 flutter test
 ```
 
-Tests load `.env.test` (placeholder values, safe to commit). Your real `.env` is only for local runs.
+Tests use built-in placeholder credentials (no extra env file). For `flutter run` / release builds you still need your real `.env`.
 
 ---
 
 ## Web dashboard (optional)
 
-The dashboard lives in `dashboard/`. It uses the **same Supabase project** as the mobile app.
+The dashboard lives in `dashboard/`. It reads **Supabase credentials from the repo root `.env`** (same file as Flutter).
 
 ```bash
+# from repo root — make sure .env exists first (step 2 above)
 cd dashboard
-cp .env.example .env.local
-# edit .env.local — same SUPABASE_URL and anon key as mobile
 npm install
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Sign in with an account that already exists in Supabase (usually created on mobile). Optional env vars for admin access are documented in `dashboard/.env.example` if you add them later.
+Sign in with an account that already exists in Supabase (usually created on mobile).
 
 ---
 
@@ -188,7 +189,9 @@ The app supports Firebase Cloud Messaging. These files are **gitignored** and mu
 - `android/app/google-services.json`
 - `ios/Runner/GoogleService-Info.plist`
 
-Without them the app still runs; push just won’t work until you run `flutterfire configure` or copy files from your Firebase project (`ivey-cap` or your own).
+Without them the app still runs and **release builds succeed**; push just won’t work until you add the files (from your old repo, Firebase console, or `flutterfire configure`).
+
+Place `google-services.json` at `android/app/google-services.json`.
 
 ---
 
@@ -212,7 +215,7 @@ agrilink/
 
 ## Public repo note
 
-Do **not** commit `.env`, `dashboard/.env.local`, Firebase plist/json, or signing keys. If keys were ever committed, rotate them in the Supabase / Firebase consoles before going public.
+Do **not** commit `.env`, Firebase plist/json, or signing keys. If keys were ever committed, rotate them in the Supabase / Firebase consoles before going public.
 
 ---
 

@@ -4,7 +4,11 @@ plugins {
     id("com.android.application")
     id("kotlin-android")
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services")
+}
+
+val googleServicesFile = file("google-services.json")
+if (googleServicesFile.exists()) {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 val keystorePropertiesFile = rootProject.file("key.properties")
@@ -61,7 +65,9 @@ flutter {
     source = "../.."
 }
 
-dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
-    implementation("com.google.firebase:firebase-analytics")
+if (googleServicesFile.exists()) {
+    dependencies {
+        implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+        implementation("com.google.firebase:firebase-analytics")
+    }
 }
