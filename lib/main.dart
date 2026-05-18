@@ -15,7 +15,7 @@ import 'package:cap/services/push_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-Future<void> main() async {
+Future<void> bootstrapCapApp() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (SupabaseConfig.supabaseUrl != 'YOUR_SUPABASE_URL_HERE' &&
       SupabaseConfig.supabaseAnonKey != 'YOUR_SUPABASE_ANON_KEY_HERE') {
@@ -25,6 +25,10 @@ Future<void> main() async {
     );
   }
   await PushNotificationService.initialize();
+}
+
+Future<void> main() async {
+  await bootstrapCapApp();
   runApp(const CAPApp());
 }
 
