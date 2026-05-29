@@ -11,6 +11,7 @@ function titleFromPath(pathname: string | null): string {
   if (!pathname) return "Forums";
   if (pathname.startsWith("/platform/feed")) return "Forums";
   if (pathname.startsWith("/platform/directory")) return "Farm Directory";
+  if (pathname.startsWith("/platform/profile/farm-details")) return "Farm Details";
   if (pathname.startsWith("/platform/profile")) return "My Profile";
   if (pathname.startsWith("/platform/collaboration/projects/")) return "Project";
   if (pathname.startsWith("/platform/collaboration/projects")) return "Projects";

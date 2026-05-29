@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
@@ -10,7 +11,6 @@ import { ProfilePostGrid } from "@/components/profile-post-grid";
 import { PlatformEventList } from "@/components/platform-event-card";
 import { FarmDetailsModal } from "@/components/farm-details-modal";
 import { loadFarmDetailsFull, type FarmDetailsRow } from "@/lib/farm-details";
-import { loadFarmDetailsSummary, upsertFarmDetailsSummary } from "@/lib/farm-details";
 
 type Profile = {
   id: string;
@@ -48,6 +48,7 @@ type EventRow = {
 };
 
 export default function PlatformProfilePage() {
+  const searchParams = useSearchParams();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [tab, setTab] = useState<ProfileTab>("about");
@@ -59,11 +60,16 @@ export default function PlatformProfilePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [farmName, setFarmName] = useState("");
-  const [farmOverview, setFarmOverview] = useState("");
   const [followStats, setFollowStats] = useState<{ followers: number; following: number; posts: number } | null>(null);
   const [farmDetails, setFarmDetails] = useState<FarmDetailsRow | null>(null);
   const [farmModalOpen, setFarmModalOpen] = useState(false);
+
+  useEffect(() => {
+    const t = searchParams.get("tab");
+    if (t === "about" || t === "posts" || t === "events") {
+      setTab(t);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     let cancelled = false;
@@ -92,12 +98,6 @@ export default function PlatformProfilePage() {
       else setProfile(data as Profile);
 
       if (data && !e) {
-        const { row: farm, error: fe } = await loadFarmDetailsSummary(user.id);
-        if (!cancelled && !fe && farm) {
-          setFarmName(farm.farm_name ?? "");
-          setFarmOverview(farm.farm_overview ?? "");
-        }
-
         const [fcRes, fgRes, postsRes, farmFull] = await Promise.all([
           supabase.from("follows").select("id", { count: "exact", head: true }).eq("following_id", user.id),
           supabase.from("follows").select("id", { count: "exact", head: true }).eq("follower_id", user.id),
@@ -197,14 +197,7 @@ export default function PlatformProfilePage() {
       return;
     }
 
-    const farmNameTrim = farmName.trim();
-    const overviewTrim = farmOverview.trim();
-    const { error: fe } = await upsertFarmDetailsSummary(profile.id, {
-      farm_name: farmNameTrim.length ? farmNameTrim : null,
-      farm_overview: overviewTrim.length ? overviewTrim : null,
-    });
-    if (fe) setError(fe);
-    else setSuccess("Profile and farm summary updated.");
+    setSuccess("Profile updated.");
     setSaving(false);
   };
 
@@ -244,7 +237,7 @@ export default function PlatformProfilePage() {
               {profile.bio?.trim() ? <p className="platform-profile-bio">{profile.bio.trim()}</p> : null}
               <div className="platform-profile-actions">
                 <button type="button" className="btn btn-secondary" onClick={() => setFarmModalOpen(true)}>
-                  Farm details
+                  View farm details
                 </button>
               </div>
             </div>
@@ -294,21 +287,16 @@ export default function PlatformProfilePage() {
                 <label>Location</label>
                 <input value={profile.location ?? ""} onChange={(e) => update("location", e.target.value)} />
               </div>
-              <div className="field">
-                <label>Farm overview</label>
-                <textarea
-                  rows={5}
-                  value={farmOverview}
-                  onChange={(e) => setFarmOverview(e.target.value)}
-                  placeholder="Region, land, story—anything that helps others understand your farm."
-                />
+              <div className="farm-edit-promo content-card stack">
+                <p className="subtle" style={{ margin: 0 }}>
+                  Crops, livestock, practices, visitor info, and more are edited on the full farm details page (same as the mobile app).
+                </p>
+                <Link href="/platform/profile/farm-details" className="btn btn-primary" style={{ alignSelf: "flex-start" }}>
+                  Edit farm details
+                </Link>
               </div>
               <div className="field">
-                <label>Farm name</label>
-                <input value={farmName} onChange={(e) => setFarmName(e.target.value)} placeholder="Optional display name for your farm" />
-              </div>
-              <div className="field">
-                <label>Farm type</label>
+                <label>Profile farm type</label>
                 <input value={profile.farm_type ?? ""} onChange={(e) => update("farm_type", e.target.value)} />
               </div>
               <div className="field">
