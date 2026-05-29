@@ -168,6 +168,19 @@ For new apps, Play uses **Play App Signing**:
 - You sign the bundle with your **upload key** (the one in `upload-keystore.jks`).
 - Play signs the app with the **app signing key** (managed by Google).
 
+### App signing cert vs upload keystore (important)
+
+Play Console shows two different things:
+
+| What Play shows | What you download | Used for |
+|-----------------|-------------------|----------|
+| **App signing key certificate** (e.g. `deployment_cert.der`) | Public certificate only | Register SHA-1/SHA-256 with Firebase, Maps, etc. **Not** for building `.aab` files. |
+| **Upload key certificate** | Fingerprints of *your* upload key | Must match the `.jks` you use in `android/key.properties` when running `flutter build appbundle`. |
+
+If you only have `deployment_cert.der`, you still need `upload-keystore.jks` + `key.properties` to build. See `android/certs/README.md` for the app-signing fingerprints from Play.
+
+In Play Console → **App integrity** → **App signing**, scroll to **Upload key certificate** (not the app signing key block). If you lost that `.jks`, use upload key reset or find the machine that built your last release.
+
 When you upload the first `.aab`, Play may ask you to enroll in Play App Signing and to register your upload key. Keep `upload-keystore.jks` and both passwords in a safe place; you need them for all future releases.
 
 ---
