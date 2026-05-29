@@ -37,7 +37,8 @@ function youSectionActive(pathname: string | null) {
   return (
     pathname.startsWith("/platform/profile") ||
     pathname.startsWith("/platform/settings") ||
-    pathname.startsWith("/dashboard/posts")
+    pathname.startsWith("/dashboard/posts") ||
+    pathname.startsWith("/dashboard/listings")
   );
 }
 
@@ -49,7 +50,7 @@ function chatNavActive(pathname: string | null) {
 function dashboardSectionActive(pathname: string | null, memberPreview: boolean) {
   if (!pathname) return false;
   if (memberPreview) {
-    return pathname === "/dashboard" || (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/admin"));
+    return pathname === "/dashboard";
   }
   if (pathname === "/dashboard") return true;
   return pathname.startsWith("/dashboard/admin");
