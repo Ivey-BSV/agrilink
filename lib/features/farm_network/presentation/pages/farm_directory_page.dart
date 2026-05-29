@@ -465,34 +465,33 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            if (profile.displayUsername != null &&
-                                profile.displayUsername!.isNotEmpty) ...[
-                              Text(
-                                '@${profile.displayUsername}',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                            if (profile.location != null) ...[
+                        Text.rich(
+                          TextSpan(
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                            children: [
                               if (profile.displayUsername != null &&
                                   profile.displayUsername!.isNotEmpty)
-                                Text(
-                                  ' • ',
+                                TextSpan(
+                                  text: '@${profile.displayUsername}',
+                                ),
+                              if (profile.displayUsername != null &&
+                                  profile.displayUsername!.isNotEmpty &&
+                                  profile.location != null &&
+                                  profile.location!.isNotEmpty)
+                                TextSpan(
+                                  text: ' • ',
                                   style: TextStyle(color: Colors.grey[400]),
                                 ),
-                              Text(
-                                profile.location!,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
+                              if (profile.location != null &&
+                                  profile.location!.isNotEmpty)
+                                TextSpan(text: profile.location!),
                             ],
-                          ],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -528,54 +527,52 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
               if (farm?.farmSize != null ||
                   farm?.establishedDate != null ||
                   farm?.farmingMethod != null) ...[
-                Row(
-                  children: [
-                    if (farm?.farmSize != null) ...[
-                      Text(
-                        '${farm!.farmSize} ${farm.farmSizeUnit ?? 'acres'}',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                    if (farm?.establishedDate != null) ...[
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                    children: [
                       if (farm?.farmSize != null)
-                        Text(
-                          ' • ',
-                          style: TextStyle(color: Colors.grey[400]),
+                        TextSpan(
+                          text:
+                              '${farm!.farmSize} ${farm.farmSizeUnit ?? 'acres'}',
                         ),
-                      Text(
-                        formatFarmEstablishedDate(farm!.establishedDate!),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                    if (farm?.farmingMethod != null) ...[
-                      if (farm?.farmSize != null ||
-                          farm?.establishedDate != null)
-                        Text(
-                          ' • ',
-                          style: TextStyle(color: Colors.grey[400]),
-                        ),
-                      Expanded(
-                        child: Text(
-                          formatFarmDisplayLabel(farm!.farmingMethod!),
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[700],
-                            fontWeight: FontWeight.w500,
+                      if (farm?.establishedDate != null) ...[
+                        if (farm?.farmSize != null)
+                          TextSpan(
+                            text: ' • ',
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontWeight: FontWeight.normal,
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        TextSpan(
+                          text: formatFarmEstablishedDate(
+                            farm!.establishedDate!,
+                          ),
                         ),
-                      ),
+                      ],
+                      if (farm?.farmingMethod != null) ...[
+                        if (farm?.farmSize != null ||
+                            farm?.establishedDate != null)
+                          TextSpan(
+                            text: ' • ',
+                            style: TextStyle(
+                              color: Colors.grey[400],
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        TextSpan(
+                          text: formatFarmDisplayLabel(farm!.farmingMethod!),
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
               ],
@@ -630,31 +627,39 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
               if (farm?.certification != null || farm?.farmScale != null) ...[
                 Row(
                   children: [
-                    if (farm?.certification != null) ...[
+                    if (farm?.certification != null)
                       Icon(Icons.verified, size: 14, color: Colors.amber),
-                      const SizedBox(width: 4),
-                      Text(
-                        formatFarmDisplayLabel(farm!.certification!),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[700],
+                    if (farm?.certification != null) const SizedBox(width: 4),
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[700],
+                          ),
+                          children: [
+                            if (farm?.certification != null)
+                              TextSpan(
+                                text: formatFarmDisplayLabel(
+                                  farm!.certification!,
+                                ),
+                              ),
+                            if (farm?.farmScale != null) ...[
+                              if (farm?.certification != null)
+                                TextSpan(
+                                  text: ' • ',
+                                  style: TextStyle(color: Colors.grey[400]),
+                                ),
+                              TextSpan(
+                                text: formatFarmDisplayLabel(farm!.farmScale!),
+                              ),
+                            ],
+                          ],
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    ],
-                    if (farm?.farmScale != null) ...[
-                      if (farm?.certification != null)
-                        Text(
-                          ' • ',
-                          style: TextStyle(color: Colors.grey[400]),
-                        ),
-                      Text(
-                        formatFarmDisplayLabel(farm!.farmScale!),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                    ],
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),
