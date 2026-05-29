@@ -99,7 +99,6 @@ class Post {
     String? userAvatar,
     int commentCount = 0,
   }) {
-    final List<dynamic>? imageUrls = row['image_urls'] as List<dynamic>?;
     final List<dynamic>? tagsArray = row['tags'] as List<dynamic>?;
 
     return Post(
@@ -109,9 +108,7 @@ class Post {
       userName: userName,
       userAvatar: sanitizeImageUrl(userAvatar),
       content: (row['content'] ?? '') as String,
-      imageUrl: imageUrls != null && imageUrls.isNotEmpty
-          ? sanitizeImageUrl(imageUrls.first as String)
-          : null,
+      imageUrl: firstPostImageUrl(row['image_urls']),
       location: row['location'] as String?,
       likes: 0,
       comments: commentCount,

@@ -5,7 +5,7 @@ import 'package:cap/providers/post_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/comment.dart';
 import 'package:cap/shared/models/post.dart';
-import 'package:cap/shared/widgets/cached_image_widget.dart';
+import 'package:cap/shared/widgets/post_media_preview.dart';
 import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:cap/shared/widgets/linkified_text.dart';
 import 'package:cap/shared/utils/image_url_utils.dart';
@@ -399,31 +399,23 @@ class _PostDetailPageState extends State<PostDetailPage> {
           ),
           const SizedBox(height: 12),
         ],
-        if (_post!.imageUrl != null) ...[
+        if (sanitizeImageUrl(_post!.imageUrl) != null) ...[
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: _imageAspectRatio != null
+            child: isDirectImageUrl(_post!.imageUrl) &&
+                    _imageAspectRatio != null
                 ? AspectRatio(
                     aspectRatio: _imageAspectRatio!,
-                    child: CachedImageWidget(
-                      imageUrl: _post!.imageUrl!,
+                    child: PostMediaPreview(
+                      mediaUrl: _post!.imageUrl,
                       fit: BoxFit.contain,
-                      errorWidget: Container(
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: Icon(Icons.image, color: Colors.grey),
-                        ),
-                      ),
                     ),
                   )
-                : CachedImageWidget(
-                    imageUrl: _post!.imageUrl!,
-                    fit: BoxFit.contain,
-                    errorWidget: Container(
-                      color: Colors.grey[200],
-                      child: const Center(
-                        child: Icon(Icons.image, color: Colors.grey),
-                      ),
+                : AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: PostMediaPreview(
+                      mediaUrl: _post!.imageUrl,
+                      fit: BoxFit.cover,
                     ),
                   ),
           ),

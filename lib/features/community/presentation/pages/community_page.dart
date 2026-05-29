@@ -12,6 +12,7 @@ import 'package:cap/providers/auth_provider.dart';
 import 'package:cap/providers/post_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/post.dart';
+import 'package:cap/shared/utils/image_url_utils.dart';
 import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -241,16 +242,7 @@ class _CommunityPageState extends State<CommunityPage>
     return filtered;
   }
 
-  bool _isVideoPost(Post post) {
-    if (post.imageUrl == null) return false;
-    final url = post.imageUrl!.toLowerCase();
-    return url.endsWith('.mp4') ||
-        url.endsWith('.mov') ||
-        url.endsWith('.avi') ||
-        url.endsWith('.mkv') ||
-        url.contains('video') ||
-        url.contains('mp4');
-  }
+  bool _isVideoPost(Post post) => isVideoMediaUrl(post.imageUrl);
 
   String _getSortLabel(String sortBy) {
     switch (sortBy) {

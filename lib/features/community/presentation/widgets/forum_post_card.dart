@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cap/core/theme/app_theme.dart';
-import 'package:cap/shared/widgets/image_placeholder.dart';
-import 'package:cap/shared/widgets/cached_image_widget.dart';
+import 'package:cap/shared/utils/image_url_utils.dart';
+import 'package:cap/shared/widgets/post_media_preview.dart';
 import 'package:cap/shared/widgets/network_circle_avatar.dart';
 
 class ForumPostCard extends StatefulWidget {
@@ -40,34 +40,7 @@ class ForumPostCard extends StatefulWidget {
 
 class _ForumPostCardState extends State<ForumPostCard> {
   Widget _buildImage(BoxFit fit) {
-    if (widget.imageUrl == null) {
-      return const ImagePlaceholder(borderRadius: 8);
-    }
-    if (widget.imageUrl!.startsWith('http')) {
-      return CachedImageWidget(
-        imageUrl: widget.imageUrl!,
-        fit: fit,
-        errorWidget: Container(
-          color: AppTheme.primaryGreen.withValues(alpha: 0.1),
-          child: const Center(
-            child: ImagePlaceholder(borderRadius: 8),
-          ),
-        ),
-      );
-    } else {
-      return Image.asset(
-        widget.imageUrl!,
-        fit: fit,
-        errorBuilder: (context, error, stack) {
-          return Container(
-            color: AppTheme.primaryGreen.withValues(alpha: 0.1),
-            child: const Center(
-              child: ImagePlaceholder(borderRadius: 8),
-            ),
-          );
-        },
-      );
-    }
+    return PostMediaPreview(mediaUrl: widget.imageUrl, fit: fit);
   }
 
   @override
@@ -157,7 +130,7 @@ class _ForumPostCardState extends State<ForumPostCard> {
                 ],
               ),
               const SizedBox(height: 10),
-              if (widget.imageUrl != null) ...[
+              if (sanitizeImageUrl(widget.imageUrl) != null) ...[
                 Stack(
                   children: [
                     ClipRRect(

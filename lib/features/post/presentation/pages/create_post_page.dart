@@ -181,15 +181,16 @@ class _CreatePostPageState extends State<CreatePostPage> {
       }
 
       final bytes = await picked.readAsBytes();
-      final fileExt = picked.name.split('.').last;
+      // imageQuality compresses to JPEG on mobile; store as .jpg with matching type.
+      const contentType = 'image/jpeg';
       final path =
-          '${user.id}/${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+          '${user.id}/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
       await supabase.storage.from('post-images').uploadBinary(
             path,
             bytes,
             fileOptions: const FileOptions(
-                cacheControl: '3600', upsert: true, contentType: 'image/jpeg'),
+                cacheControl: '3600', upsert: true, contentType: contentType),
           );
 
       final publicUrl = supabase.storage.from('post-images').getPublicUrl(path);
