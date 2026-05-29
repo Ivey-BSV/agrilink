@@ -3,7 +3,7 @@ import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/providers/auth_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/user_profile.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -98,23 +98,16 @@ class _FollowersFollowingListPageState
           shape: BoxShape.circle,
           gradient: AppTheme.primaryGradient,
         ),
-        child: CircleAvatar(
+        child: NetworkCircleAvatar(
           radius: 28,
-          backgroundColor: Colors.transparent,
-          backgroundImage: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-              ? CachedNetworkImageProvider(user.avatarUrl!)
-              : null,
-          child: user.avatarUrl == null || user.avatarUrl!.isEmpty
-              ? Text(
-                  _getInitialLetter(
-                      user.fullName ?? user.displayUsername ?? 'U'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )
-              : null,
+          imageUrl: user.avatarUrl,
+          fallbackLetter: _getInitialLetter(
+              user.fullName ?? user.displayUsername ?? 'U'),
+          fallbackTextStyle: const TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       title: Text(

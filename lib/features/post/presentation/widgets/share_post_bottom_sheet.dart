@@ -4,7 +4,7 @@ import 'package:cap/providers/auth_provider.dart';
 import 'package:cap/providers/chat_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/user_profile.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:provider/provider.dart';
 
 class SharePostBottomSheet extends StatefulWidget {
@@ -298,28 +298,20 @@ class _SharePostBottomSheetState extends State<SharePostBottomSheet> {
                             children: [
                               Stack(
                                 children: [
-                                  CircleAvatar(
+                                  NetworkCircleAvatar(
                                     radius: 24,
                                     backgroundColor:
                                         AppTheme.primaryGreen.withValues(alpha: 0.1),
-                                    backgroundImage: user.avatarUrl != null
-                                        ? CachedNetworkImageProvider(
-                                            user.avatarUrl!,
-                                          )
-                                        : null,
-                                    child: user.avatarUrl == null
-                                        ? Text(
-                                            _getInitialLetter(
-                                              user.fullName ??
-                                                  user.displayUsername ??
-                                                  'U',
-                                            ),
-                                            style: TextStyle(
-                                              color: AppTheme.primaryGreen,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          )
-                                        : null,
+                                    imageUrl: user.avatarUrl,
+                                    fallbackLetter: _getInitialLetter(
+                                      user.fullName ??
+                                          user.displayUsername ??
+                                          'U',
+                                    ),
+                                    fallbackTextStyle: TextStyle(
+                                      color: AppTheme.primaryGreen,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                   if (isSelected)
                                     Positioned(

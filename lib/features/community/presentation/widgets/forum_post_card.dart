@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/shared/widgets/image_placeholder.dart';
 import 'package:cap/shared/widgets/cached_image_widget.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 
 class ForumPostCard extends StatefulWidget {
   final String title;
@@ -91,26 +91,17 @@ class _ForumPostCardState extends State<ForumPostCard> {
                       shape: BoxShape.circle,
                       gradient: AppTheme.primaryGradient,
                     ),
-                    child: CircleAvatar(
+                    child: NetworkCircleAvatar(
                       radius: 14,
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: widget.authorAvatarUrl != null &&
-                              widget.authorAvatarUrl!.isNotEmpty
-                          ? CachedNetworkImageProvider(widget.authorAvatarUrl!)
-                          : null,
-                      child: (widget.authorAvatarUrl == null ||
-                              widget.authorAvatarUrl!.isEmpty)
-                          ? Text(
-                              widget.author.isNotEmpty
-                                  ? widget.author[0].toUpperCase()
-                                  : 'U',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            )
-                          : null,
+                      imageUrl: widget.authorAvatarUrl,
+                      fallbackLetter: widget.author.isNotEmpty
+                          ? widget.author[0].toUpperCase()
+                          : 'U',
+                      fallbackTextStyle: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),

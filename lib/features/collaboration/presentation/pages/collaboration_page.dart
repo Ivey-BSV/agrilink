@@ -10,7 +10,7 @@ import 'package:cap/features/community/presentation/pages/exchange_hub_page.dart
 import 'package:cap/features/profile/presentation/pages/profile_page.dart';
 import 'package:cap/providers/auth_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:provider/provider.dart';
 
 class CollaborationPage extends StatefulWidget {
@@ -290,12 +290,6 @@ class _CollaborationPageState extends State<CollaborationPage>
       });
     }
 
-    final String imageUrl = avatarUrl != null && avatarUrl.isNotEmpty
-        ? (avatarUrl.contains('?')
-            ? '$avatarUrl&_u=${auth.userId ?? 'none'}'
-            : '$avatarUrl?_u=${auth.userId ?? 'none'}')
-        : '';
-
     return Padding(
       padding: const EdgeInsets.only(left: 16),
       child: InkWell(
@@ -311,23 +305,17 @@ class _CollaborationPageState extends State<CollaborationPage>
             shape: BoxShape.circle,
             gradient: AppTheme.primaryGradient,
           ),
-          child: CircleAvatar(
-            key: ValueKey('avatar_${auth.userId}_${avatarUrl ?? 'none'}'),
+          child: NetworkCircleAvatar(
+            avatarKey: ValueKey('avatar_${auth.userId}_${avatarUrl ?? 'none'}'),
             radius: 18,
-            backgroundColor: Colors.transparent,
-            backgroundImage: imageUrl.isNotEmpty
-                ? CachedNetworkImageProvider(imageUrl)
-                : null,
-            child: imageUrl.isEmpty
-                ? Text(
-                    displayLetter,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  )
-                : null,
+            imageUrl: avatarUrl,
+            cacheBustKey: auth.userId ?? 'none',
+            fallbackLetter: displayLetter,
+            fallbackTextStyle: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/providers/post_provider.dart';
 import 'package:cap/shared/widgets/cached_image_widget.dart';
+import 'package:cap/shared/utils/image_url_utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -269,7 +270,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   Future<Size> _getImageSize(String imageUrl) async {
     try {
-      final image = CachedNetworkImageProvider(imageUrl);
+      final url = sanitizeImageUrl(imageUrl) ?? imageUrl;
+      final image = CachedNetworkImageProvider(url);
       final completer = Completer<Size>();
       final imageStream = image.resolve(const ImageConfiguration());
       late ImageStreamListener listener;

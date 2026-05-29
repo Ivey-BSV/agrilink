@@ -6,7 +6,9 @@ import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/comment.dart';
 import 'package:cap/shared/models/post.dart';
 import 'package:cap/shared/widgets/cached_image_widget.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:cap/shared/widgets/linkified_text.dart';
+import 'package:cap/shared/utils/image_url_utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cap/features/post/presentation/widgets/share_post_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
@@ -113,9 +115,10 @@ class _PostDetailPageState extends State<PostDetailPage> {
   }
 
   void _resolveImageAspectRatio(String imageUrl) {
-    final ImageProvider provider = imageUrl.startsWith('http')
-        ? CachedNetworkImageProvider(imageUrl)
-        : AssetImage(imageUrl) as ImageProvider;
+    final sanitized = sanitizeImageUrl(imageUrl) ?? imageUrl;
+    final ImageProvider provider = sanitized.startsWith('http')
+        ? CachedNetworkImageProvider(sanitized)
+        : AssetImage(sanitized) as ImageProvider;
     final ImageStream stream = provider.resolve(const ImageConfiguration());
     ImageStreamListener? listener;
     listener = ImageStreamListener((ImageInfo info, bool synchronousCall) {
@@ -274,34 +277,17 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   shape: BoxShape.circle,
                   gradient: AppTheme.primaryGradient,
                 ),
-                child: CircleAvatar(
+                child: NetworkCircleAvatar(
                   radius: 24,
-                  backgroundColor: Colors.transparent,
-                  child: _post!.userAvatar != null
-                      ? ClipOval(
-                          child: CachedImageWidget(
-                            imageUrl: _post!.userAvatar!,
-                            width: 48,
-                            height: 48,
-                            fit: BoxFit.cover,
-                            errorWidget: Text(
-                              _post!.userName[0].toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 24,
-                              ),
-                            ),
-                          ),
-                        )
-                      : Text(
-                          _post!.userName[0].toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 24,
-                          ),
-                        ),
+                  imageUrl: _post!.userAvatar,
+                  fallbackLetter: _post!.userName.isNotEmpty
+                      ? _post!.userName[0].toUpperCase()
+                      : 'U',
+                  fallbackTextStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -591,34 +577,17 @@ class _PostDetailPageState extends State<PostDetailPage> {
                   shape: BoxShape.circle,
                   gradient: AppTheme.primaryGradient,
                 ),
-                child: CircleAvatar(
+                child: NetworkCircleAvatar(
                   radius: 16,
-                  backgroundColor: Colors.transparent,
-                  child: comment.userAvatar != null
-                      ? ClipOval(
-                          child: CachedImageWidget(
-                            imageUrl: comment.userAvatar!,
-                            width: 32,
-                            height: 32,
-                            fit: BoxFit.cover,
-                            errorWidget: Text(
-                              comment.userName[0].toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        )
-                      : Text(
-                          comment.userName[0].toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
+                  imageUrl: comment.userAvatar,
+                  fallbackLetter: comment.userName.isNotEmpty
+                      ? comment.userName[0].toUpperCase()
+                      : 'U',
+                  fallbackTextStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),
@@ -939,37 +908,18 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                         shape: BoxShape.circle,
                                         gradient: AppTheme.primaryGradient,
                                       ),
-                                      child: CircleAvatar(
+                                      child: NetworkCircleAvatar(
                                         radius: 18,
-                                        backgroundColor: Colors.transparent,
-                                        child: _currentUserAvatar != null
-                                            ? ClipOval(
-                                                child: CachedImageWidget(
-                                                  imageUrl: _currentUserAvatar!,
-                                                  width: 36,
-                                                  height: 36,
-                                                  fit: BoxFit.cover,
-                                                  errorWidget: Text(
-                                                    _currentUserName[0]
-                                                        .toUpperCase(),
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 18,
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                            : Text(
-                                                _currentUserName[0]
-                                                    .toUpperCase(),
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18,
-                                                ),
-                                              ),
+                                        imageUrl: _currentUserAvatar,
+                                        fallbackLetter: _currentUserName
+                                                .isNotEmpty
+                                            ? _currentUserName[0].toUpperCase()
+                                            : 'U',
+                                        fallbackTextStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(width: 12),

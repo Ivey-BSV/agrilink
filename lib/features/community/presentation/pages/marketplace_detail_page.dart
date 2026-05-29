@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/providers/marketplace_provider.dart';
 import 'package:cap/shared/widgets/cached_image_widget.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -228,31 +228,29 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
                             shape: BoxShape.circle,
                             gradient: AppTheme.primaryGradient,
                           ),
-                          child: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Colors.transparent,
-                            backgroundImage: widget.authorAvatarUrl != null &&
-                                    widget.authorAvatarUrl!.isNotEmpty
-                                ? (widget.authorAvatarUrl!.startsWith('http')
-                                    ? CachedNetworkImageProvider(
-                                        widget.authorAvatarUrl!)
-                                    : AssetImage(widget.authorAvatarUrl!)
-                                        as ImageProvider)
-                                : null,
-                            child: (widget.authorAvatarUrl == null ||
-                                    widget.authorAvatarUrl!.isEmpty)
-                                ? Text(
-                                    widget.authorName.isNotEmpty
-                                        ? widget.authorName[0].toUpperCase()
-                                        : 'U',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                : null,
-                          ),
+                          child: widget.authorAvatarUrl != null &&
+                                  widget.authorAvatarUrl!.isNotEmpty &&
+                                  !widget.authorAvatarUrl!.startsWith('http')
+                              ? CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor: Colors.transparent,
+                                  backgroundImage: AssetImage(
+                                    widget.authorAvatarUrl!.trim(),
+                                  ),
+                                  child: null,
+                                )
+                              : NetworkCircleAvatar(
+                                  radius: 16,
+                                  imageUrl: widget.authorAvatarUrl,
+                                  fallbackLetter: widget.authorName.isNotEmpty
+                                      ? widget.authorName[0].toUpperCase()
+                                      : 'U',
+                                  fallbackTextStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
                         ),
                       ),
                       const SizedBox(width: 10),

@@ -1,3 +1,5 @@
+import 'package:cap/shared/utils/image_url_utils.dart';
+
 class UserProfile {
   final String id;
   final String? username;
@@ -57,7 +59,7 @@ class UserProfile {
       location: json['location'] as String?,
       farmType: json['farm_type'] as String?,
       experienceLevel: json['experience_level'] as String?,
-      avatarUrl: json['avatar_url'] as String?,
+      avatarUrl: sanitizeImageUrl(json['avatar_url'] as String?),
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'] as String)
           : null,

@@ -16,7 +16,7 @@ import 'package:cap/shared/widgets/cached_image_widget.dart';
 import 'package:cap/shared/utils/event_date_format.dart';
 import 'package:cap/shared/utils/farm_display_formatters.dart';
 import 'package:cap/shared/widgets/linkified_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -417,26 +417,17 @@ class _UserProfilePageState extends State<UserProfilePage>
                         ),
                       ],
                     ),
-                    child: CircleAvatar(
+                    child: NetworkCircleAvatar(
                       radius: 40,
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: (profile.avatarUrl != null &&
-                              profile.avatarUrl!.isNotEmpty)
-                          ? CachedNetworkImageProvider(profile.avatarUrl!)
-                          : null,
-                      child: (profile.avatarUrl == null ||
-                              profile.avatarUrl!.isEmpty)
-                          ? Text(
-                              _getInitialLetter(profile.fullName ??
-                                  profile.displayUsername ??
-                                  'U'),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          : null,
+                      imageUrl: profile.avatarUrl,
+                      fallbackLetter: _getInitialLetter(profile.fullName ??
+                          profile.displayUsername ??
+                          'U'),
+                      fallbackTextStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),

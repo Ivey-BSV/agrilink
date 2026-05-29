@@ -4,7 +4,7 @@ import 'package:cap/features/collaboration/presentation/widgets/community_circle
 import 'package:cap/features/collaboration/presentation/widgets/goal_shared_files_section.dart';
 import 'package:cap/services/goal_service.dart';
 import 'package:cap/shared/constants/circle_roles.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -328,13 +328,10 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
           final avatar = prof is Map ? prof['avatar_url'] as String? : null;
           sheetChildren.add(
             ListTile(
-              leading: CircleAvatar(
-                backgroundImage: avatar != null && avatar.isNotEmpty
-                    ? CachedNetworkImageProvider(avatar)
-                    : null,
-                child: avatar == null || avatar.isEmpty
-                    ? const Icon(Icons.person)
-                    : null,
+              leading: NetworkCircleAvatar(
+                radius: 20,
+                imageUrl: avatar,
+                fallbackLetter: '?',
               ),
               title: Text(name),
               onTap: () async {
@@ -1339,19 +1336,17 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                   context.push('/user-profile/$userId');
                 }
               : null,
-          child: CircleAvatar(
+          child: NetworkCircleAvatar(
+            radius: 20,
             backgroundColor: isCreator
                 ? AppTheme.primaryGreen.withValues(alpha: 0.1)
                 : Colors.grey.withValues(alpha: 0.1),
-            backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
-                ? CachedNetworkImageProvider(avatarUrl)
-                : null,
-            child: avatarUrl == null || avatarUrl.isEmpty
-                ? Icon(
-                    Icons.person,
-                    color: isCreator ? AppTheme.primaryGreen : Colors.grey[600],
-                  )
-                : null,
+            imageUrl: avatarUrl,
+            fallbackLetter: name.isNotEmpty ? name[0].toUpperCase() : '?',
+            fallbackTextStyle: TextStyle(
+              color: isCreator ? AppTheme.primaryGreen : Colors.grey[600],
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         const SizedBox(width: 12),

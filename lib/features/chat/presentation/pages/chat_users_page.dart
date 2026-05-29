@@ -6,7 +6,7 @@ import 'package:cap/providers/chat_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/chat.dart';
 import 'package:cap/shared/models/user_profile.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -439,26 +439,17 @@ class _ChatUsersPageState extends State<ChatUsersPage>
                           shape: BoxShape.circle,
                           gradient: AppTheme.primaryGradient,
                         ),
-                        child: CircleAvatar(
+                        child: NetworkCircleAvatar(
                           radius: 28,
-                          backgroundColor: Colors.transparent,
-                          backgroundImage: user.avatarUrl != null &&
-                                  user.avatarUrl!.isNotEmpty
-                              ? CachedNetworkImageProvider(user.avatarUrl!)
-                              : null,
-                          child:
-                              user.avatarUrl == null || user.avatarUrl!.isEmpty
-                                  ? Text(
-                                      _getInitialLetter(user.fullName ??
-                                          user.displayUsername ??
-                                          'U'),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 28,
-                                      ),
-                                    )
-                                  : null,
+                          imageUrl: user.avatarUrl,
+                          fallbackLetter: _getInitialLetter(user.fullName ??
+                              user.displayUsername ??
+                              'U'),
+                          fallbackTextStyle: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 28,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -659,26 +650,17 @@ class _ChatUsersPageState extends State<ChatUsersPage>
                           shape: BoxShape.circle,
                           gradient: AppTheme.primaryGradient,
                         ),
-                        child: CircleAvatar(
+                        child: NetworkCircleAvatar(
                           radius: 28,
-                          backgroundColor: Colors.transparent,
-                          backgroundImage: user.user.avatarUrl != null &&
-                                  user.user.avatarUrl!.isNotEmpty
-                              ? CachedNetworkImageProvider(user.user.avatarUrl!)
-                              : null,
-                          child: user.user.avatarUrl == null ||
-                                  user.user.avatarUrl!.isEmpty
-                              ? Text(
-                                  _getInitialLetter(user.user.fullName ??
-                                      user.user.displayUsername ??
-                                      'U'),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 28,
-                                  ),
-                                )
-                              : null,
+                          imageUrl: user.user.avatarUrl,
+                          fallbackLetter: _getInitialLetter(user.user.fullName ??
+                              user.user.displayUsername ??
+                              'U'),
+                          fallbackTextStyle: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 28,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 12),

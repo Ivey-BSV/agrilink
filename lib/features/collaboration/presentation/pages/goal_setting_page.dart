@@ -3,7 +3,7 @@ import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/features/collaboration/presentation/pages/create_goal_page.dart';
 import 'package:cap/features/collaboration/presentation/pages/goal_detail_page.dart';
 import 'package:cap/services/goal_service.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -468,22 +468,15 @@ class _GoalSettingPageState extends State<GoalSettingPage>
                       shape: BoxShape.circle,
                       gradient: AppTheme.primaryGradient,
                     ),
-                    child: CircleAvatar(
+                    child: NetworkCircleAvatar(
                       radius: 16,
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: goal['authorAvatarUrl'] != null
-                          ? CachedNetworkImageProvider(goal['authorAvatarUrl'])
-                          : null,
-                      child: goal['authorAvatarUrl'] == null
-                          ? Text(
-                              goal['author'][0],
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            )
-                          : null,
+                      imageUrl: goal['authorAvatarUrl'] as String?,
+                      fallbackLetter: goal['author'][0],
+                      fallbackTextStyle: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),

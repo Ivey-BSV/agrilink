@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:cap/shared/utils/image_url_utils.dart';
 
 class CachedImageWidget extends StatelessWidget {
   final String imageUrl;
@@ -23,8 +24,17 @@ class CachedImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final url = sanitizeImageUrl(imageUrl);
+    if (url == null) {
+      return errorWidget ??
+          Container(
+            color: Colors.grey[200],
+            child: const Icon(Icons.error_outline, color: Colors.grey),
+          );
+    }
+
     Widget image = CachedNetworkImage(
-      imageUrl: imageUrl,
+      imageUrl: url,
       width: width,
       height: height,
       fit: fit,

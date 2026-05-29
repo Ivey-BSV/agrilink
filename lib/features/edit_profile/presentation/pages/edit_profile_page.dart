@@ -5,7 +5,7 @@ import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/core/utils/username_utils.dart';
 import 'package:cap/providers/auth_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
@@ -424,29 +424,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ),
                       ],
                     ),
-                    child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: _selectedImage != null
-                          ? FileImage(_selectedImage!)
-                          : (profile?.avatarUrl != null &&
-                                  profile!.avatarUrl!.isNotEmpty)
-                              ? CachedNetworkImageProvider(profile.avatarUrl!)
-                              : null,
-                      child: _selectedImage == null &&
-                              (profile?.avatarUrl == null ||
-                                  profile!.avatarUrl!.isEmpty)
-                          ? Text(
-                              _getInitialLetter(
-                                  profile?.fullName ?? user.userName ?? 'U'),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 60,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          : null,
-                    ),
+                    child: _selectedImage != null
+                        ? CircleAvatar(
+                            radius: 60,
+                            backgroundColor: Colors.transparent,
+                            backgroundImage: FileImage(_selectedImage!),
+                          )
+                        : NetworkCircleAvatar(
+                            radius: 60,
+                            imageUrl: profile?.avatarUrl,
+                            fallbackLetter: _getInitialLetter(
+                                profile?.fullName ?? user.userName ?? 'U'),
+                            fallbackTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 60,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
                 if (_isUploadingImage)

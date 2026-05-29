@@ -7,7 +7,7 @@ import 'package:cap/providers/farm_details_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/farm_details.dart';
 import 'package:cap/shared/models/user_profile.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:provider/provider.dart';
 
 class FarmDirectoryPage extends StatefulWidget {
@@ -436,26 +436,17 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
                       shape: BoxShape.circle,
                       gradient: AppTheme.primaryGradient,
                     ),
-                    child: CircleAvatar(
+                    child: NetworkCircleAvatar(
                       radius: 24,
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: profile.avatarUrl != null &&
-                              profile.avatarUrl!.isNotEmpty
-                          ? CachedNetworkImageProvider(profile.avatarUrl!)
-                          : null,
-                      child: (profile.avatarUrl == null ||
-                              profile.avatarUrl!.isEmpty)
-                          ? Text(
-                              (profile.fullName?.isNotEmpty ?? false)
-                                  ? profile.fullName![0].toUpperCase()
-                                  : 'U',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 24,
-                              ),
-                            )
-                          : null,
+                      imageUrl: profile.avatarUrl,
+                      fallbackLetter: (profile.fullName?.isNotEmpty ?? false)
+                          ? profile.fullName![0].toUpperCase()
+                          : 'U',
+                      fallbackTextStyle: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),

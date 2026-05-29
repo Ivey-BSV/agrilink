@@ -10,7 +10,8 @@ import 'package:cap/shared/models/event.dart';
 import 'package:cap/shared/models/message.dart';
 import 'package:cap/shared/models/post.dart';
 import 'package:cap/shared/widgets/linkified_text.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/cached_image_widget.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -646,25 +647,17 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     shape: BoxShape.circle,
                     gradient: AppTheme.primaryGradient,
                   ),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.transparent,
+                  child: NetworkCircleAvatar(
                     radius: 16,
-                    backgroundImage:
-                        post.userAvatar != null && post.userAvatar!.isNotEmpty
-                            ? CachedNetworkImageProvider(post.userAvatar!)
-                            : null,
-                    child: (post.userAvatar == null || post.userAvatar!.isEmpty)
-                        ? Text(
-                            post.userName.isNotEmpty
-                                ? post.userName[0].toUpperCase()
-                                : 'U',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          )
-                        : null,
+                    imageUrl: post.userAvatar,
+                    fallbackLetter: post.userName.isNotEmpty
+                        ? post.userName[0].toUpperCase()
+                        : 'U',
+                    fallbackTextStyle: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -720,8 +713,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               const SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image(
-                  image: CachedNetworkImageProvider(post.imageUrl!),
+                child: CachedImageWidget(
+                  imageUrl: post.imageUrl!,
                   height: 140,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -960,22 +953,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                   shape: BoxShape.circle,
                   gradient: AppTheme.primaryGradient,
                 ),
-                child: CircleAvatar(
+                child: NetworkCircleAvatar(
                   radius: 18,
-                  backgroundColor: Colors.transparent,
-                  backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
-                      ? CachedNetworkImageProvider(avatarUrl)
-                      : null,
-                  child: avatarUrl == null || avatarUrl.isEmpty
-                      ? Text(
-                          initial,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        )
-                      : null,
+                  imageUrl: avatarUrl,
+                  fallbackLetter: initial,
+                  fallbackTextStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
                 ),
               ),
             ),
@@ -1115,25 +1101,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                       shape: BoxShape.circle,
                                       gradient: AppTheme.primaryGradient,
                                     ),
-                                    child: CircleAvatar(
+                                    child: NetworkCircleAvatar(
                                       radius: 16,
-                                      backgroundColor: Colors.transparent,
-                                      backgroundImage: avatarUrl != null &&
-                                              avatarUrl.isNotEmpty
-                                          ? CachedNetworkImageProvider(
-                                              avatarUrl)
-                                          : null,
-                                      child:
-                                          avatarUrl == null || avatarUrl.isEmpty
-                                              ? Text(
-                                                  initial,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16,
-                                                  ),
-                                                )
-                                              : null,
+                                      imageUrl: avatarUrl,
+                                      fallbackLetter: initial,
+                                      fallbackTextStyle: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1383,27 +1359,16 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                       shape: BoxShape.circle,
                                       gradient: AppTheme.primaryGradient,
                                     ),
-                                    child: CircleAvatar(
+                                    child: NetworkCircleAvatar(
                                       radius: 16,
-                                      backgroundColor: Colors.transparent,
-                                      backgroundImage: _currentUserAvatarUrl !=
-                                                  null &&
-                                              _currentUserAvatarUrl!.isNotEmpty
-                                          ? CachedNetworkImageProvider(
-                                              _currentUserAvatarUrl!)
-                                          : null,
-                                      child: _currentUserAvatarUrl == null ||
-                                              _currentUserAvatarUrl!.isEmpty
-                                          ? Text(
-                                              _getInitialLetter(
-                                                  _currentUserName ?? 'Me'),
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16,
-                                              ),
-                                            )
-                                          : null,
+                                      imageUrl: _currentUserAvatarUrl,
+                                      fallbackLetter: _getInitialLetter(
+                                          _currentUserName ?? 'Me'),
+                                      fallbackTextStyle: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
                                     ),
                                   ),
                                 ),

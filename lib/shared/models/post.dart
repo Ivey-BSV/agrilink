@@ -1,3 +1,5 @@
+import 'package:cap/shared/utils/image_url_utils.dart';
+
 class Post {
   final String id;
   final String title;
@@ -80,9 +82,9 @@ class Post {
       title: json['title'],
       userId: json['userId'],
       userName: json['userName'],
-      userAvatar: json['userAvatar'],
+      userAvatar: sanitizeImageUrl(json['userAvatar'] as String?),
       content: json['content'],
-      imageUrl: json['imageUrl'],
+      imageUrl: sanitizeImageUrl(json['imageUrl'] as String?),
       location: json['location'],
       likes: json['likes'],
       comments: json['comments'],
@@ -105,10 +107,10 @@ class Post {
       title: (row['title'] ?? 'Post') as String,
       userId: row['user_id'] as String,
       userName: userName,
-      userAvatar: userAvatar,
+      userAvatar: sanitizeImageUrl(userAvatar),
       content: (row['content'] ?? '') as String,
       imageUrl: imageUrls != null && imageUrls.isNotEmpty
-          ? imageUrls.first as String
+          ? sanitizeImageUrl(imageUrls.first as String)
           : null,
       location: row['location'] as String?,
       likes: 0,

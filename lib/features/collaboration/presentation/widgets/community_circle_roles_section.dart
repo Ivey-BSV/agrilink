@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/shared/constants/circle_roles.dart';
@@ -120,23 +120,16 @@ class _RoleRow extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
+              NetworkCircleAvatar(
                 radius: 22,
                 backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.12),
-                backgroundImage: !isVacant &&
-                        profile is Map &&
-                        (profile['avatar_url'] as String?)?.isNotEmpty == true
-                    ? CachedNetworkImageProvider(
-                        profile['avatar_url'] as String,
-                      )
+                imageUrl: !isVacant && profile is Map
+                    ? profile['avatar_url'] as String?
                     : null,
-                child: isVacant
+                fallbackLetter: '?',
+                fallbackWidget: isVacant
                     ? Icon(Icons.person_outline, color: Colors.grey[600])
-                    : (profile is Map &&
-                            (profile['avatar_url'] as String?)?.isNotEmpty !=
-                                true)
-                        ? Icon(Icons.person, color: Colors.grey[700])
-                        : null,
+                    : Icon(Icons.person, color: Colors.grey[700]),
               ),
               const SizedBox(width: 12),
               Expanded(
