@@ -52,11 +52,14 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (keystorePropertiesFile.exists()) {
-                signingConfigs.getByName("release")
-            } else {
-                signingConfigs.getByName("debug")
+            if (!keystorePropertiesFile.exists()) {
+                throw GradleException(
+                    "Release signing is not configured. Create android/key.properties and " +
+                        "android/upload-keystore.jks (see ANDROID_PLAY_STORE.md). " +
+                        "Without them, Play Console rejects the bundle as debug-signed.",
+                )
             }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
