@@ -9,11 +9,13 @@ import 'package:cap/shared/widgets/image_placeholder.dart';
 class PostMediaPreview extends StatefulWidget {
   final String? mediaUrl;
   final BoxFit fit;
+  final bool compact;
 
   const PostMediaPreview({
     super.key,
     required this.mediaUrl,
     this.fit = BoxFit.cover,
+    this.compact = false,
   });
 
   @override
@@ -85,8 +87,12 @@ class _PostMediaPreviewState extends State<PostMediaPreview> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Container(
             color: AppTheme.primaryGreen.withValues(alpha: 0.06),
-            child: const Center(
-              child: CircularProgressIndicator(strokeWidth: 2),
+            child: Center(
+              child: SizedBox(
+                width: widget.compact ? 18 : 24,
+                height: widget.compact ? 18 : 24,
+                child: const CircularProgressIndicator(strokeWidth: 2),
+              ),
             ),
           );
         }
@@ -108,6 +114,13 @@ class _PostMediaPreviewState extends State<PostMediaPreview> {
   }
 
   Widget _buildLinkFallback(String url) {
+    if (widget.compact) {
+      return Container(
+        color: AppTheme.primaryGreen.withValues(alpha: 0.08),
+        child: Icon(Icons.link, color: AppTheme.primaryGreen, size: 22),
+      );
+    }
+
     final host = Uri.tryParse(url)?.host ?? url;
     return Container(
       color: AppTheme.primaryGreen.withValues(alpha: 0.08),

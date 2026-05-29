@@ -11,7 +11,8 @@ import 'package:cap/providers/farm_details_provider.dart';
 import 'package:cap/providers/post_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/event.dart';
-import 'package:cap/shared/widgets/cached_image_widget.dart';
+import 'package:cap/shared/utils/image_url_utils.dart';
+import 'package:cap/shared/widgets/post_media_preview.dart';
 import 'package:cap/shared/utils/event_date_format.dart';
 import 'package:cap/shared/utils/farm_display_formatters.dart';
 import 'package:cap/shared/widgets/network_circle_avatar.dart';
@@ -586,30 +587,14 @@ class _ProfilePageState extends State<ProfilePage>
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: post.imageUrl != null
+                  child: sanitizeImageUrl(post.imageUrl) != null
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(4),
-                          child: post.imageUrl!.startsWith('http')
-                              ? CachedImageWidget(
-                                  imageUrl: post.imageUrl!,
-                                  fit: BoxFit.cover,
-                                  errorWidget: Container(
-                                    color: Colors.grey[300],
-                                    child: const Icon(Icons.image,
-                                        color: Colors.grey),
-                                  ),
-                                )
-                              : Image.asset(
-                                  post.imageUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.image,
-                                          color: Colors.grey),
-                                    );
-                                  },
-                                ),
+                          child: PostMediaPreview(
+                            mediaUrl: post.imageUrl,
+                            fit: BoxFit.cover,
+                            compact: true,
+                          ),
                         )
                       : Container(
                           color: Colors.grey[300],
@@ -1279,34 +1264,41 @@ class _ProfilePageState extends State<ProfilePage>
     required String text,
     required Color color,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: double.infinity),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: color.withValues(alpha: 0.3),
+            width: 1,
+          ),
         ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 12,
-            color: color,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 11,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 12,
               color: color,
-              fontWeight: FontWeight.w500,
             ),
-          ),
-        ],
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: color,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
