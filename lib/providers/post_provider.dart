@@ -117,6 +117,53 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
+  Future<Post?> fetchPostById(String postId) async {
+    try {
+      final supabase = Supabase.instance.client;
+      final row = await supabase
+          .from('posts')
+          .select(
+              'id, user_id, title, content, image_urls, tags, location, created_at')
+          .eq('id', postId)
+          .maybeSingle();
+
+      if (row == null) return null;
+
+      final rowMap = row;
+      final userId = rowMap['user_id'] as String;
+
+      final profileRow = await supabase
+          .from('user_profiles')
+          .select('id, full_name, username, avatar_url')
+          .eq('id', userId)
+          .maybeSingle();
+
+      String userName = 'User';
+      String? avatarUrl;
+      if (profileRow != null) {
+        userName = (profileRow['full_name'] as String?) ??
+            (profileRow['username'] as String?) ??
+            'User';
+        avatarUrl = profileRow['avatar_url'] as String?;
+      }
+
+      final List<dynamic> commentRows = await supabase
+          .from('comments')
+          .select('id')
+          .eq('post_id', postId);
+      final commentCount = commentRows.length;
+
+      return Post.fromSupabaseRow(
+        rowMap,
+        userName: userName,
+        userAvatar: avatarUrl,
+        commentCount: commentCount,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> createPost(
     String content, {
     String? imageUrl,

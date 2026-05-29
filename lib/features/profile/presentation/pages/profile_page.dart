@@ -782,20 +782,18 @@ class _ProfilePageState extends State<ProfilePage>
                 children: [
                   Icon(Icons.calendar_today, size: 16, color: Colors.grey[600]),
                   const SizedBox(width: 4),
-                  Text(
-                    formatEventDateAbbreviated(event.eventDate),
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'at',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      event.time,
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  Expanded(
+                    child: Text.rich(
+                      TextSpan(
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                        children: [
+                          TextSpan(
+                            text: formatEventDateAbbreviated(event.eventDate),
+                          ),
+                          const TextSpan(text: ' at '),
+                          TextSpan(text: event.time),
+                        ],
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

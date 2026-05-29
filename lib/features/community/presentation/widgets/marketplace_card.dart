@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/shared/widgets/image_placeholder.dart';
-import 'package:cap/shared/widgets/cached_image_widget.dart';
+import 'package:cap/shared/widgets/listing_media_tile.dart';
 
 class MarketplaceCard extends StatelessWidget {
   final String title;
@@ -51,30 +51,18 @@ class MarketplaceCard extends StatelessWidget {
                       aspectRatio: 4 / 3,
                       child: Container(
                         color: AppTheme.primaryGreen.withValues(alpha: 0.1),
-                        child: imageUrl != null && imageUrl!.isNotEmpty
-                            ? (imageUrl!.startsWith('http')
-                                ? CachedImageWidget(
-                                    imageUrl: imageUrl!,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorWidget: const ImagePlaceholder(
-                                        borderRadius: 12,
-                                        icon: Icons.inventory_2),
-                                  )
-                                : Image.asset(
-                                    imageUrl!,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return const ImagePlaceholder(
-                                          borderRadius: 12,
-                                          icon: Icons.inventory_2);
-                                    },
-                                  ))
-                            : const ImagePlaceholder(
-                                borderRadius: 12, icon: Icons.inventory_2),
+                        child: ListingMediaTile(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          placeholder: const ImagePlaceholder(
+                            borderRadius: 12,
+                            icon: Icons.inventory_2,
+                          ),
+                          errorWidget: const ImagePlaceholder(
+                            borderRadius: 12,
+                            icon: Icons.inventory_2,
+                          ),
+                        ),
                       ),
                     ),
                     Positioned(

@@ -9,6 +9,7 @@ import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/event.dart';
 import 'package:cap/shared/models/message.dart';
 import 'package:cap/shared/models/post.dart';
+import 'package:cap/shared/utils/image_url_utils.dart';
 import 'package:cap/shared/widgets/linkified_text.dart';
 import 'package:cap/shared/widgets/cached_image_widget.dart';
 import 'package:cap/shared/widgets/network_circle_avatar.dart';
@@ -53,7 +54,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
   void initState() {
     super.initState();
     _participantName = widget.participantName;
-    _participantAvatarUrl = widget.participantAvatarUrl;
+    _participantAvatarUrl = sanitizeImageUrl(widget.participantAvatarUrl);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadChat();
@@ -134,7 +135,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           _participantName = (profileResponse['full_name'] as String?) ??
               (profileResponse['username'] as String?)?.toLowerCase() ??
               'User';
-          _participantAvatarUrl = profileResponse['avatar_url'] as String?;
+          _participantAvatarUrl =
+              sanitizeImageUrl(profileResponse['avatar_url'] as String?);
         });
       }
     } catch (e) { /* ignored */ }
@@ -157,7 +159,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           _currentUserName = (profileResponse['full_name'] as String?) ??
               (profileResponse['username'] as String?)?.toLowerCase() ??
               'Me';
-          _currentUserAvatarUrl = profileResponse['avatar_url'] as String?;
+          _currentUserAvatarUrl =
+              sanitizeImageUrl(profileResponse['avatar_url'] as String?);
         });
       }
     } catch (e) { /* ignored */ }
@@ -433,7 +436,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         userName = (profile['full_name'] as String?) ??
             (profile['username'] as String?) ??
             'User';
-        avatarUrl = profile['avatar_url'] as String?;
+        avatarUrl = sanitizeImageUrl(profile['avatar_url'] as String?);
       }
 
       return Post.fromSupabaseRow(

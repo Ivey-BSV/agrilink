@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/providers/marketplace_provider.dart';
-import 'package:cap/shared/widgets/cached_image_widget.dart';
+import 'package:cap/shared/widgets/listing_media_tile.dart';
 import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -149,40 +149,21 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
                           },
                           itemBuilder: (context, index) {
                             final imageUrl = _images[index];
-                            final isNetworkImage = imageUrl.startsWith('http');
-                            return isNetworkImage
-                                ? CachedImageWidget(
-                                    imageUrl: imageUrl,
-                                    fit: BoxFit.cover,
-                                    errorWidget: Container(
-                                      color: AppTheme.primaryGreen
-                                          .withValues(alpha: 0.1),
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.inventory_2,
-                                          size: 48,
-                                          color: AppTheme.primaryGreen,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Image.asset(
-                                    imageUrl,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        color: AppTheme.primaryGreen
-                                            .withValues(alpha: 0.1),
-                                        child: const Center(
-                                          child: Icon(
-                                            Icons.inventory_2,
-                                            size: 48,
-                                            color: AppTheme.primaryGreen,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
+                            return ListingMediaTile(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              errorWidget: Container(
+                                color: AppTheme.primaryGreen
+                                    .withValues(alpha: 0.1),
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.inventory_2,
+                                    size: 48,
+                                    color: AppTheme.primaryGreen,
+                                  ),
+                                ),
+                              ),
+                            );
                           },
                         ),
                 ),
@@ -513,15 +494,10 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
                         child: InteractiveViewer(
                           minScale: 0.8,
                           maxScale: 4,
-                          child: _images[_currentIndex].startsWith('http')
-                              ? CachedImageWidget(
-                                  imageUrl: _images[_currentIndex],
-                                  fit: BoxFit.contain,
-                                )
-                              : Image.asset(
-                                  _images[_currentIndex],
-                                  fit: BoxFit.contain,
-                                ),
+                          child: ListingMediaTile(
+                            imageUrl: _images[_currentIndex],
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 12),

@@ -56,14 +56,16 @@ class _PostDetailPageState extends State<PostDetailPage> {
       _isLoading = true;
     });
 
+    Post? foundPost;
     try {
-      final foundPost = postProvider.posts
+      foundPost = postProvider.posts
           .where((post) => post.id == widget.postId)
           .firstOrNull;
-      _post = foundPost;
-    } catch (e) {
-      _post = null;
+    } catch (_) {
+      foundPost = null;
     }
+    foundPost ??= await postProvider.fetchPostById(widget.postId);
+    _post = foundPost;
 
     await postProvider.loadCommentsForPost(widget.postId);
     if (!mounted) return;
@@ -90,7 +92,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
 
           if (profile != null) {
             setState(() {
-              _currentUserAvatar = profile['avatar_url'];
+              _currentUserAvatar =
+                  sanitizeImageUrl(profile['avatar_url'] as String?);
               _currentUserName = profile['full_name'] ??
                   (profile['username'] as String?)?.toLowerCase() ??
                   'User';
@@ -109,14 +112,15 @@ class _PostDetailPageState extends State<PostDetailPage> {
       _isLoading = false;
     });
 
-    if (_post?.imageUrl != null && _post!.imageUrl!.isNotEmpty) {
-      _resolveImageAspectRatio(_post!.imageUrl!);
+    final previewUrl = sanitizeImageUrl(_post?.imageUrl);
+    if (previewUrl != null && isDirectImageUrl(previewUrl)) {
+      _resolveImageAspectRatio(previewUrl);
     }
   }
 
   void _resolveImageAspectRatio(String imageUrl) {
     final sanitized = sanitizeImageUrl(imageUrl) ?? imageUrl;
-    final ImageProvider provider = sanitized.startsWith('http')
+    final ImageProvider provider = isNetworkImageUrl(sanitized)
         ? CachedNetworkImageProvider(sanitized)
         : AssetImage(sanitized) as ImageProvider;
     final ImageStream stream = provider.resolve(const ImageConfiguration());
@@ -304,39 +308,27 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         decoration: isCurrentUser ? TextDecoration.none : null,
                       ),
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          _formatTimestamp(_post!.timestamp),
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 13,
-                            fontFamily: 'Poppins',
-                          ),
+                    Text.rich(
+                      TextSpan(
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 13,
+                          fontFamily: 'Poppins',
                         ),
-                        if (_post!.location != null &&
-                            _post!.location!.isNotEmpty) ...[
-                          Text(
-                            ' • ',
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 13,
-                              fontFamily: 'Poppins',
+                        children: [
+                          TextSpan(text: _formatTimestamp(_post!.timestamp)),
+                          if (_post!.location != null &&
+                              _post!.location!.isNotEmpty) ...[
+                            TextSpan(
+                              text: ' • ',
+                              style: TextStyle(color: Colors.grey[400]),
                             ),
-                          ),
-                          Flexible(
-                            child: Text(
-                              _post!.location!,
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 13,
-                                fontFamily: 'Poppins',
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
+                            TextSpan(text: _post!.location!),
+                          ],
                         ],
-                      ],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

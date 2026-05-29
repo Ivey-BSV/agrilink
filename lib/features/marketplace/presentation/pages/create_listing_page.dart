@@ -139,15 +139,15 @@ class _CreateListingPageState extends State<CreateListingPage> {
       }
 
       final bytes = await picked.readAsBytes();
-      final fileExt = picked.name.split('.').last;
+      const contentType = 'image/jpeg';
       final path =
-          '${user.id}/${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+          '${user.id}/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
       await supabase.storage.from('marketplace-images').uploadBinary(
             path,
             bytes,
             fileOptions: const FileOptions(
-                cacheControl: '3600', upsert: true, contentType: 'image/jpeg'),
+                cacheControl: '3600', upsert: true, contentType: contentType),
           );
 
       final publicUrl =
