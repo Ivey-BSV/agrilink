@@ -2,7 +2,8 @@
 
 import { Fragment } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { setStaffMemberPreview } from "@/lib/member-preview";
 import { useStaffAccess } from "@/components/staff-access-context";
 import {
   isAdminOrSuperEffective,
@@ -35,6 +36,7 @@ function navLinkActive(pathname: string, href: string): boolean {
 
 export default function AdminSectionLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { staffAccess: access, ready } = useStaffAccess();
 
   if (!ready) {
@@ -69,9 +71,16 @@ export default function AdminSectionLayout({ children }: { children: React.React
               ? " (signed in via the admin email allowlist—ask a super admin to grant you full staff access so permissions match your role.)"
               : ""}
           </div>
-          <Link href="/dashboard" className="btn btn-secondary btn-primary-compact">
-            Open member dashboard
-          </Link>
+          <button
+            type="button"
+            className="btn btn-secondary btn-primary-compact"
+            onClick={() => {
+              setStaffMemberPreview(true);
+              router.push("/platform/feed");
+            }}
+          >
+            Preview member experience
+          </button>
         </div>
         <nav className="admin-nav-flat" aria-label="Admin pages">
           {items.map((item) => (

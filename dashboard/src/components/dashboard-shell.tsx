@@ -9,7 +9,9 @@ import { isSuperEffective, type EffectiveStaffAccess } from "@/lib/staff-profile
 import { getImpersonatedUserId, setImpersonatedUserId } from "@/lib/impersonation";
 import { dashboardPageTitle } from "@/lib/dashboard-page-title";
 import { AppSidebar, AppSidebarMobileNav } from "@/components/app-sidebar";
+import { StaffMemberPreviewGate } from "@/components/staff-member-preview-gate";
 import { useStaffAccess } from "@/components/staff-access-context";
+import { useStaffMemberPreview } from "@/hooks/use-staff-member-preview";
 
 type DashboardShellProps = {
   user: User;
@@ -21,14 +23,12 @@ function formatRoleLabel(access: EffectiveStaffAccess | null) {
   return access.appRole.replace(/_/g, " ");
 }
 
-function isMemberWorkspaceDashboardPath(pathname: string | null) {
-  return pathname === "/dashboard";
-}
-
 export function DashboardShell({ user, children }: DashboardShellProps) {
   const pathname = usePathname();
-  const { staffAccess, ready } = useStaffAccess();
+  const { staffAccess } = useStaffAccess();
+  const { active: memberPreview } = useStaffMemberPreview();
   const [impersonateId, setImpersonateId] = React.useState<string | null>(null);
+  const showStaffRoleInHeader = staffAccess != null && !memberPreview;
 
   React.useEffect(() => {
     const sync = () => setImpersonateId(getImpersonatedUserId());
@@ -37,9 +37,6 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
     return () => window.removeEventListener("agrilink_impersonation_changed", sync);
   }, []);
 
-  const isStaff = staffAccess != null;
-  const showStaffMemberWorkspaceBanner =
-    ready && staffAccess != null && isMemberWorkspaceDashboardPath(pathname);
   const headerTitle = dashboardPageTitle(pathname);
 
   return (
@@ -58,27 +55,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           </div>
         ) : null}
 
-        {showStaffMemberWorkspaceBanner ? (
-          <div className="content-card" style={{ marginBottom: 16, padding: "12px 16px" }}>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 12,
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <p className="subtle" style={{ margin: 0 }}>
-                You’re on the <strong>member dashboard</strong> — the same home farmers use. Use <strong>Staff</strong> in the sidebar
-                or the button below when you need admin tools.
-              </p>
-              <Link href="/dashboard/admin" className="btn btn-primary btn-primary-compact">
-                Back to admin console
-              </Link>
-            </div>
-          </div>
-        ) : null}
+        <StaffMemberPreviewGate />
 
         <div className="app-shell-frame">
           <AppSidebar />
@@ -88,7 +65,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
               <h1>{headerTitle}</h1>
               <p className="platform-title-meta subtle">
                 {user.email}
-                {isStaff ? ` · ${formatRoleLabel(staffAccess)}` : ""}
+                {showStaffRoleInHeader ? ` · ${formatRoleLabel(staffAccess)}` : ""}
               </p>
             </header>
 

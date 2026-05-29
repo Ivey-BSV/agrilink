@@ -268,8 +268,8 @@ export default function AdminConsoleHomePage() {
             ) : null}
           </ul>
           <p className="subtle" style={{ margin: 0, fontSize: 12 }}>
-            Member-facing pages (feed, listings, workshops) live under{" "}
-            <Link href="/dashboard">Dashboard</Link>.
+            Use <strong>Preview member experience</strong> above to browse forums, events, projects, and other
+            member tools with the same navigation farmers see.
           </p>
         </section>
       </div>

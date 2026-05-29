@@ -12,6 +12,7 @@ import {
   type SidebarNavItem,
 } from "@/components/app-sidebar-nav";
 import { useStaffAccess } from "@/components/staff-access-context";
+import { useStaffMemberPreview } from "@/hooks/use-staff-member-preview";
 
 function NavBlock({
   label,
@@ -57,7 +58,9 @@ function NavBlock({
 export function AppSidebar() {
   const pathname = usePathname();
   const { staffAccess, ready } = useStaffAccess();
+  const { active: memberPreview } = useStaffMemberPreview();
   const isStaff = staffAccess != null;
+  const showStaffNav = isStaff && !memberPreview;
 
   return (
     <aside className="platform-sidebar app-shell-sidebar app-sidebar--desktop-only" aria-label="App sections">
@@ -66,12 +69,12 @@ export function AppSidebar() {
       <NavBlock label="Resources" ariaLabel="Resources" items={resourcesNavItems} pathname={pathname} />
       <NavBlock label="You" ariaLabel="Account" items={accountNavItems} pathname={pathname} />
 
-      <div className="platform-sidebar-label">Staff</div>
+      <div className="platform-sidebar-label">{showStaffNav ? "Staff" : "Workspace"}</div>
       {!ready ? (
         <p className="app-shell-sidebar-muted" aria-busy="true">
           Checking staff access…
         </p>
-      ) : isStaff ? (
+      ) : showStaffNav ? (
         <nav className="platform-nav" aria-label="Staff">
           <Link
             href="/dashboard/admin"
@@ -97,7 +100,9 @@ export function AppSidebar() {
 export function AppSidebarMobileNav() {
   const pathname = usePathname();
   const { staffAccess, ready } = useStaffAccess();
+  const { active: memberPreview } = useStaffMemberPreview();
   const isStaff = ready && staffAccess != null;
+  const showStaffNav = isStaff && !memberPreview;
 
   return (
     <nav className="platform-mobile-nav app-sidebar-mobile-strip" aria-label="Section navigation">
@@ -122,7 +127,7 @@ export function AppSidebarMobileNav() {
           </Link>
         ),
       )}
-      {isStaff ? (
+      {showStaffNav ? (
         <Link
           href="/dashboard/admin"
           className={`platform-mobile-pill platform-mobile-pill--staff${linkActive(pathname, "/dashboard/admin") ? " active" : ""}`}

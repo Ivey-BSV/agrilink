@@ -1161,6 +1161,24 @@ a.welcome-tile:hover {
   border-bottom: 1px solid var(--border);
 }
 
+.staff-member-preview-banner {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+}
+
+.staff-member-preview-banner-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.staff-member-preview-banner-text {
+  margin: 0;
+  flex: 1 1 240px;
+}
+
 .admin-nav-flat {
   display: flex;
   flex-wrap: wrap;

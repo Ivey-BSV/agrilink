@@ -7,6 +7,7 @@ import type { User } from "@supabase/supabase-js";
 import { SiteBrandMark } from "@/components/site-brand";
 import { UserAvatar } from "@/components/user-avatar";
 import { useStaffAccess } from "@/components/staff-access-context";
+import { useStaffMemberPreview } from "@/hooks/use-staff-member-preview";
 
 function communitySectionActive(pathname: string | null) {
   if (!pathname) return false;
@@ -45,8 +46,11 @@ function chatNavActive(pathname: string | null) {
   return pathname === "/platform/chat" || pathname.startsWith("/platform/chat/");
 }
 
-function dashboardSectionActive(pathname: string | null) {
+function dashboardSectionActive(pathname: string | null, memberPreview: boolean) {
   if (!pathname) return false;
+  if (memberPreview) {
+    return pathname === "/dashboard" || (pathname.startsWith("/dashboard/") && !pathname.startsWith("/dashboard/admin"));
+  }
   if (pathname === "/dashboard") return true;
   return pathname.startsWith("/dashboard/admin");
 }
@@ -55,14 +59,17 @@ export function AppNav({ user }: { user: User | null }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { staffAccess, ready } = useStaffAccess();
+  const { active: memberPreview } = useStaffMemberPreview();
+
+  const showStaffTopNav = ready && staffAccess != null && !memberPreview;
 
   const dashboardHref = useMemo(() => {
     if (!user) return "/dashboard";
     if (!ready) return "/dashboard";
-    return staffAccess != null ? "/dashboard/admin" : "/dashboard";
-  }, [user, ready, staffAccess]);
+    return showStaffTopNav ? "/dashboard/admin" : "/dashboard";
+  }, [user, ready, showStaffTopNav]);
 
-  const dashboardLinkLabel = staffAccess != null ? "Staff" : "Dashboard";
+  const dashboardLinkLabel = showStaffTopNav ? "Staff" : "Dashboard";
 
   const brandHref = user ? "/platform/feed" : "/";
 
@@ -102,7 +109,7 @@ export function AppNav({ user }: { user: User | null }) {
             </Link>
             <Link
               href={dashboardHref}
-              className={`marketing-nav-link${dashboardSectionActive(pathname) ? " active" : ""}`}
+              className={`marketing-nav-link${dashboardSectionActive(pathname, memberPreview) ? " active" : ""}`}
             >
               {dashboardLinkLabel}
             </Link>
@@ -220,7 +227,7 @@ export function AppNav({ user }: { user: User | null }) {
           </Link>
           <Link
             href={dashboardHref}
-            className={`marketing-mobile-link${dashboardSectionActive(pathname) ? " active" : ""}`}
+            className={`marketing-mobile-link${dashboardSectionActive(pathname, memberPreview) ? " active" : ""}`}
             onClick={() => setOpen(false)}
           >
             {dashboardLinkLabel}

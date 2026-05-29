@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import type { User } from "@supabase/supabase-js";
 import { AppSidebar, AppSidebarMobileNav } from "@/components/app-sidebar";
+import { StaffMemberPreviewGate } from "@/components/staff-member-preview-gate";
 import { useStaffAccess } from "@/components/staff-access-context";
+import { useStaffMemberPreview } from "@/hooks/use-staff-member-preview";
 
 function titleFromPath(pathname: string | null): string {
   if (!pathname) return "Forums";
@@ -33,10 +35,14 @@ function titleFromPath(pathname: string | null): string {
 export function PlatformShell({ user, children }: { user: User; children: ReactNode }) {
   const pathname = usePathname();
   const { staffAccess } = useStaffAccess();
+  const { active: memberPreview } = useStaffMemberPreview();
+  const showStaffRoleInHeader = staffAccess != null && !memberPreview;
 
   return (
     <div className="platform-root app-shell-unified">
       <div className="app-shell-inner">
+        <StaffMemberPreviewGate />
+
         <div className="app-shell-frame">
           <AppSidebar />
 
@@ -45,7 +51,7 @@ export function PlatformShell({ user, children }: { user: User; children: ReactN
               <h1>{titleFromPath(pathname)}</h1>
               <p className="platform-title-meta subtle">
                 {user.email}
-                {staffAccess ? ` · ${staffAccess.appRole.replace(/_/g, " ")}` : ""}
+                {showStaffRoleInHeader ? ` · ${staffAccess.appRole.replace(/_/g, " ")}` : ""}
               </p>
             </header>
 
