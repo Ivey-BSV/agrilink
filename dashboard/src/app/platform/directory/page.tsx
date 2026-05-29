@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { FarmDirectoryCard } from "@/components/farm-directory-card";
 import { MotionListItem } from "@/components/motion-list";
+import { PageSectionHeader } from "@/components/page-section-header";
 import { directoryEntrySearchText, loadDirectoryEntries, type DirectoryEntry } from "@/lib/farm-directory";
 
 export default function PlatformDirectoryPage() {
@@ -35,10 +36,10 @@ export default function PlatformDirectoryPage() {
 
   return (
     <motion.div className="content-card stack" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-      <p className="subtle" style={{ marginBottom: 12 }}>
-        Search members by name, region, farm type, crops, activities, and other farm details to find people you may want
-        to connect with.
-      </p>
+      <PageSectionHeader
+        title="Farm Directory"
+        description="Search members by name, region, farm type, crops, activities, and other farm details to find people you may want to connect with."
+      />
       <div className="field" style={{ maxWidth: 430 }}>
         <label htmlFor="directory-search">Search</label>
         <input

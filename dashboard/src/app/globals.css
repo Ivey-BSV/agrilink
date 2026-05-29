@@ -2045,6 +2045,92 @@ button.file-preview-trigger.workshop-thumb-placeholder {
   }
 }
 
+.page-section-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.page-section-header-row--end {
+  justify-content: flex-end;
+}
+
+.page-section-header-main {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.page-section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.page-section-title-row--spaced {
+  margin-top: 12px;
+}
+
+.page-section-header-action {
+  flex-shrink: 0;
+}
+
+.section-info-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.section-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(46, 125, 50, 0.35);
+  background: rgba(46, 125, 50, 0.08);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-style: italic;
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.section-info-btn:hover {
+  background: rgba(46, 125, 50, 0.14);
+  border-color: rgba(46, 125, 50, 0.5);
+}
+
+.section-info-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.section-info-popover {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(22rem, calc(100vw - 2.5rem));
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-md);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-style: normal;
+  font-family: inherit;
+}
+
 .platform-feed-shell {
   width: 100%;
   min-width: 0;

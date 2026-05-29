@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { PageSectionHeader } from "@/components/page-section-header";
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
@@ -63,19 +64,17 @@ export default function NotificationsPage() {
 
   return (
     <motion.div className="content-card stack" style={{ gap: 16 }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
-        <div>
-          <h2 className="section-title">Notifications</h2>
-          <p className="subtle" style={{ marginTop: 8 }}>
-            Alerts when something important happens on your account—new activity on posts, projects, polls, and more. Mark items read to keep the list manageable.
-          </p>
-        </div>
-        {unread > 0 ? (
-          <button type="button" className="btn btn-secondary" onClick={() => void markAllRead()}>
-            Mark all read
-          </button>
-        ) : null}
-      </div>
+      <PageSectionHeader
+        title="Notifications"
+        description="Alerts when something important happens on your account—new activity on posts, projects, polls, and more. Mark items read to keep the list manageable."
+        action={
+          unread > 0 ? (
+            <button type="button" className="btn btn-secondary" onClick={() => void markAllRead()}>
+              Mark all read
+            </button>
+          ) : null
+        }
+      />
       {loading ? <p className="subtle">Loading…</p> : null}
       {error ? <p className="error">{error}</p> : null}
       {!loading && rows.length === 0 ? <p className="empty">No notifications yet.</p> : null}

@@ -12,6 +12,7 @@ import { FileBrowseGalleryDocumentsTabs } from "@/components/file-browse-gallery
 import { FileGalleryGrid } from "@/components/file-gallery-grid";
 import { FileRowThumb } from "@/components/file-row-thumb";
 import { MotionListItem } from "@/components/motion-list";
+import { PageSectionHeader } from "@/components/page-section-header";
 import { fetchUploaderLabelByUserIds } from "@/lib/document-owner-profiles";
 
 type WorkshopDocRow = {
@@ -58,11 +59,9 @@ export default function WorkshopsFilesPage() {
 
   const isStaff = isModeratorPlusEffective(staffAccess);
   const heading = !accessResolved || isStaff ? "Workshop Files" : "My Workshop Files";
-  const introCopy = !accessResolved
-    ? "Loading workshop materials…"
-    : isStaff
-      ? "Workshop materials are split into a photo gallery for visuals and a document list for PDFs, slides, and other files. Use filters, approvals, and search to review what members have uploaded."
-      : "Upload handouts and photos from your workshops. Images appear in the gallery; PDFs and other files stay in the document list. Click a row or thumbnail to preview when your browser supports it.";
+  const workshopInfo = isStaff
+    ? "Workshop materials are split into a photo gallery for visuals and a document list for PDFs, slides, and other files. Use filters, approvals, and search to review what members have uploaded."
+    : "Upload handouts and photos from your workshops. Images appear in the gallery; PDFs and other files stay in the document list. Click a row or thumbnail to preview when your browser supports it.";
 
   useEffect(() => {
     let cancelled = false;
@@ -337,33 +336,20 @@ export default function WorkshopsFilesPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 12,
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-        }}
-      >
-        <div className="stack" style={{ flex: "1 1 12rem", minWidth: 0, gap: 8 }}>
-          <h2 className="section-title" style={{ margin: 0 }}>
-            {heading}
-          </h2>
-          <p className="subtle" style={{ margin: 0 }}>
-            {introCopy}
-          </p>
-        </div>
-        <button
-          type="submit"
-          form="workshop-upload-form"
-          className="btn btn-primary btn-primary-compact"
-          style={{ flexShrink: 0 }}
-          disabled={uploading}
-        >
-          {uploading ? "Uploading…" : "Upload file"}
-        </button>
-      </div>
+      <PageSectionHeader
+        title={heading}
+        description={workshopInfo}
+        action={
+          <button
+            type="submit"
+            form="workshop-upload-form"
+            className="btn btn-primary btn-primary-compact"
+            disabled={uploading}
+          >
+            {uploading ? "Uploading…" : "Upload file"}
+          </button>
+        }
+      />
       {error ? <p className="error">{error}</p> : null}
       {success ? <p className="success">{success}</p> : null}
 

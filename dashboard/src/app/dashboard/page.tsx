@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageSectionHeader } from "@/components/page-section-header";
 
 const toolLinks = [
   { href: "/dashboard/posts", title: "Posts", desc: "Review or edit what you have shared on the community feed." },
@@ -11,13 +12,10 @@ export default function DashboardHomePage() {
   return (
     <div className="stack" style={{ gap: 20 }}>
       <section className="content-card stack" style={{ gap: 12 }}>
-        <div>
-          <h2 className="section-title">How this site is organized</h2>
-          <p className="subtle" style={{ marginTop: 8 }}>
-            <strong>Community</strong> is forums and events. <strong>Collaboration</strong> is shared projects, polls, and the exchange hub.{" "}
-            <strong>Resources</strong> is the knowledge repository, workshop file uploads, and the farm directory. <strong>You</strong> is profile, posts, chat, and settings. This hub highlights shortcuts to the tools you use most; staff see an admin console when their role allows it.
-          </p>
-        </div>
+        <PageSectionHeader
+          title="How this site is organized"
+          description="Community is forums and events. Collaboration is shared projects, polls, and the exchange hub. Resources is the knowledge repository, workshop file uploads, and the farm directory. You is profile, posts, chat, and settings. This hub highlights shortcuts to the tools you use most; staff see an admin console when their role allows it."
+        />
         <div className="app-bridges">
           <Link href="/platform/feed" className="app-bridge-card">
             <span className="app-bridge-kicker">Community</span>

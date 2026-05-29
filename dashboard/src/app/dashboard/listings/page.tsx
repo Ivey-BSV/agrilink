@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/format";
 import { parseImageUrls } from "@/lib/media-urls";
 import { ContentThumbCell } from "@/components/content-thumb-cell";
 import { MotionListItem } from "@/components/motion-list";
+import { PageSectionHeader } from "@/components/page-section-header";
 
 type ListingRow = {
   id: string;
@@ -119,12 +120,10 @@ export default function ListingsPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div>
-        <h2 className="section-title">My listings</h2>
-        <p className="subtle" style={{ marginTop: 8 }}>
-          Review marketplace items you have listed—title, price, location, and the first photo shown on each row.
-        </p>
-      </div>
+      <PageSectionHeader
+        title="My listings"
+        description="Review marketplace items you have listed—title, price, location, and the first photo shown on each row."
+      />
       {error ? <p className="error">{error}</p> : null}
       {loading ? <p className="subtle">Loading listings…</p> : null}
       {!loading && items.length === 0 ? <p className="empty">No listings yet.</p> : null}

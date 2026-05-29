@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { SectionTitleWithInfo } from "@/components/page-section-header";
 import { motion } from "framer-motion";
 
 const EMAIL = "cap@ivey.ca";
@@ -21,12 +22,11 @@ export default function ContactSettingsPage() {
         <Link href="/platform/settings" className="btn btn-secondary" style={{ display: "inline-block" }}>
           ← Settings
         </Link>
-        <h2 className="section-title" style={{ marginTop: 12 }}>
-          Contact
-        </h2>
-        <p className="subtle" style={{ marginTop: 8 }}>
-          Program staff contact details for account questions or general help.
-        </p>
+        <SectionTitleWithInfo
+          className="page-section-title-row--spaced"
+          title="Contact"
+          description="Program staff contact details for account questions or general help."
+        />
       </div>
 
       <div className="content-card stack" style={{ gap: 16, padding: 20, background: "#fafafa" }}>

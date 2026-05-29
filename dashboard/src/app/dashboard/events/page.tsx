@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/format";
 import { formatEventCategory, formatEventDateTimeLine, isEventUpcoming } from "@/lib/event-format";
 import { ContentThumbCell } from "@/components/content-thumb-cell";
 import { MotionListItem } from "@/components/motion-list";
+import { PageSectionHeader } from "@/components/page-section-header";
 
 type EventRow = {
   id: string;
@@ -194,32 +195,15 @@ export default function EventsPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 12,
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-        }}
-      >
-        <div className="stack" style={{ flex: "1 1 12rem", minWidth: 0, gap: 8 }}>
-          <h2 className="section-title" style={{ margin: 0 }}>
-            My events
-          </h2>
-          <p className="subtle" style={{ margin: 0 }}>
-            Plan gatherings, set date and place, and add a cover image so members know what to expect and how to join.
-          </p>
-        </div>
-        <button
-          type="button"
-          className="btn btn-primary btn-primary-compact"
-          style={{ flexShrink: 0 }}
-          onClick={() => setCreateOpen(true)}
-        >
-          New event
-        </button>
-      </div>
+      <PageSectionHeader
+        title="My events"
+        description="Plan gatherings, set date and place, and add a cover image so members know what to expect and how to join."
+        action={
+          <button type="button" className="btn btn-primary btn-primary-compact" onClick={() => setCreateOpen(true)}>
+            New event
+          </button>
+        }
+      />
       {createOpen ? (
         <div className="content-card stack" style={{ gap: 12 }}>
           <h3 className="section-title" style={{ fontSize: "1.05rem" }}>

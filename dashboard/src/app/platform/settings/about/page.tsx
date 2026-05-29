@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { SectionTitleWithInfo } from "@/components/page-section-header";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -74,13 +75,11 @@ export default function AboutYourAccountPage() {
         <Link href="/platform/settings" className="btn btn-secondary" style={{ display: "inline-block" }}>
           ← Settings
         </Link>
-        <h2 className="section-title" style={{ marginTop: 12 }}>
-          About your account
-        </h2>
-        <p className="subtle" style={{ marginTop: 8 }}>
-          A read-only snapshot of the email, username, and profile fields stored for your account. To change them, edit{" "}
-          <Link href="/platform/profile">My Profile</Link>.
-        </p>
+        <SectionTitleWithInfo
+          className="page-section-title-row--spaced"
+          title="About your account"
+          description="A read-only snapshot of the email, username, and profile fields stored for your account. To change them, edit My Profile."
+        />
       </div>
 
       {loading ? <p className="subtle">Loading…</p> : null}

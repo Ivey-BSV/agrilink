@@ -7,6 +7,7 @@ import { formatDate } from "@/lib/format";
 import { parseImageUrls } from "@/lib/media-urls";
 import { ContentThumbCell } from "@/components/content-thumb-cell";
 import { MotionListItem } from "@/components/motion-list";
+import { PageSectionHeader } from "@/components/page-section-header";
 
 type PostRow = {
   id: string;
@@ -118,12 +119,10 @@ export default function PostsPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div>
-        <h2 className="section-title">My posts</h2>
-        <p className="subtle" style={{ marginTop: 8 }}>
-          See everything you have published to the community feed, edit text in place, and review the first image shown on each card.
-        </p>
-      </div>
+      <PageSectionHeader
+        title="My posts"
+        description="See everything you have published to the community feed, edit text in place, and review the first image shown on each card."
+      />
       {error ? <p className="error">{error}</p> : null}
       {loading ? <p className="subtle">Loading posts…</p> : null}
       {!loading && items.length === 0 ? <p className="empty">No posts yet.</p> : null}

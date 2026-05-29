@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
 import { parseImageUrls } from "@/lib/media-urls";
 import { ContentThumbCell } from "@/components/content-thumb-cell";
+import { PageSectionHeader } from "@/components/page-section-header";
 
 type ListingRow = {
   id: string;
@@ -44,12 +45,10 @@ export default function ExchangeHubPage() {
 
   return (
     <motion.div className="content-card stack" style={{ gap: 16 }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-      <div>
-        <h2 className="section-title">Exchange Hub</h2>
-        <p className="subtle" style={{ marginTop: 8 }}>
-          Browse equipment, services, and other listings members have shared. This view is for discovery only; publishing or editing a listing is done in your listing tools.
-        </p>
-      </div>
+      <PageSectionHeader
+        title="Exchange Hub"
+        description="Browse equipment, services, and other listings members have shared. This view is for discovery only; publishing or editing a listing is done in your listing tools."
+      />
       {loading ? <p className="subtle">Loading listings…</p> : null}
       {error ? <p className="error">{error}</p> : null}
       {!loading && items.length === 0 ? <p className="empty">No listings yet.</p> : null}

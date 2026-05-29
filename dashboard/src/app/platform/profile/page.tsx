@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
+import { PageSectionHeader } from "@/components/page-section-header";
 import { UserAvatar } from "@/components/user-avatar";
 import { ProfilePostGrid } from "@/components/profile-post-grid";
 import { PlatformEventList } from "@/components/platform-event-card";
@@ -203,12 +204,10 @@ export default function PlatformProfilePage() {
 
   return (
     <motion.div className="content-card stack" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
-      <div>
-        <h2 className="section-title">My profile</h2>
-        <p className="subtle" style={{ marginTop: 8 }}>
-          Update the name, bio, location, and photo other members see when you join discussions, projects, or events.
-        </p>
-      </div>
+      <PageSectionHeader
+        title="My profile"
+        description="Update the name, bio, location, and photo other members see when you join discussions, projects, or events."
+      />
 
       {loading ? <p className="subtle">Loading profile…</p> : null}
       {error ? <p className="error">{error}</p> : null}

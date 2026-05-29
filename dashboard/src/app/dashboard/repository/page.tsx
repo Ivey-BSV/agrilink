@@ -11,6 +11,7 @@ import { FileBrowseGalleryDocumentsTabs } from "@/components/file-browse-gallery
 import { FileGalleryGrid } from "@/components/file-gallery-grid";
 import { FileRowThumb } from "@/components/file-row-thumb";
 import { MotionListItem } from "@/components/motion-list";
+import { PageSectionHeader } from "@/components/page-section-header";
 import { fetchUploaderLabelByUserIds } from "@/lib/document-owner-profiles";
 
 type RepoDocRow = {
@@ -53,11 +54,9 @@ export default function RepositoryFilesPage() {
   const isStaff = isModeratorPlusEffective(staffAccess);
   const heading =
     !accessResolved || isStaff ? "Repository Files" : "My Repository Files";
-  const introCopy = !accessResolved
-    ? "Loading repository materials…"
-    : isStaff
-      ? "Shared reference files live in a gallery for images and a document list for everything else. Filter by approval, owner, or filename when you are curating what the cohort can see."
-      : "Store guides, PDFs, and reference images for your farm or cohort. The gallery highlights pictures; longer documents sit in the list below with preview and open-in-new-tab where supported.";
+  const repositoryInfo = isStaff
+    ? "Shared reference files live in a gallery for images and a document list for everything else. Filter by approval, owner, or filename when you are curating what the cohort can see."
+    : "Store guides, PDFs, and reference images for your farm or cohort. The gallery highlights pictures; longer documents sit in the list below with preview and open-in-new-tab where supported.";
 
   useEffect(() => {
     let cancelled = false;
@@ -322,33 +321,20 @@ export default function RepositoryFilesPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 12,
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-        }}
-      >
-        <div className="stack" style={{ flex: "1 1 12rem", minWidth: 0, gap: 8 }}>
-          <h2 className="section-title" style={{ margin: 0 }}>
-            {heading}
-          </h2>
-          <p className="subtle" style={{ margin: 0 }}>
-            {introCopy}
-          </p>
-        </div>
-        <button
-          type="submit"
-          form="repo-upload-form"
-          className="btn btn-primary btn-primary-compact"
-          style={{ flexShrink: 0 }}
-          disabled={uploading}
-        >
-          {uploading ? "Uploading…" : "Upload file"}
-        </button>
-      </div>
+      <PageSectionHeader
+        title={heading}
+        description={repositoryInfo}
+        action={
+          <button
+            type="submit"
+            form="repo-upload-form"
+            className="btn btn-primary btn-primary-compact"
+            disabled={uploading}
+          >
+            {uploading ? "Uploading…" : "Upload file"}
+          </button>
+        }
+      />
       {error ? <p className="error">{error}</p> : null}
       {success ? <p className="success">{success}</p> : null}
 

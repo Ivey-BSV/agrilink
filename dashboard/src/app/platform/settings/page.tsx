@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { PageSectionHeader } from "@/components/page-section-header";
 import { MOBILE_APP_VERSION_DISPLAY, WEB_DASHBOARD_VERSION } from "@/lib/cap-app-version";
 
 const SETTINGS_LINKS: { href: string; label: string }[] = [
@@ -31,13 +32,10 @@ export default function PlatformSettingsPage() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <div>
-        <h2 className="section-title">Settings</h2>
-        <p className="subtle" style={{ marginTop: 8 }}>
-          Password, notifications, legal notices, and how to reach the program team. Update the profile other members see under{" "}
-          <Link href="/platform/profile">My Profile</Link> in the sidebar.
-        </p>
-      </div>
+      <PageSectionHeader
+        title="Settings"
+        description="Password, notifications, legal notices, and how to reach the program team. Update the profile other members see under My Profile in the sidebar."
+      />
 
       <nav className="platform-settings-list" aria-label="Settings sections">
         {SETTINGS_LINKS.map((item) => (

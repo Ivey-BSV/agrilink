@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FormEvent, useEffect, useState } from "react";
+import { PageSectionHeader } from "@/components/page-section-header";
 import { formatDate } from "@/lib/format";
 import { createPollWithOptions, listPollsForWeb, type PollListRow } from "@/lib/polls";
 import { supabase } from "@/lib/supabase";
@@ -77,34 +78,17 @@ export default function PlatformPollsPage() {
 
   return (
     <motion.div className="content-card stack" style={{ gap: 16 }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 12,
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-        }}
-      >
-        <div className="stack" style={{ flex: "1 1 12rem", minWidth: 0, gap: 8 }}>
-          <h2 className="section-title" style={{ margin: 0 }}>
-            Polls
-          </h2>
-          <p className="subtle" style={{ margin: 0 }}>
-            Run quick surveys: create a poll, collect votes while it is open, and review results when it closes. Anyone signed in can start a poll; organizers can edit or close their own.
-          </p>
-        </div>
-        {signedIn ? (
-          <button
-            type="button"
-            className="btn btn-primary btn-primary-compact"
-            style={{ flexShrink: 0 }}
-            onClick={() => setCreateOpen(true)}
-          >
-            New poll
-          </button>
-        ) : null}
-      </div>
+      <PageSectionHeader
+        title="Polls"
+        description="Run quick surveys: create a poll, collect votes while it is open, and review results when it closes. Anyone signed in can start a poll; organizers can edit or close their own."
+        action={
+          signedIn ? (
+            <button type="button" className="btn btn-primary btn-primary-compact" onClick={() => setCreateOpen(true)}>
+              New poll
+            </button>
+          ) : null
+        }
+      />
       {loading ? <p className="subtle">Loading polls…</p> : null}
       {error ? <p className="error">{error}</p> : null}
       {!loading && rows.length === 0 ? <p className="empty">No polls yet.</p> : null}

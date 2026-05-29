@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { SectionTitleWithInfo } from "@/components/page-section-header";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -84,12 +85,11 @@ export default function NotificationSettingsPage() {
         <Link href="/platform/settings" className="btn btn-secondary" style={{ alignSelf: "flex-start", display: "inline-block" }}>
           ← Settings
         </Link>
-        <h2 className="section-title" style={{ marginTop: 12 }}>
-          Notification settings
-        </h2>
-        <p className="subtle" style={{ marginTop: 8 }}>
-          Decide which kinds of activity should ping you inside the site. Push alerts also respect your device and account settings when push is enabled.
-        </p>
+        <SectionTitleWithInfo
+          className="page-section-title-row--spaced"
+          title="Notification settings"
+          description="Decide which kinds of activity should ping you inside the site. Push alerts also respect your device and account settings when push is enabled."
+        />
       </div>
       {loading ? <p className="subtle">Loading…</p> : null}
       {error ? <p className="error">{error}</p> : null}

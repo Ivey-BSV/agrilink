@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { PageSectionHeader } from "@/components/page-section-header";
 import {
   formatGoalDeadlineLabel,
   joinCommunityProject,
@@ -209,32 +210,15 @@ export default function CollaborationProjectsPage() {
       transition={{ duration: 0.2 }}
     >
       <div className="content-card stack" style={{ gap: 14 }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 12,
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-          }}
-        >
-          <div className="stack" style={{ flex: "1 1 12rem", minWidth: 0, gap: 8 }}>
-            <h2 className="section-title" style={{ margin: 0 }}>
-              Projects
-            </h2>
-            <p className="subtle" style={{ margin: 0 }}>
-              Community projects are open for others to join; farm projects stay on your account with milestones you check off over time. Start either kind here, then open a project to manage members and progress.
-            </p>
-          </div>
-          <button
-            type="button"
-            className="btn btn-primary btn-primary-compact"
-            style={{ flexShrink: 0 }}
-            onClick={() => openCreateModal()}
-          >
-            {tab === "community" ? "New community project" : "New farm project"}
-          </button>
-        </div>
+        <PageSectionHeader
+          title="Projects"
+          description="Community projects are open for others to join; farm projects stay on your account with milestones you check off over time. Start either kind here, then open a project to manage members and progress."
+          action={
+            <button type="button" className="btn btn-primary btn-primary-compact" onClick={() => openCreateModal()}>
+              {tab === "community" ? "New community project" : "New farm project"}
+            </button>
+          }
+        />
         <div className="platform-profile-tabs" role="tablist" aria-label="Project type">
           <button
             type="button"

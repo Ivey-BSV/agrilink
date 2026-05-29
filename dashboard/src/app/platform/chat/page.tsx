@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ChatThreadAvatar } from "@/components/chat-thread-avatar";
+import { PageSectionHeader } from "@/components/page-section-header";
 import {
   fetchFollowingWithMeta,
   filterMessageRequests,
@@ -175,17 +176,15 @@ export default function PlatformChatPage() {
       transition={{ duration: 0.2 }}
     >
       <div className="chat-hub-header">
-        <div>
-          <h2 className="section-title" style={{ marginBottom: 6 }}>
-            Messages
-          </h2>
-          <p className="subtle" style={{ margin: 0 }}>
-            Chats with people you follow. Requests are from people who follow you but you don&apos;t follow back yet.
-          </p>
-        </div>
-        <button type="button" className="btn btn-secondary" onClick={() => void load()}>
-          Refresh
-        </button>
+        <PageSectionHeader
+          title="Messages"
+          description="Chats with people you follow. Requests are from people who follow you but you don't follow back yet."
+          action={
+            <button type="button" className="btn btn-secondary" onClick={() => void load()}>
+              Refresh
+            </button>
+          }
+        />
       </div>
 
       {error ? <p className="error" style={{ padding: "0 0 12px" }}>{error}</p> : null}

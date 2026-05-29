@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
+import { SectionTitleWithInfo } from "@/components/page-section-header";
 import { UserAvatar } from "@/components/user-avatar";
 
 type Row = {
@@ -116,10 +117,7 @@ export function ProfileFollowListPage({
         <Link href={backHref} className="subtle" style={{ textDecoration: "none" }}>
           {backLabel}
         </Link>
-        <h2 className="section-title">{title}</h2>
-        <p className="subtle" style={{ margin: 0 }}>
-          {description}
-        </p>
+        <SectionTitleWithInfo title={title} description={description} />
       </div>
 
       {loading ? <p className="subtle">Loading…</p> : null}

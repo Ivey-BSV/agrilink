@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { SectionTitleWithInfo } from "@/components/page-section-header";
 import { FormEvent, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
@@ -75,12 +76,11 @@ export default function ChangePasswordPage() {
         <Link href="/platform/settings" className="btn btn-secondary" style={{ display: "inline-block" }}>
           ← Settings
         </Link>
-        <h2 className="section-title" style={{ marginTop: 12 }}>
-          Change password
-        </h2>
-        <p className="subtle" style={{ marginTop: 8 }}>
-          Enter your current password, then choose a new one. We confirm your existing password before saving the update.
-        </p>
+        <SectionTitleWithInfo
+          className="page-section-title-row--spaced"
+          title="Change password"
+          description="Enter your current password, then choose a new one. We confirm your existing password before saving the update."
+        />
       </div>
 
       {done ? (
