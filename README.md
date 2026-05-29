@@ -4,7 +4,7 @@
 
 This repo also includes a **web dashboard** (Next.js) for staff and power users, plus **Supabase** backend config (database migrations and edge functions).
 
-**Last updated:** May 2026 · App version `1.0.7+18`
+**Last updated:** May 2026 · App version `1.0.8+19`
 
 ---
 
