@@ -6,6 +6,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { ChatThreadAvatar } from "@/components/chat-thread-avatar";
 import {
   followUser,
   getAuthUserIdForData,
@@ -15,6 +16,7 @@ import {
   sendTextMessage,
   type ChatMessageRow,
 } from "@/lib/chat";
+import { networkDisplayImageUrl } from "@/lib/image-urls";
 
 function extractPostIdFromContent(content: string): string | null {
   const idx = content.indexOf(POST_SHARE_TOKEN_PREFIX);
@@ -101,7 +103,7 @@ function PlatformChatDetailInner() {
       if (prof) {
         const p = prof as { full_name: string | null; username: string | null; avatar_url: string | null };
         setOtherName(p.full_name?.trim() || p.username || "User");
-        setOtherAvatar(p.avatar_url);
+        setOtherAvatar(networkDisplayImageUrl(p.avatar_url, 256));
       }
 
       const rows = await loadMessagesForChat(chatId);
@@ -224,13 +226,7 @@ function PlatformChatDetailInner() {
           ← Messages
         </Link>
         <div className="chat-detail-peer">
-          <div className="chat-thread-avatar chat-thread-avatar--sm" aria-hidden>
-            {otherAvatar ? (
-              <img src={otherAvatar} alt="" width={40} height={40} />
-            ) : (
-              <span>{title.trim() ? title[0]!.toUpperCase() : "U"}</span>
-            )}
-          </div>
+          <ChatThreadAvatar url={otherAvatar} name={title} sm />
           <div>
             <div className="chat-detail-peer-name">{title}</div>
             <div className="subtle" style={{ fontSize: 12 }}>

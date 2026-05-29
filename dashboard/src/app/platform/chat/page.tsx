@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { ChatThreadAvatar } from "@/components/chat-thread-avatar";
 import {
   fetchFollowingWithMeta,
   filterMessageRequests,
@@ -14,6 +15,7 @@ import {
   type ChatListEntry,
   type ChatLoadMeta,
 } from "@/lib/chat";
+import { networkDisplayImageUrl } from "@/lib/image-urls";
 
 type Tab = "messages" | "requests";
 
@@ -24,11 +26,6 @@ type FollowingRow = {
   avatar_url: string | null;
   follow_created_at: string;
 };
-
-function initialLetter(name: string) {
-  if (!name.trim()) return "U";
-  return name[0]!.toUpperCase();
-}
 
 function formatTimeAgo(iso: string) {
   const t = new Date(iso).getTime();
@@ -135,7 +132,7 @@ export default function PlatformChatPage() {
       return {
         chat,
         displayName: fu?.full_name?.trim() || fu?.username || chat.otherName,
-        avatar: fu?.avatar_url ?? chat.otherAvatar,
+        avatar: networkDisplayImageUrl(chat.otherAvatar ?? fu?.avatar_url, 256),
       };
     });
   }, [messageRequests, following]);
@@ -285,7 +282,7 @@ export default function PlatformChatPage() {
           <ul className="chat-thread-list">
             {messageHubRows.map(({ follow, chat }) => {
               const display = follow.full_name?.trim() || follow.username || chat?.otherName || "User";
-              const avatarUrl = follow.avatar_url ?? chat?.otherAvatar ?? null;
+              const avatarUrl = networkDisplayImageUrl(follow.avatar_url ?? chat?.otherAvatar, 256);
               const href = chat ? `/platform/chat/${chat.id}` : `/platform/chat/with/${follow.id}`;
               const rowKey = chat?.id ?? `pending-${follow.id}`;
 
@@ -312,13 +309,7 @@ export default function PlatformChatPage() {
               return (
                 <li key={rowKey}>
                   <Link href={href} className="chat-thread-row">
-                    <div className="chat-thread-avatar" aria-hidden>
-                      {avatarUrl ? (
-                        <img src={avatarUrl} alt="" width={48} height={48} />
-                      ) : (
-                        <span>{initialLetter(display)}</span>
-                      )}
-                    </div>
+                    <ChatThreadAvatar url={avatarUrl} name={display} />
                     <div className="chat-thread-meta">
                       <div className="chat-thread-title-row">
                         <span className="chat-thread-name">{display}</span>
@@ -352,13 +343,7 @@ export default function PlatformChatPage() {
             return (
               <li key={chat.id}>
                 <Link href={`/platform/chat/${chat.id}?request=1`} className="chat-thread-row">
-                  <div className="chat-thread-avatar" aria-hidden>
-                    {avatar ? (
-                      <img src={avatar} alt="" width={48} height={48} />
-                    ) : (
-                      <span>{initialLetter(displayName)}</span>
-                    )}
-                  </div>
+                  <ChatThreadAvatar url={avatar} name={displayName} />
                   <div className="chat-thread-meta">
                     <div className="chat-thread-title-row">
                       <span className="chat-thread-name">{displayName}</span>

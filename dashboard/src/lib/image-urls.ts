@@ -2,10 +2,39 @@ import { parseImageUrls } from "@/lib/media-urls";
 
 export { parseImageUrls };
 
+const SUPABASE_OBJECT_PUBLIC = "/storage/v1/object/public/";
+const SUPABASE_RENDER_PUBLIC = "/storage/v1/render/image/public/";
+
 export function sanitizeImageUrl(raw: string | null | undefined): string | null {
   if (raw == null) return null;
   const trimmed = raw.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+/** Supabase render endpoint transcodes HEIC/large uploads for browsers that cannot decode them. */
+export function supabaseRenderImageUrl(raw: string | null | undefined, width = 1200): string | null {
+  const url = sanitizeImageUrl(raw);
+  if (!url || !url.includes(SUPABASE_OBJECT_PUBLIC)) return null;
+  const render = url.replace(SUPABASE_OBJECT_PUBLIC, SUPABASE_RENDER_PUBLIC);
+  try {
+    const uri = new URL(render);
+    uri.searchParams.set("width", String(width));
+    return uri.toString();
+  } catch {
+    const sep = render.includes("?") ? "&" : "?";
+    return `${render}${sep}width=${width}`;
+  }
+}
+
+/** Primary URL for avatars and in-app image widgets (matches mobile). */
+export function networkDisplayImageUrl(raw: string | null | undefined, renderWidth = 1200): string | null {
+  const url = sanitizeImageUrl(raw);
+  if (!url) return null;
+  const lower = url.toLowerCase();
+  if (lower.includes(".heic") || lower.includes(".heif")) {
+    return supabaseRenderImageUrl(url, renderWidth) ?? url;
+  }
+  return url;
 }
 
 export function isNetworkImageUrl(raw: string | null | undefined): boolean {

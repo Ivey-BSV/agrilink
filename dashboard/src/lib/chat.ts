@@ -1,3 +1,4 @@
+import { networkDisplayImageUrl } from "@/lib/image-urls";
 import { supabase } from "@/lib/supabase";
 
 export const POST_SHARE_TOKEN_PREFIX = "POST_SHARE_ID:";
@@ -332,7 +333,7 @@ export async function loadChatsForCurrentUser(
       id: row.id,
       otherUserId,
       otherName,
-      otherAvatar: prof?.avatar_url ?? null,
+      otherAvatar: networkDisplayImageUrl(prof?.avatar_url, 256),
       lastMessage,
       lastMessageTime,
       unreadCount,
@@ -397,7 +398,7 @@ export async function fetchFollowingWithMeta(currentUserId: string) {
       id,
       username: p?.username ?? null,
       full_name: p?.full_name ?? null,
-      avatar_url: p?.avatar_url ?? null,
+      avatar_url: networkDisplayImageUrl(p?.avatar_url, 256),
       follow_created_at: followMap.get(id) ?? "",
     };
   });

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { isNetworkImageUrl, networkDisplayImageUrl } from "@/lib/image-urls";
 
 type UserAvatarProps = {
   url?: string | null;
@@ -10,24 +11,33 @@ type UserAvatarProps = {
   className?: string;
 };
 
-function initialLetterFrom(name: string | null | undefined, email?: string | null): string {
+export function initialLetterFrom(name: string | null | undefined, email?: string | null): string {
   const n = (name ?? "").trim();
-  if (n.length >= 1) return n[0].toUpperCase();
+  if (n.length >= 1) return n[0]!.toUpperCase();
   const e = (email ?? "").trim();
-  if (e.length >= 1) return e[0].toUpperCase();
+  if (e.length >= 1) return e[0]!.toUpperCase();
   return "U";
 }
 
 export function UserAvatar({ url, name, email, size = 40, className = "" }: UserAvatarProps) {
   const [failed, setFailed] = useState(false);
   const label = useMemo(() => initialLetterFrom(name, email), [name, email]);
+  const displayUrl = useMemo(
+    () => networkDisplayImageUrl(url, Math.max(96, size * 2)),
+    [url, size],
+  );
+  const canShowImage = Boolean(displayUrl && isNetworkImageUrl(displayUrl) && !failed);
+
+  useEffect(() => {
+    setFailed(false);
+  }, [displayUrl]);
 
   const style = { width: size, height: size, fontSize: Math.max(10, Math.round(size * 0.5)) };
 
-  if (url && url.trim() && !failed) {
+  if (canShowImage && displayUrl) {
     return (
       <img
-        src={url.trim()}
+        src={displayUrl}
         alt=""
         className={`user-avatar user-avatar--img ${className}`.trim()}
         style={style}
