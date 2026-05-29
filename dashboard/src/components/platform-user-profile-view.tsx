@@ -17,8 +17,8 @@ import {
   unfollowUser,
 } from "@/lib/profile-social";
 import { UserAvatar } from "@/components/user-avatar";
-import { ContentThumbCell } from "@/components/content-thumb-cell";
 import { ProfilePostGrid } from "@/components/profile-post-grid";
+import { PlatformEventList } from "@/components/platform-event-card";
 import { FarmDetailsModal } from "@/components/farm-details-modal";
 
 type ProfileTab = "posts" | "events";
@@ -322,42 +322,12 @@ export function PlatformUserProfileView({ userId }: PlatformUserProfileViewProps
           ) : null}
 
           {tab === "events" ? (
-            <div className="platform-profile-panel stack" style={{ gap: 12 }}>
-              {loadingTab ? <p className="subtle">Loading events…</p> : null}
-              {!loadingTab && events.length === 0 ? (
-                <p className="empty">This member has not created any events yet.</p>
-              ) : null}
-              <div className="list">
-                {events.map((ev) => {
-                  const now = new Date();
-                  const evDate = new Date(ev.event_date);
-                  const isUpcoming =
-                    evDate > now ||
-                    (evDate.getFullYear() === now.getFullYear() &&
-                      evDate.getMonth() === now.getMonth() &&
-                      evDate.getDate() === now.getDate());
-                  return (
-                    <div key={ev.id} className="list-item platform-post-card platform-profile-event-card">
-                      <ContentThumbCell imageUrl={ev.image_url} />
-                      <div className="stack workshop-file-body" style={{ gap: 6 }}>
-                        <div className="workshop-line-title">{ev.title}</div>
-                        <div className="workshop-line-meta">{ev.category}</div>
-                        {ev.description ? (
-                          <div className="subtle" style={{ fontSize: "0.88rem" }}>
-                            {ev.description}
-                          </div>
-                        ) : null}
-                        <div className="platform-post-meta-row">
-                          <span className={`pill${isUpcoming ? "" : " subtle"}`}>{isUpcoming ? "Upcoming" : "Past"}</span>
-                          <span className="pill">{ev.event_date}</span>
-                          <span className="subtle">{ev.time}</span>
-                          <span className="subtle">{ev.location}</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            <div className="platform-profile-panel">
+              <PlatformEventList
+                events={events}
+                loading={loadingTab}
+                emptyMessage="This member has not created any events yet."
+              />
             </div>
           ) : null}
         </>

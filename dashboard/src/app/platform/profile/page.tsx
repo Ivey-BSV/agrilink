@@ -6,11 +6,10 @@ import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
 import { UserAvatar } from "@/components/user-avatar";
-import { ContentThumbCell } from "@/components/content-thumb-cell";
 import { ProfilePostGrid } from "@/components/profile-post-grid";
+import { PlatformEventList } from "@/components/platform-event-card";
 import { FarmDetailsModal } from "@/components/farm-details-modal";
 import { loadFarmDetailsFull, type FarmDetailsRow } from "@/lib/farm-details";
-import { MotionListItem } from "@/components/motion-list";
 import { loadFarmDetailsSummary, upsertFarmDetailsSummary } from "@/lib/farm-details";
 
 type Profile = {
@@ -338,27 +337,12 @@ export default function PlatformProfilePage() {
           ) : null}
 
           {tab === "events" ? (
-            <div className="platform-profile-panel stack" style={{ gap: 12 }}>
-              <p className="subtle">Events and workshops you have created or host for the community.</p>
-              {loadingEvents ? <p className="subtle">Loading events…</p> : null}
-              {!loadingEvents && events.length === 0 ? <p className="empty">No events yet. Add one from Events in the workspace.</p> : null}
-              <div className="list">
-                {events.map((ev, index) => (
-                  <MotionListItem key={ev.id} index={index} className="list-item platform-post-card">
-                    <ContentThumbCell imageUrl={ev.image_url} />
-                    <div className="stack workshop-file-body" style={{ gap: 6 }}>
-                      <div className="workshop-line-title">{ev.title}</div>
-                      <div className="workshop-line-meta">{ev.category}</div>
-                      {ev.description ? <div className="subtle" style={{ fontSize: "0.88rem" }}>{ev.description}</div> : null}
-                      <div className="platform-post-meta-row">
-                        <span className="pill">{ev.event_date}</span>
-                        <span className="subtle">{ev.time}</span>
-                        <span className="subtle">{ev.location}</span>
-                      </div>
-                    </div>
-                  </MotionListItem>
-                ))}
-              </div>
+            <div className="platform-profile-panel">
+              <PlatformEventList
+                events={events}
+                loading={loadingEvents}
+                emptyMessage="No events yet. Create one from Events in the workspace."
+              />
             </div>
           ) : null}
           <FarmDetailsModal

@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
+import { formatEventCategory, formatEventDateTimeLine, isEventUpcoming } from "@/lib/event-format";
 import { ContentThumbCell } from "@/components/content-thumb-cell";
 import { MotionListItem } from "@/components/motion-list";
 
@@ -343,10 +344,17 @@ export default function EventsPage() {
               ) : (
                 <>
                   <div className="workshop-line-title">{item.title}</div>
-                  <div className="workshop-line-meta">
-                    {item.category} · {item.event_date} at {item.time}
+                  <div className="workshop-line-meta platform-event-inline-meta">
+                    <span className={`platform-event-inline-status${isEventUpcoming(item.event_date) ? " is-upcoming" : " is-past"}`}>
+                      {isEventUpcoming(item.event_date) ? "Upcoming" : "Past"}
+                    </span>
+                    <span className="platform-event-inline-sep" aria-hidden>
+                      ·
+                    </span>
+                    <span>{formatEventCategory(item.category)}</span>
                   </div>
-                  <div className="workshop-line-meta">{item.location}</div>
+                  <div className="workshop-line-meta">{formatEventDateTimeLine(item.event_date, item.time)}</div>
+                  {item.location?.trim() ? <div className="workshop-line-meta">{item.location.trim()}</div> : null}
                   {item.description ? (
                     <div className="workshop-line-meta" style={{ maxHeight: 72, overflow: "hidden" }}>
                       {item.description}
