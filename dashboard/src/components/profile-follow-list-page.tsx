@@ -19,6 +19,8 @@ type ProfileFollowListPageProps = {
   emptyMessage: string;
   followColumn: "follower_id" | "following_id";
   filterColumn: "following_id" | "follower_id";
+  /** When omitted, uses the signed-in user's id (my profile lists). */
+  userId?: string;
 };
 
 export function ProfileFollowListPage({
@@ -27,8 +29,10 @@ export function ProfileFollowListPage({
   emptyMessage,
   followColumn,
   filterColumn,
+  userId: userIdProp,
 }: ProfileFollowListPageProps) {
   const [rows, setRows] = useState<Row[]>([]);
+  const [subjectName, setSubjectName] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +43,8 @@ export function ProfileFollowListPage({
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) {
+      const subjectId = userIdProp ?? user?.id ?? null;
+      if (!subjectId) {
         if (!cancelled) {
           setError("Not signed in.");
           setLoading(false);
@@ -47,10 +52,20 @@ export function ProfileFollowListPage({
         return;
       }
 
+      const { data: subjectProfile } = await supabase
+        .from("user_profiles")
+        .select("full_name, username")
+        .eq("id", subjectId)
+        .maybeSingle();
+      if (!cancelled && subjectProfile) {
+        const sp = subjectProfile as { full_name: string | null; username: string | null };
+        setSubjectName(sp.full_name?.trim() || sp.username || "Member");
+      }
+
       const { data: followRows, error: fe } = await supabase
         .from("follows")
         .select(`${followColumn}, created_at`)
-        .eq(filterColumn, user.id)
+        .eq(filterColumn, subjectId)
         .order("created_at", { ascending: false })
         .limit(200);
 
@@ -61,8 +76,7 @@ export function ProfileFollowListPage({
         return;
       }
 
-      const ids =
-        (followRows as Record<string, string>[] | null)?.map((r) => r[followColumn]) ?? [];
+      const ids = (followRows as Record<string, string>[] | null)?.map((r) => r[followColumn]) ?? [];
       if (ids.length === 0) {
         setRows([]);
         setLoading(false);
@@ -86,7 +100,10 @@ export function ProfileFollowListPage({
     return () => {
       cancelled = true;
     };
-  }, [followColumn, filterColumn]);
+  }, [followColumn, filterColumn, userIdProp]);
+
+  const backHref = userIdProp ? `/platform/user/${userIdProp}` : "/platform/profile";
+  const backLabel = userIdProp ? (subjectName ? `← ${subjectName}` : "← Profile") : "← My profile";
 
   return (
     <motion.div
@@ -96,8 +113,8 @@ export function ProfileFollowListPage({
       transition={{ duration: 0.2 }}
     >
       <div className="stack" style={{ gap: 4 }}>
-        <Link href="/platform/profile" className="subtle" style={{ textDecoration: "none" }}>
-          ← My profile
+        <Link href={backHref} className="subtle" style={{ textDecoration: "none" }}>
+          {backLabel}
         </Link>
         <h2 className="section-title">{title}</h2>
         <p className="subtle" style={{ margin: 0 }}>
@@ -115,15 +132,17 @@ export function ProfileFollowListPage({
           const name = r.full_name?.trim() || r.username || "Member";
           return (
             <li key={r.id} className="list-item" style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <UserAvatar url={r.avatar_url} name={name} email={null} size={44} />
-              <div className="stack" style={{ gap: 2, minWidth: 0 }}>
-                <div style={{ fontWeight: 600 }}>{name}</div>
-                {r.username ? <div className="subtle">@{r.username}</div> : null}
-              </div>
+              <Link href={`/platform/user/${r.id}`} style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, minWidth: 0, textDecoration: "none", color: "inherit" }}>
+                <UserAvatar url={r.avatar_url} name={name} email={null} size={44} />
+                <div className="stack" style={{ gap: 2, minWidth: 0 }}>
+                  <div style={{ fontWeight: 600 }}>{name}</div>
+                  {r.username ? <div className="subtle">@{r.username}</div> : null}
+                </div>
+              </Link>
               <Link
                 href={`/platform/chat/with/${r.id}`}
                 className="btn btn-secondary"
-                style={{ marginLeft: "auto", flexShrink: 0 }}
+                style={{ flexShrink: 0 }}
               >
                 Message
               </Link>

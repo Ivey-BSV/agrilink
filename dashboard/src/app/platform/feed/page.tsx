@@ -1,9 +1,13 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
+import { isVideoMediaUrl } from "@/lib/image-urls";
 import { parseImageUrls } from "@/lib/media-urls";
+import { PostMediaPreview } from "@/components/post-media-preview";
 import { linkifyPlainText } from "@/lib/linkify-plain-text";
 import { MotionListItem } from "@/components/motion-list";
 import { UserAvatar } from "@/components/user-avatar";
@@ -101,6 +105,7 @@ async function removePostImages(post: PostRow) {
 }
 
 export default function PlatformFeedPage() {
+  const router = useRouter();
   const { staffAccess, ready: staffReady } = useStaffAccess();
   const isSuper = staffReady && isSuperEffective(staffAccess);
 
@@ -661,7 +666,7 @@ export default function PlatformFeedPage() {
           const profile = profiles[post.user_id];
           const imageUrls = parseImageUrls(post.image_urls);
           const imageUrl = imageUrls[0] ?? null;
-          const isVideo = imageUrl ? isVideoUrl(imageUrl) : false;
+          const isVideo = imageUrl ? isVideoMediaUrl(imageUrl) || isVideoUrl(imageUrl) : false;
           const tags = parseTextArray(post.tags);
           const rawName = profile?.full_name?.trim();
           const uname = profile?.username?.trim();
@@ -671,6 +676,7 @@ export default function PlatformFeedPage() {
           const mine = currentUserId === post.user_id;
           const canEditPost = mine || isSuper;
           const heading = displayPostTitle(post.title);
+          const authorProfileHref = mine ? "/platform/profile" : `/platform/user/${post.user_id}`;
 
           return (
             <MotionListItem
@@ -680,13 +686,15 @@ export default function PlatformFeedPage() {
             >
               <article className="feed-post">
                 <header className="feed-post-header">
-                  <UserAvatar url={profile?.avatar_url} name={author} size={44} />
+                  <Link href={authorProfileHref} className="feed-post-author-link" aria-label={`View ${author}'s profile`}>
+                    <UserAvatar url={profile?.avatar_url} name={author} size={44} />
+                  </Link>
                   <div className="feed-post-header-main">
                     <div className="feed-post-header-top">
                       <div className="feed-post-identity">
-                        <span className="feed-post-name">
+                        <Link href={authorProfileHref} className="feed-post-name feed-post-author-link">
                           {rawName ? rawName : uname ? `@${uname}` : "Farmer"}
-                        </span>
+                        </Link>
                       </div>
                     </div>
                     <div className="feed-post-meta-line">
@@ -703,26 +711,26 @@ export default function PlatformFeedPage() {
                   </div>
                 </header>
 
-                {heading ? <h2 className="feed-post-title">{heading}</h2> : null}
+                {heading ? (
+                  <h2 className="feed-post-title">
+                    <Link href={`/platform/post/${post.id}`} className="feed-post-title-link">
+                      {heading}
+                    </Link>
+                  </h2>
+                ) : null}
                 <p className="feed-post-body">
                   {post.content?.trim() ? linkifyPlainText(post.content, "inline-link feed-post-link") : "No content."}
                 </p>
 
                 {imageUrl ? (
                   <div className="feed-post-media">
-                    <button
-                      type="button"
-                      className="feed-post-media-trigger"
-                      onClick={() => setImageLightboxUrl(imageUrl)}
-                      aria-label={isVideo ? "Open video" : "View image full size"}
-                    >
-                      <img src={imageUrl} alt="" className="feed-post-media-img" loading="lazy" />
-                      {isVideo ? (
-                        <span className="feed-post-video-badge" aria-hidden>
-                          Video
-                        </span>
-                      ) : null}
-                    </button>
+                    <PostMediaPreview
+                      mediaUrl={imageUrl}
+                      triggerClassName="feed-post-media-trigger"
+                      imageClassName="feed-post-media-img"
+                      isVideo={isVideo}
+                      onOpen={() => router.push(`/platform/post/${post.id}`)}
+                    />
                   </div>
                 ) : null}
 
@@ -753,10 +761,10 @@ export default function PlatformFeedPage() {
                       <span className="feed-post-action-label">{likedByMe[post.id] ? "Liked" : "Like"}</span>
                       <span className="feed-post-action-count">{nLikes}</span>
                     </button>
-                    <button type="button" className="feed-post-action" onClick={() => void openComments(post)}>
+                    <Link href={`/platform/post/${post.id}#comments`} className="feed-post-action">
                       <span className="feed-post-action-label">Comment</span>
                       <span className="feed-post-action-count">{nComments}</span>
-                    </button>
+                    </Link>
                     {canEditPost ? (
                       <>
                         <button type="button" className="feed-post-action feed-post-action-muted" onClick={() => openEdit(post)}>
@@ -976,16 +984,17 @@ export default function PlatformFeedPage() {
                   const name = cp?.full_name || cp?.username || "Farmer";
                   const commentMine = currentUserId === c.user_id;
                   const canModComment = isSuper || commentMine;
+                  const commentProfileHref = commentMine ? "/platform/profile" : `/platform/user/${c.user_id}`;
                   return (
                     <div key={c.id} className="platform-comment-item">
                       <div className="feed-author-row" style={{ justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-                        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                        <Link href={commentProfileHref} className="feed-post-author-link" style={{ display: "flex", gap: 10, alignItems: "center", textDecoration: "none", color: "inherit" }}>
                           <UserAvatar url={cp?.avatar_url} name={name} size={28} />
                           <div>
                             <div className="workshop-line-title" style={{ fontSize: "0.84rem" }}>{name}</div>
                             <div className="workshop-line-meta">{formatDate(c.created_at)}</div>
                           </div>
-                        </div>
+                        </Link>
                         {canModComment ? (
                           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                             {editingCommentId === c.id ? (

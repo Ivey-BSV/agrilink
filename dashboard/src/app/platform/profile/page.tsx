@@ -5,9 +5,11 @@ import { FormEvent, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
-import { parseImageUrls } from "@/lib/media-urls";
 import { UserAvatar } from "@/components/user-avatar";
 import { ContentThumbCell } from "@/components/content-thumb-cell";
+import { ProfilePostGrid } from "@/components/profile-post-grid";
+import { FarmDetailsModal } from "@/components/farm-details-modal";
+import { loadFarmDetailsFull, type FarmDetailsRow } from "@/lib/farm-details";
 import { MotionListItem } from "@/components/motion-list";
 import { loadFarmDetailsSummary, upsertFarmDetailsSummary } from "@/lib/farm-details";
 
@@ -60,7 +62,9 @@ export default function PlatformProfilePage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [farmName, setFarmName] = useState("");
   const [farmOverview, setFarmOverview] = useState("");
-  const [followStats, setFollowStats] = useState<{ followers: number; following: number } | null>(null);
+  const [followStats, setFollowStats] = useState<{ followers: number; following: number; posts: number } | null>(null);
+  const [farmDetails, setFarmDetails] = useState<FarmDetailsRow | null>(null);
+  const [farmModalOpen, setFarmModalOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,16 +99,20 @@ export default function PlatformProfilePage() {
           setFarmOverview(farm.farm_overview ?? "");
         }
 
-        const [fcRes, fgRes] = await Promise.all([
+        const [fcRes, fgRes, postsRes, farmFull] = await Promise.all([
           supabase.from("follows").select("id", { count: "exact", head: true }).eq("following_id", user.id),
           supabase.from("follows").select("id", { count: "exact", head: true }).eq("follower_id", user.id),
+          supabase.from("posts").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+          loadFarmDetailsFull(user.id),
         ]);
         if (!cancelled && !fcRes.error && !fgRes.error) {
           setFollowStats({
             followers: fcRes.count ?? 0,
             following: fgRes.count ?? 0,
+            posts: postsRes.count ?? 0,
           });
         }
+        if (!cancelled && !farmFull.error) setFarmDetails(farmFull.row);
       }
 
       setLoading(false);
@@ -222,15 +230,24 @@ export default function PlatformProfilePage() {
               <div className="section-title" style={{ fontSize: "1.3rem" }}>{profile.full_name || profile.username || "Farmer"}</div>
               <div className="subtle">{profile.username ? `@${profile.username}` : email}</div>
               {followStats ? (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "14px 20px", marginTop: 10 }}>
-                  <Link href="/platform/profile/followers" className="subtle" style={{ fontWeight: 600, textDecoration: "none" }}>
-                    {followStats.followers} Followers
+                <div className="platform-profile-stats" style={{ marginTop: 10 }}>
+                  <Link href="/platform/profile/followers" className="platform-profile-stat">
+                    <strong>{followStats.followers}</strong> followers
                   </Link>
-                  <Link href="/platform/profile/following" className="subtle" style={{ fontWeight: 600, textDecoration: "none" }}>
-                    {followStats.following} Following
+                  <Link href="/platform/profile/following" className="platform-profile-stat">
+                    <strong>{followStats.following}</strong> following
                   </Link>
+                  <span className="platform-profile-stat">
+                    <strong>{followStats.posts}</strong> posts
+                  </span>
                 </div>
               ) : null}
+              {profile.bio?.trim() ? <p className="platform-profile-bio">{profile.bio.trim()}</p> : null}
+              <div className="platform-profile-actions">
+                <button type="button" className="btn btn-secondary" onClick={() => setFarmModalOpen(true)}>
+                  Farm details
+                </button>
+              </div>
             </div>
           </div>
 
@@ -311,33 +328,12 @@ export default function PlatformProfilePage() {
           ) : null}
 
           {tab === "posts" ? (
-            <div className="platform-profile-panel stack" style={{ gap: 12 }}>
-              <p className="subtle">A quick list of everything you have published to the forums.</p>
+            <div className="platform-profile-panel">
               {loadingPosts ? <p className="subtle">Loading posts…</p> : null}
-              {!loadingPosts && posts.length === 0 ? <p className="empty">No posts yet. Start one from the Forums page.</p> : null}
-              <div className="list">
-                {posts.map((post, index) => {
-                  const imageUrl = parseImageUrls(post.image_urls)[0] ?? null;
-                  const pt = (post.post_type ?? "general").toLowerCase();
-                  return (
-                    <MotionListItem
-                      key={post.id}
-                      index={index}
-                      className={`list-item platform-post-card${pt === "ask" ? " ask" : pt === "offer" ? " offer" : ""}`}
-                    >
-                      <ContentThumbCell imageUrl={imageUrl} />
-                      <div className="stack workshop-file-body" style={{ gap: 6 }}>
-                        <div className="workshop-line-title">{post.title || "Post"}</div>
-                        <div className="workshop-line-meta">{post.content || "—"}</div>
-                        <div className="platform-post-meta-row">
-                          <span className="subtle">{formatDate(post.created_at)}</span>
-                          {post.location ? <span className="pill">{post.location}</span> : null}
-                        </div>
-                      </div>
-                    </MotionListItem>
-                  );
-                })}
-              </div>
+              {!loadingPosts && posts.length === 0 ? (
+                <p className="empty">No posts yet. Start one from the Forums page.</p>
+              ) : null}
+              <ProfilePostGrid posts={posts} />
             </div>
           ) : null}
 
@@ -365,6 +361,12 @@ export default function PlatformProfilePage() {
               </div>
             </div>
           ) : null}
+          <FarmDetailsModal
+            open={farmModalOpen}
+            onClose={() => setFarmModalOpen(false)}
+            farm={farmDetails}
+            isOwnProfile
+          />
         </>
       ) : null}
     </motion.div>

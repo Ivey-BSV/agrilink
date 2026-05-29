@@ -6,6 +6,23 @@ export type FarmDetailsSummary = {
   farm_overview: string | null;
 };
 
+export type FarmDetailsRow = FarmDetailsSummary & {
+  farm_size: number | null;
+  farm_size_unit: string | null;
+  crops: string[] | null;
+  livestock: string[] | null;
+  soil_type: string | null;
+  irrigation_method: string | null;
+  farming_method: string | null;
+  certification: string | null;
+  established_date: string | null;
+  farm_type: string[] | null;
+  farm_scale: string | null;
+  activities: string[] | null;
+  specializations: string[] | null;
+  is_open_farm: boolean | null;
+};
+
 export async function loadFarmDetailsSummary(userId: string): Promise<{
   row: FarmDetailsSummary | null;
   error: string | null;
@@ -13,6 +30,21 @@ export async function loadFarmDetailsSummary(userId: string): Promise<{
   const { data, error } = await supabase.from("farm_details").select("id, farm_name, farm_overview").eq("user_id", userId).maybeSingle();
   if (error) return { row: null, error: error.message };
   return { row: (data as FarmDetailsSummary) ?? null, error: null };
+}
+
+export async function loadFarmDetailsFull(userId: string): Promise<{
+  row: FarmDetailsRow | null;
+  error: string | null;
+}> {
+  const { data, error } = await supabase.from("farm_details").select("*").eq("user_id", userId).maybeSingle();
+  if (error) return { row: null, error: error.message };
+  return { row: (data as FarmDetailsRow) ?? null, error: null };
+}
+
+export function formatFarmLabel(value: string): string {
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export async function upsertFarmDetailsSummary(

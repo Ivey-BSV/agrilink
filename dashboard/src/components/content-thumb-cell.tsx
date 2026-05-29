@@ -1,6 +1,8 @@
 "use client";
 
-import { FileRowThumb } from "@/components/file-row-thumb";
+import { useState } from "react";
+import { FilePreviewModal } from "@/components/file-preview-modal";
+import { PostMediaPreview } from "@/components/post-media-preview";
 
 function fileNameFromUrl(url: string): string {
   try {
@@ -14,6 +16,9 @@ function fileNameFromUrl(url: string): string {
 
 export function ContentThumbCell({ imageUrl }: { imageUrl: string | null | undefined }) {
   const url = imageUrl?.trim() ?? "";
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+
   if (!url) {
     return (
       <div className="workshop-thumb-placeholder content-thumb-empty" title="No image" aria-hidden>
@@ -21,5 +26,31 @@ export function ContentThumbCell({ imageUrl }: { imageUrl: string | null | undef
       </div>
     );
   }
-  return <FileRowThumb fileUrl={url} fileName={fileNameFromUrl(url)} mimeType={null} />;
+
+  return (
+    <>
+      <PostMediaPreview
+        compact
+        mediaUrl={url}
+        triggerClassName="workshop-thumb-wrap file-preview-trigger"
+        imageClassName="workshop-thumb"
+        onOpen={(displayUrl) => {
+          setLightboxUrl(displayUrl);
+          setPreviewOpen(true);
+        }}
+      />
+      {lightboxUrl ? (
+        <FilePreviewModal
+          open={previewOpen}
+          onClose={() => {
+            setPreviewOpen(false);
+            setLightboxUrl(null);
+          }}
+          fileUrl={lightboxUrl}
+          fileName={fileNameFromUrl(lightboxUrl)}
+          mimeType={null}
+        />
+      ) : null}
+    </>
+  );
 }

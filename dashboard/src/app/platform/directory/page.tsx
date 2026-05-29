@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
@@ -71,7 +72,7 @@ export default function PlatformDirectoryPage() {
       <div className="list">
         {filtered.map((row, index) => (
           <MotionListItem key={row.id} index={index} className="list-item farm-directory-card platform-directory-card">
-            <div className="feed-author-row">
+            <Link href={`/platform/user/${row.id}`} className="feed-author-row platform-directory-card-link">
               <UserAvatar url={row.avatar_url} name={row.full_name ?? row.username} size={54} />
               <div className="stack" style={{ gap: 4 }}>
                 <div className="workshop-line-title">{row.full_name || row.username || "Farmer"}</div>
@@ -80,7 +81,7 @@ export default function PlatformDirectoryPage() {
                 </div>
                 {row.bio ? <div className="subtle">{row.bio}</div> : null}
               </div>
-            </div>
+            </Link>
           </MotionListItem>
         ))}
       </div>
