@@ -517,8 +517,8 @@ class _CollaborationPageState extends State<CollaborationPage>
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: Colors.black,
-                          side:
-                              BorderSide(color: Colors.black.withValues(alpha: 0.12)),
+                          side: BorderSide(
+                              color: Colors.black.withValues(alpha: 0.12)),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),

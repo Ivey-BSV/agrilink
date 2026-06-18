@@ -1,11 +1,11 @@
-/** Human-readable category label from stored value. */
+
 export function formatEventCategory(raw: string | null | undefined): string {
   const t = (raw ?? "").trim();
   if (!t) return "Event";
   return t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-/** e.g. "May 28, 2026" from ISO date or date string. */
+
 export function formatEventDateAbbreviated(value: string | null | undefined): string {
   if (!value?.trim()) return "Date TBD";
   const d = new Date(value.trim());

@@ -3,7 +3,6 @@ import 'package:cap/shared/utils/image_url_utils.dart';
 
 final Map<String, String?> _ogImageCache = {};
 
-/// Fetches an Open Graph / Twitter preview image for a webpage URL.
 Future<String?> fetchOpenGraphImageUrl(String pageUrl) async {
   final normalized = sanitizeImageUrl(pageUrl);
   if (normalized == null) return null;

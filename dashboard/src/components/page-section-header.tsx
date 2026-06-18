@@ -19,7 +19,7 @@ type SectionTitleWithInfoProps = {
   className?: string;
 };
 
-/** Title + info button only (e.g. below a back link on settings subpages). */
+
 export function SectionTitleWithInfo({ title, description, infoLabel, titleStyle, className }: SectionTitleWithInfoProps) {
   return (
     <div className={`page-section-title-row${className ? ` ${className}` : ""}`}>
@@ -31,7 +31,7 @@ export function SectionTitleWithInfo({ title, description, infoLabel, titleStyle
   );
 }
 
-/** Section title with an info (“i”) button instead of a visible description paragraph. */
+
 export function PageSectionHeader({ title, description, infoLabel, action, titleStyle }: PageSectionHeaderProps) {
   return (
     <div className="page-section-header-row">

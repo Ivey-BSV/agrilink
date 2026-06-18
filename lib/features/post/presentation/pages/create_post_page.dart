@@ -181,10 +181,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
       }
 
       final bytes = await picked.readAsBytes();
-      // imageQuality compresses to JPEG on mobile; store as .jpg with matching type.
       const contentType = 'image/jpeg';
-      final path =
-          '${user.id}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final path = '${user.id}/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
       await supabase.storage.from('post-images').uploadBinary(
             path,
@@ -536,8 +534,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                               icon: const Icon(Icons.videocam_outlined),
                               label: const Text('Add Video'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    AppTheme.primaryGreen.withValues(alpha: 0.1),
+                                backgroundColor: AppTheme.primaryGreen
+                                    .withValues(alpha: 0.1),
                                 foregroundColor: AppTheme.primaryGreen,
                                 elevation: 0,
                                 padding: const EdgeInsets.symmetric(
@@ -545,8 +543,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   side: BorderSide(
-                                    color:
-                                        AppTheme.primaryGreen.withValues(alpha: 0.3),
+                                    color: AppTheme.primaryGreen
+                                        .withValues(alpha: 0.3),
                                     width: 1,
                                   ),
                                 ),
@@ -775,8 +773,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                                     }
                                   });
                                 },
-                                selectedColor:
-                                    AppTheme.primaryGreen.withValues(alpha: 0.2),
+                                selectedColor: AppTheme.primaryGreen
+                                    .withValues(alpha: 0.2),
                                 checkmarkColor: AppTheme.primaryGreen,
                                 materialTapTargetSize:
                                     MaterialTapTargetSize.shrinkWrap,

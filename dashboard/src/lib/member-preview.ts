@@ -22,7 +22,7 @@ export function setStaffMemberPreview(active: boolean) {
   }
 }
 
-/** Routes farmers use (platform + workspace), excluding staff admin tools. */
+
 export function isMemberFacingPath(pathname: string | null): boolean {
   if (!pathname) return false;
   if (pathname.startsWith("/dashboard/admin")) return false;

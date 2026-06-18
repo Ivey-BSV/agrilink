@@ -124,7 +124,7 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
       if (widget.type == 'Community') {
         try {
           await _goalService.ensureCommunityCircleRoles(widget.goalId);
-        } catch (_) { /* ignored */ }
+        } catch (_) {}
         try {
           final circle =
               await _goalService.getCommunityGoalCircleRoles(widget.goalId);
@@ -726,7 +726,8 @@ class _GoalDetailPageState extends State<GoalDetailPage> {
                                     ),
                                     decoration: BoxDecoration(
                                       color: isCommunityGoal
-                                          ? AppTheme.grainGold.withValues(alpha: 0.12)
+                                          ? AppTheme.grainGold
+                                              .withValues(alpha: 0.12)
                                           : Colors.blue.withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(12),
                                     ),

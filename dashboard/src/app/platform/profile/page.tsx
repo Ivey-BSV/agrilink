@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import { formatDate } from "@/lib/format";
 import { PageSectionHeader } from "@/components/page-section-header";
 import { UserAvatar } from "@/components/user-avatar";
 import { ProfilePostGrid } from "@/components/profile-post-grid";

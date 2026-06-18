@@ -140,8 +140,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
 
       final bytes = await picked.readAsBytes();
       const contentType = 'image/jpeg';
-      final path =
-          '${user.id}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final path = '${user.id}/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
       await supabase.storage.from('marketplace-images').uploadBinary(
             path,
@@ -733,7 +732,8 @@ class _CreateListingPageState extends State<CreateListingPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+                      border: Border.all(
+                          color: Colors.black.withValues(alpha: 0.05)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

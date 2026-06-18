@@ -8,7 +8,7 @@ type ChatThreadAvatarProps = {
   sm?: boolean;
 };
 
-/** Avatar for chat lists and thread headers — letter fallback + broken-image handling. */
+
 export function ChatThreadAvatar({ url, name, sm }: ChatThreadAvatarProps) {
   const size = sm ? 40 : 48;
   return (

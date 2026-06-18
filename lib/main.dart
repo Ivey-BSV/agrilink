@@ -23,8 +23,7 @@ Future<void> bootstrapCapApp() async {
     await dotenv.load(fileName: '.env');
   }
   if (!SupabaseConfig.isConfigured) {
-    const message =
-        'Missing SUPABASE_URL or SUPABASE_ANON_KEY in .env. '
+    const message = 'Missing SUPABASE_URL or SUPABASE_ANON_KEY in .env. '
         'Copy .env.example to .env and add your Supabase credentials.';
     if (kDebugMode) {
       debugPrint(message);

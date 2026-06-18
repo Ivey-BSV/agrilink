@@ -300,8 +300,8 @@ class _SharePostBottomSheetState extends State<SharePostBottomSheet> {
                                 children: [
                                   NetworkCircleAvatar(
                                     radius: 24,
-                                    backgroundColor:
-                                        AppTheme.primaryGreen.withValues(alpha: 0.1),
+                                    backgroundColor: AppTheme.primaryGreen
+                                        .withValues(alpha: 0.1),
                                     imageUrl: user.avatarUrl,
                                     fallbackLetter: _getInitialLetter(
                                       user.fullName ??

@@ -38,14 +38,6 @@ type ProfileRow = {
   avatar_url: string | null;
 };
 
-type CommentRow = {
-  id: string;
-  post_id: string;
-  user_id: string;
-  content: string;
-  created_at: string;
-};
-
 function parseTextArray(raw: unknown): string[] {
   if (Array.isArray(raw)) {
     return raw.map((v) => String(v).trim()).filter((v) => v.length > 0);
@@ -139,15 +131,6 @@ export default function PlatformFeedPage() {
   const [editTags, setEditTags] = useState<string[]>([]);
   const [savingEdit, setSavingEdit] = useState(false);
 
-  const [activePost, setActivePost] = useState<PostRow | null>(null);
-  const [activeComments, setActiveComments] = useState<CommentRow[]>([]);
-  const [commentLoading, setCommentLoading] = useState(false);
-  const [commentDraft, setCommentDraft] = useState("");
-  const [commentSubmitting, setCommentSubmitting] = useState(false);
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingCommentBody, setEditingCommentBody] = useState("");
-  const [commentActionBusy, setCommentActionBusy] = useState<string | null>(null);
-
   const [imageLightboxUrl, setImageLightboxUrl] = useState<string | null>(null);
 
   const editCountyOptions = useMemo(() => {
@@ -169,42 +152,6 @@ export default function PlatformFeedPage() {
       document.body.style.overflow = prevOverflow;
     };
   }, [imageLightboxUrl]);
-
-  const loadComments = async (postId: string) => {
-    setCommentLoading(true);
-    const { data, error: cErr } = await supabase
-      .from("comments")
-      .select("id, post_id, user_id, content, created_at")
-      .eq("post_id", postId)
-      .order("created_at", { ascending: false });
-
-    if (cErr) {
-      setError(cErr.message);
-      setCommentLoading(false);
-      return;
-    }
-
-    const rows = (data as CommentRow[]) ?? [];
-    setActiveComments(rows);
-    setCommentCounts((prev) => ({ ...prev, [postId]: rows.length }));
-
-    const needIds = [...new Set(rows.map((r) => r.user_id).filter(Boolean))];
-    if (needIds.length > 0) {
-      const { data: extraProfiles, error: pErr } = await supabase
-        .from("user_profiles")
-        .select("id, full_name, username, avatar_url")
-        .in("id", needIds);
-      if (!pErr && extraProfiles?.length) {
-        setProfiles((prev) => {
-          const next = { ...prev };
-          for (const p of extraProfiles as ProfileRow[]) next[p.id] = p;
-          return next;
-        });
-      }
-    }
-
-    setCommentLoading(false);
-  };
 
   useEffect(() => {
     let cancelled = false;
@@ -496,7 +443,6 @@ export default function PlatformFeedPage() {
 
     const row = data as PostRow;
     setPosts((prev) => prev.map((p) => (p.id === row.id ? row : p)));
-    if (activePost?.id === row.id) setActivePost(row);
     setEditOpen(false);
     setEditingPost(null);
     setSavingEdit(false);
@@ -505,98 +451,6 @@ export default function PlatformFeedPage() {
   const closeEdit = () => {
     setEditOpen(false);
     setEditingPost(null);
-  };
-
-  const openComments = async (post: PostRow) => {
-    setActivePost(post);
-    setCommentDraft("");
-    await loadComments(post.id);
-  };
-
-  const addComment = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!activePost || !commentDraft.trim()) return;
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      setError("Sign in required.");
-      return;
-    }
-
-    setCommentSubmitting(true);
-    const { error: cErr } = await supabase.from("comments").insert({
-      post_id: activePost.id,
-      user_id: user.id,
-      content: commentDraft.trim(),
-    });
-
-    if (cErr) {
-      setError(cErr.message);
-      setCommentSubmitting(false);
-      return;
-    }
-
-    setCommentDraft("");
-    await loadComments(activePost.id);
-    setCommentSubmitting(false);
-  };
-
-  const closeComments = () => {
-    setActivePost(null);
-    setActiveComments([]);
-    setCommentDraft("");
-    setEditingCommentId(null);
-    setEditingCommentBody("");
-  };
-
-  const deleteComment = async (commentId: string) => {
-    if (!confirm("Delete this comment?")) return;
-    setCommentActionBusy(commentId);
-    setError(null);
-    const { error: dErr } = await supabase.from("comments").delete().eq("id", commentId);
-    setCommentActionBusy(null);
-    if (dErr) {
-      setError(dErr.message);
-      return;
-    }
-    if (activePost) {
-      setActiveComments((prev) => prev.filter((c) => c.id !== commentId));
-      setCommentCounts((prev) => ({
-        ...prev,
-        [activePost.id]: Math.max(0, (prev[activePost.id] ?? 1) - 1),
-      }));
-    }
-  };
-
-  const startEditComment = (c: CommentRow) => {
-    setEditingCommentId(c.id);
-    setEditingCommentBody(c.content);
-  };
-
-  const cancelEditComment = () => {
-    setEditingCommentId(null);
-    setEditingCommentBody("");
-  };
-
-  const saveCommentEdit = async () => {
-    if (!editingCommentId || !editingCommentBody.trim()) return;
-    setCommentActionBusy(editingCommentId);
-    setError(null);
-    const { error: uErr } = await supabase
-      .from("comments")
-      .update({ content: editingCommentBody.trim() })
-      .eq("id", editingCommentId);
-    setCommentActionBusy(null);
-    if (uErr) {
-      setError(uErr.message);
-      return;
-    }
-    setActiveComments((prev) =>
-      prev.map((c) => (c.id === editingCommentId ? { ...c, content: editingCommentBody.trim() } : c)),
-    );
-    cancelEditComment();
   };
 
   return (
@@ -949,90 +803,6 @@ export default function PlatformFeedPage() {
               Close
             </button>
             <img src={imageLightboxUrl} alt="" className="feed-image-lightbox-img" draggable={false} />
-          </div>
-        </div>
-      ) : null}
-
-      {activePost ? (
-        <div className="backdrop active" role="dialog" aria-modal="true">
-          <div className="absolute inset-0" onClick={closeComments} />
-          <div className="modal-content platform-create-modal" style={{ opacity: 1, transform: "none" }}>
-            <div className="stack" style={{ gap: 12 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-                <h3 className="section-title" style={{ fontSize: "1.1rem" }}>Comments</h3>
-                <button type="button" className="btn btn-secondary" onClick={closeComments}>Close</button>
-              </div>
-              <p className="subtle">{activePost.title || "Post"}</p>
-
-              <form onSubmit={addComment} className="stack" style={{ gap: 8 }}>
-                <div className="field">
-                  <label>Add a comment</label>
-                  <textarea rows={3} value={commentDraft} onChange={(e) => setCommentDraft(e.target.value)} placeholder="Write a comment" />
-                </div>
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <button type="submit" className="btn btn-primary" disabled={commentSubmitting || !commentDraft.trim()}>
-                    {commentSubmitting ? "Posting…" : "Post comment"}
-                  </button>
-                </div>
-              </form>
-
-              <div className="platform-comment-list">
-                {commentLoading ? <p className="subtle">Loading comments…</p> : null}
-                {!commentLoading && activeComments.length === 0 ? <p className="empty">No comments yet.</p> : null}
-                {activeComments.map((c) => {
-                  const cp = profiles[c.user_id];
-                  const name = cp?.full_name || cp?.username || "Farmer";
-                  const commentMine = currentUserId === c.user_id;
-                  const canModComment = isSuper || commentMine;
-                  const commentProfileHref = commentMine ? "/platform/profile" : `/platform/user/${c.user_id}`;
-                  return (
-                    <div key={c.id} className="platform-comment-item">
-                      <div className="feed-author-row" style={{ justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-                        <Link href={commentProfileHref} className="feed-post-author-link" style={{ display: "flex", gap: 10, alignItems: "center", textDecoration: "none", color: "inherit" }}>
-                          <UserAvatar url={cp?.avatar_url} name={name} size={28} />
-                          <div>
-                            <div className="workshop-line-title" style={{ fontSize: "0.84rem" }}>{name}</div>
-                            <div className="workshop-line-meta">{formatDate(c.created_at)}</div>
-                          </div>
-                        </Link>
-                        {canModComment ? (
-                          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                            {editingCommentId === c.id ? (
-                              <>
-                                <button type="button" className="btn btn-primary" disabled={!!commentActionBusy} onClick={() => void saveCommentEdit()}>
-                                  Save
-                                </button>
-                                <button type="button" className="btn btn-secondary" disabled={!!commentActionBusy} onClick={cancelEditComment}>
-                                  Cancel
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <button type="button" className="btn btn-secondary" disabled={!!commentActionBusy} onClick={() => startEditComment(c)}>
-                                  Edit
-                                </button>
-                                <button type="button" className="btn btn-danger" disabled={!!commentActionBusy} onClick={() => void deleteComment(c.id)}>
-                                  Delete
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        ) : null}
-                      </div>
-                      {editingCommentId === c.id ? (
-                        <div className="field" style={{ marginTop: 8 }}>
-                          <textarea rows={3} value={editingCommentBody} onChange={(e) => setEditingCommentBody(e.target.value)} />
-                        </div>
-                      ) : (
-                        <div className="workshop-line-meta" style={{ marginTop: 6, color: "var(--text-secondary)" }}>
-                          {linkifyPlainText(c.content, "inline-link")}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
           </div>
         </div>
       ) : null}

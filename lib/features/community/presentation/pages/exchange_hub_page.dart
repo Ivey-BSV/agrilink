@@ -145,8 +145,8 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                                       });
                                       setLocalState(() {});
                                     },
-                                    selectedColor:
-                                        AppTheme.primaryGreen.withValues(alpha: 0.2),
+                                    selectedColor: AppTheme.primaryGreen
+                                        .withValues(alpha: 0.2),
                                     checkmarkColor: AppTheme.primaryGreen,
                                     materialTapTargetSize:
                                         MaterialTapTargetSize.shrinkWrap,
@@ -500,7 +500,6 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                               title: m['title'] as String,
                               price: m['price'] as String,
                               location: m['location'] as String,
-                              condition: m['condition'] as String,
                               imageUrl: imageUrl ?? '',
                               postedAt: m['postedAt'] as DateTime,
                               authorName: m['authorName'] as String,

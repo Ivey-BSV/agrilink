@@ -1,4 +1,4 @@
-/** Option lists aligned with mobile `FarmDetailsPage`. */
+
 
 export const FARM_SIZE_UNITS = ["acres", "hectares"] as const;
 

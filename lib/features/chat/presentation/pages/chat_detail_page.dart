@@ -139,7 +139,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               sanitizeImageUrl(profileResponse['avatar_url'] as String?);
         });
       }
-    } catch (e) { /* ignored */ }
+    } catch (e) {}
   }
 
   Future<void> _loadCurrentUserProfile() async {
@@ -163,7 +163,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
               sanitizeImageUrl(profileResponse['avatar_url'] as String?);
         });
       }
-    } catch (e) { /* ignored */ }
+    } catch (e) {}
   }
 
   Future<void> _checkIfMessageRequest() async {
@@ -207,7 +207,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           _isMessageRequest = isRequest;
         });
       }
-    } catch (e) { /* ignored */ }
+    } catch (e) {}
   }
 
   Future<void> _followBack() async {
@@ -502,7 +502,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           color: isMe ? Colors.white : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isMe ? Colors.white.withValues(alpha: 0.5) : Colors.grey[300]!,
+            color:
+                isMe ? Colors.white.withValues(alpha: 0.5) : Colors.grey[300]!,
             width: 1.5,
           ),
           boxShadow: [
@@ -626,7 +627,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           color: isMe ? Colors.white : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isMe ? Colors.white.withValues(alpha: 0.5) : Colors.grey[300]!,
+            color:
+                isMe ? Colors.white.withValues(alpha: 0.5) : Colors.grey[300]!,
             width: 1.5,
           ),
           boxShadow: [

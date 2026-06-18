@@ -27,7 +27,7 @@ function resolvePreviewImageUrl(raw: string, pageUrl: string): string | null {
   return sanitizeImageUrl(imageUrl);
 }
 
-export function parseOpenGraphImageFromHtml(html: string, pageUrl: string): string | null {
+function parseOpenGraphImageFromHtml(html: string, pageUrl: string): string | null {
   for (const pattern of OG_PATTERNS) {
     const match = html.match(pattern);
     if (!match?.[1]) continue;
@@ -37,7 +37,7 @@ export function parseOpenGraphImageFromHtml(html: string, pageUrl: string): stri
   return null;
 }
 
-/** Server-side fetch of og:image / twitter:image for a webpage URL. */
+
 export async function fetchOpenGraphImageUrl(pageUrl: string): Promise<string | null> {
   const normalized = sanitizeImageUrl(pageUrl);
   if (!normalized || !isNetworkImageUrl(normalized)) return null;

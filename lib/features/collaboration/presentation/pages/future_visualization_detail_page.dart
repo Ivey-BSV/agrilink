@@ -256,7 +256,8 @@ class _FutureVisualizationDetailPageState
                           color: AppTheme.primaryGreen.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: AppTheme.primaryGreen.withValues(alpha: 0.3)),
+                              color:
+                                  AppTheme.primaryGreen.withValues(alpha: 0.3)),
                         ),
                         child: Text(
                           f,

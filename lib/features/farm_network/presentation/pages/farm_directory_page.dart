@@ -176,7 +176,7 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
                 'profile': profile,
               });
             }
-          } catch (e) { /* ignored */ }
+          } catch (e) {}
         }
       } else {
         final allProfiles = await profileProvider.searchProfiles(limit: 100);
@@ -198,7 +198,7 @@ class _FarmDirectoryPageState extends State<FarmDirectoryPage> {
               'farm': farm,
               'profile': profile,
             });
-          } catch (e) { /* ignored */ }
+          } catch (e) {}
         }
       }
 

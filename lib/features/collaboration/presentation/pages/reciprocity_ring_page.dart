@@ -318,7 +318,8 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
-              side: BorderSide(color: AppTheme.primaryGreen.withValues(alpha: 0.4)),
+              side: BorderSide(
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.4)),
               foregroundColor: AppTheme.primaryGreen,
             ),
             icon: const Icon(Icons.volunteer_activism_outlined),
@@ -394,7 +395,8 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1),
+        border:
+            Border.all(color: Colors.black.withValues(alpha: 0.05), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -657,7 +659,8 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
+                    backgroundColor:
+                        AppTheme.primaryGreen.withValues(alpha: 0.15),
                     child: Text(
                       ask['avatar'] as String,
                       style: const TextStyle(
@@ -790,7 +793,8 @@ class _ReciprocityRingPageState extends State<ReciprocityRingPage> {
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
+                    backgroundColor:
+                        AppTheme.primaryGreen.withValues(alpha: 0.15),
                     child: Text(
                       offer['avatar'] as String,
                       style: const TextStyle(

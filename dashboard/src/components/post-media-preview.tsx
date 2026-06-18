@@ -31,7 +31,7 @@ async function fetchOpenGraphImageClient(pageUrl: string): Promise<string | null
 
 type PostMediaPreviewProps = {
   mediaUrl: string | null | undefined;
-  /** Wrapper element class (e.g. feed-post-media-trigger, workshop-thumb-wrap). */
+  
   triggerClassName?: string;
   imageClassName?: string;
   compact?: boolean;

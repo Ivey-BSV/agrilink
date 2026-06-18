@@ -7,7 +7,7 @@ type SectionInfoButtonProps = {
   label?: string;
 };
 
-/** Compact “i” control that reveals section help text in a popover. */
+
 export function SectionInfoButton({ text, label }: SectionInfoButtonProps) {
   const [open, setOpen] = useState(false);
   const popoverId = useId();

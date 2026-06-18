@@ -437,7 +437,8 @@ class _AllAsksPageState extends State<AllAsksPage> {
                 children: [
                   CircleAvatar(
                     radius: 18,
-                    backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.15),
+                    backgroundColor:
+                        AppTheme.primaryGreen.withValues(alpha: 0.15),
                     child: Text(
                       ask['avatar'] as String,
                       style: const TextStyle(

@@ -4,7 +4,6 @@ import 'package:cap/shared/widgets/cached_image_widget.dart';
 import 'package:cap/shared/widgets/image_placeholder.dart';
 import 'package:cap/shared/widgets/post_media_preview.dart';
 
-/// Listing / marketplace image tile (storage URLs unchanged; link URLs use OG preview).
 class ListingMediaTile extends StatelessWidget {
   final String? imageUrl;
   final BoxFit fit;

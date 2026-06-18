@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cap/shared/models/chat.dart';
 import 'package:cap/shared/models/message.dart';
+import 'package:cap/shared/utils/user_block_utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ChatProvider extends ChangeNotifier {
@@ -74,31 +75,6 @@ class ChatProvider extends ChangeNotifier {
 
   ChatProvider();
 
-  Future<Set<String>> _getExcludedUserIds(SupabaseClient supabase) async {
-    final currentUser = supabase.auth.currentUser;
-    if (currentUser == null) return <String>{};
-    try {
-      final rows = await supabase
-          .from('user_blocks')
-          .select('blocker_id, blocked_id')
-          .or('blocker_id.eq.${currentUser.id},blocked_id.eq.${currentUser.id}');
-      final Set<String> excluded = <String>{};
-      for (final raw in rows as List<dynamic>) {
-        final row = raw as Map<String, dynamic>;
-        final blocker = row['blocker_id'] as String;
-        final blocked = row['blocked_id'] as String;
-        if (blocker == currentUser.id) {
-          excluded.add(blocked);
-        } else if (blocked == currentUser.id) {
-          excluded.add(blocker);
-        }
-      }
-      return excluded;
-    } catch (_) {
-      return <String>{};
-    }
-  }
-
   Future<void> loadChats() async {
     _isLoading = true;
     _lastLoadError = null;
@@ -137,7 +113,7 @@ class ChatProvider extends ChangeNotifier {
           (a, b) => DateTime.parse(b['updated_at'] as String)
               .compareTo(DateTime.parse(a['updated_at'] as String)),
         );
-      final excludedUserIds = await _getExcludedUserIds(supabase);
+      final excludedUserIds = await blockedUserIdsForCurrentUser(supabase);
 
       final Set<String> userIds = {};
       for (final chatRow in chatsResponse as List<dynamic>) {
@@ -277,7 +253,7 @@ class ChatProvider extends ChangeNotifier {
         _mutualFollowCache['follows_${otherUserId}_$currentUserId'] =
             otherUsersFollowSet.contains(otherUserId);
       }
-    } catch (e) { /* ignored */ }
+    } catch (e) {}
   }
 
   Future<List<Message>> _loadMessagesForChat(String chatId) async {
@@ -318,7 +294,7 @@ class ChatProvider extends ChangeNotifier {
       final supabase = Supabase.instance.client;
       final currentUser = supabase.auth.currentUser;
       if (currentUser == null) throw Exception('Not authenticated');
-      final excludedUserIds = await _getExcludedUserIds(supabase);
+      final excludedUserIds = await blockedUserIdsForCurrentUser(supabase);
       if (excludedUserIds.contains(otherUserId)) {
         throw Exception('Cannot chat with this user');
       }
@@ -379,7 +355,7 @@ class ChatProvider extends ChangeNotifier {
         final user1 = chatRow['user1_id'] as String;
         final user2 = chatRow['user2_id'] as String;
         final otherUserId = user1 == currentUser.id ? user2 : user1;
-        final excludedUserIds = await _getExcludedUserIds(supabase);
+        final excludedUserIds = await blockedUserIdsForCurrentUser(supabase);
         if (excludedUserIds.contains(otherUserId)) {
           throw Exception('Cannot send messages to this user');
         }
@@ -475,7 +451,7 @@ class ChatProvider extends ChangeNotifier {
 
       _chatMessages.remove(chatId);
       await loadChats();
-    } catch (e) { /* ignored */ }
+    } catch (e) {}
   }
 
   Future<void> refreshChat(String chatId) async {
@@ -517,7 +493,7 @@ class ChatProvider extends ChangeNotifier {
           otherUserFollowsResponse != null;
 
       await loadChats();
-    } catch (e) { /* ignored */ }
+    } catch (e) {}
   }
 
   Future<void> preloadFollowEdgesForUserIds(List<String> otherUserIds) async {

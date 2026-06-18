@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/providers/marketplace_provider.dart';
+import 'package:cap/shared/utils/relative_time_format.dart';
 import 'package:cap/shared/widgets/listing_media_tile.dart';
 import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:go_router/go_router.dart';
@@ -263,7 +264,7 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
                                       size: 12, color: Colors.grey[600]),
                                   const SizedBox(width: 4),
                                   Text(
-                                    _formatFriendlyDate(widget.postedAt),
+                                    formatFriendlyRelativeTime(widget.postedAt),
                                     style: TextStyle(
                                         fontSize: 12, color: Colors.grey[600]),
                                   ),
@@ -550,15 +551,6 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
         );
       },
     );
-  }
-
-  String _formatFriendlyDate(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-    if (difference.inDays > 0) return '${difference.inDays}d ago';
-    if (difference.inHours > 0) return '${difference.inHours}h ago';
-    if (difference.inMinutes > 0) return '${difference.inMinutes}m ago';
-    return 'Just now';
   }
 
   Widget _buildPriceBadge(String price) {

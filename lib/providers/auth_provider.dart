@@ -199,10 +199,10 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     try {
       await PushNotificationService.clearForLogout();
-    } catch (_) { /* ignored */ }
+    } catch (_) {}
     try {
       await Supabase.instance.client.auth.signOut();
-    } catch (_) { /* ignored */ }
+    } catch (_) {}
     _isAuthenticated = false;
     _userId = null;
     _userName = null;
@@ -295,5 +295,4 @@ class AuthProvider extends ChangeNotifier {
       return msg.length > 80 ? 'Network or server error. Try again.' : msg;
     }
   }
-
 }

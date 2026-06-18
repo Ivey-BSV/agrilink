@@ -1,7 +1,3 @@
-import { parseImageUrls } from "@/lib/media-urls";
-
-export { parseImageUrls };
-
 const SUPABASE_OBJECT_PUBLIC = "/storage/v1/object/public/";
 const SUPABASE_RENDER_PUBLIC = "/storage/v1/render/image/public/";
 
@@ -11,7 +7,7 @@ export function sanitizeImageUrl(raw: string | null | undefined): string | null 
   return trimmed.length > 0 ? trimmed : null;
 }
 
-/** Supabase render endpoint transcodes HEIC/large uploads for browsers that cannot decode them. */
+
 export function supabaseRenderImageUrl(raw: string | null | undefined, width = 1200): string | null {
   const url = sanitizeImageUrl(raw);
   if (!url || !url.includes(SUPABASE_OBJECT_PUBLIC)) return null;
@@ -26,7 +22,7 @@ export function supabaseRenderImageUrl(raw: string | null | undefined, width = 1
   }
 }
 
-/** Primary URL for avatars and in-app image widgets (matches mobile). */
+
 export function networkDisplayImageUrl(raw: string | null | undefined, renderWidth = 1200): string | null {
   const url = sanitizeImageUrl(raw);
   if (!url) return null;
@@ -43,7 +39,7 @@ export function isNetworkImageUrl(raw: string | null | undefined): boolean {
   return url.startsWith("http://") || url.startsWith("https://");
 }
 
-/** True when the URL likely points at an image file, not a webpage. */
+
 export function isDirectImageUrl(raw: string | null | undefined): boolean {
   const url = sanitizeImageUrl(raw);
   if (!url) return false;
@@ -62,7 +58,7 @@ export function isDirectImageUrl(raw: string | null | undefined): boolean {
   try {
     path = new URL(url).pathname;
   } catch {
-    /* use full url */
+    
   }
   const pathLower = path.toLowerCase();
   const extensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".heic", ".heif", ".avif"];

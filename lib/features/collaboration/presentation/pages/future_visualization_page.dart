@@ -573,7 +573,8 @@ class _FutureVisualizationPageState extends State<FutureVisualizationPage> {
                 SizedBox(
                   width: 120,
                   child: DropdownButtonFormField<int>(
-                    initialValue: milestone.monthOffset.clamp(1, _months.round()),
+                    initialValue:
+                        milestone.monthOffset.clamp(1, _months.round()),
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),

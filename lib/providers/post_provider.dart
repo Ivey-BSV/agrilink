@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cap/shared/models/comment.dart';
 import 'package:cap/shared/models/post.dart';
+import 'package:cap/shared/utils/user_block_utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PostProvider extends ChangeNotifier {
@@ -13,38 +14,13 @@ class PostProvider extends ChangeNotifier {
 
   PostProvider();
 
-  Future<Set<String>> _getExcludedUserIds(SupabaseClient supabase) async {
-    final user = supabase.auth.currentUser;
-    if (user == null) return <String>{};
-    try {
-      final rows = await supabase
-          .from('user_blocks')
-          .select('blocker_id, blocked_id')
-          .or('blocker_id.eq.${user.id},blocked_id.eq.${user.id}');
-      final Set<String> ids = <String>{};
-      for (final raw in rows as List<dynamic>) {
-        final row = raw as Map<String, dynamic>;
-        final blocker = row['blocker_id'] as String;
-        final blocked = row['blocked_id'] as String;
-        if (blocker == user.id) {
-          ids.add(blocked);
-        } else if (blocked == user.id) {
-          ids.add(blocker);
-        }
-      }
-      return ids;
-    } catch (_) {
-      return <String>{};
-    }
-  }
-
   Future<void> loadPostsFromSupabase() async {
     _isLoading = true;
     notifyListeners();
 
     try {
       final supabase = Supabase.instance.client;
-      final excludedUserIds = await _getExcludedUserIds(supabase);
+      final excludedUserIds = await blockedUserIdsForCurrentUser(supabase);
       final List<dynamic> rows = await supabase
           .from('posts')
           .select(
@@ -111,7 +87,8 @@ class PostProvider extends ChangeNotifier {
       }).toList();
 
       _posts = fetched;
-    } catch (_) { /* ignored */ } finally {
+    } catch (_) {
+    } finally {
       _isLoading = false;
       notifyListeners();
     }
@@ -147,10 +124,8 @@ class PostProvider extends ChangeNotifier {
         avatarUrl = profileRow['avatar_url'] as String?;
       }
 
-      final List<dynamic> commentRows = await supabase
-          .from('comments')
-          .select('id')
-          .eq('post_id', postId);
+      final List<dynamic> commentRows =
+          await supabase.from('comments').select('id').eq('post_id', postId);
       final commentCount = commentRows.length;
 
       return Post.fromSupabaseRow(
@@ -203,7 +178,7 @@ class PostProvider extends ChangeNotifier {
   Future<void> loadCommentsForPost(String postId) async {
     try {
       final supabase = Supabase.instance.client;
-      final excludedUserIds = await _getExcludedUserIds(supabase);
+      final excludedUserIds = await blockedUserIdsForCurrentUser(supabase);
       final List<dynamic> commentRows = await supabase
           .from('comments')
           .select('id, post_id, user_id, content, created_at, parent_id')
@@ -252,7 +227,7 @@ class PostProvider extends ChangeNotifier {
       _postComments[postId] = comments;
       _updateCommentCounts();
       notifyListeners();
-    } catch (e) { /* ignored */ }
+    } catch (e) {}
   }
 
   Future<void> addComment(String postId, String content,
@@ -270,7 +245,7 @@ class PostProvider extends ChangeNotifier {
       });
 
       await loadCommentsForPost(postId);
-    } catch (e) { /* ignored */ }
+    } catch (e) {}
   }
 
   Future<void> deleteComment(String commentId, String postId) async {
@@ -279,7 +254,7 @@ class PostProvider extends ChangeNotifier {
       await supabase.from('comments').delete().eq('id', commentId);
 
       await loadCommentsForPost(postId);
-    } catch (e) { /* ignored */ }
+    } catch (e) {}
   }
 
   Future<void> deletePost(String postId) async {
@@ -310,7 +285,7 @@ class PostProvider extends ChangeNotifier {
 
                   await supabase.storage.from(bucket).remove([path]);
                 }
-              } catch (e) { /* ignored */ }
+              } catch (e) {}
             }
           }
         }

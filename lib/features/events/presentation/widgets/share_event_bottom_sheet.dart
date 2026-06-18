@@ -145,7 +145,7 @@ class _ShareEventBottomSheetState extends State<ShareEventBottomSheet> {
             recipientUserId: userId,
           );
           successCount++;
-        } catch (e) { /* ignored */ }
+        } catch (e) {}
       }
 
       if (mounted) {
@@ -290,8 +290,8 @@ class _ShareEventBottomSheetState extends State<ShareEventBottomSheet> {
                                 children: [
                                   NetworkCircleAvatar(
                                     radius: 24,
-                                    backgroundColor:
-                                        AppTheme.primaryGreen.withValues(alpha: 0.1),
+                                    backgroundColor: AppTheme.primaryGreen
+                                        .withValues(alpha: 0.1),
                                     imageUrl: user.avatarUrl,
                                     fallbackLetter: _getInitialLetter(
                                       user.fullName ??

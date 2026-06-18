@@ -101,8 +101,8 @@ class _FollowersFollowingListPageState
         child: NetworkCircleAvatar(
           radius: 28,
           imageUrl: user.avatarUrl,
-          fallbackLetter: _getInitialLetter(
-              user.fullName ?? user.displayUsername ?? 'U'),
+          fallbackLetter:
+              _getInitialLetter(user.fullName ?? user.displayUsername ?? 'U'),
           fallbackTextStyle: const TextStyle(
             color: Colors.white,
             fontSize: 28,

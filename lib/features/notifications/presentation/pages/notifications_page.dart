@@ -239,7 +239,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         label: Text(_filterLabel(k)),
                         selected: selected,
                         onSelected: (_) => setState(() => _filter = k),
-                        selectedColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
+                        selectedColor:
+                            AppTheme.primaryGreen.withValues(alpha: 0.2),
                         checkmarkColor: AppTheme.primaryGreen,
                       );
                     }).toList(),

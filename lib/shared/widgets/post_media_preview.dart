@@ -5,7 +5,6 @@ import 'package:cap/shared/utils/link_preview_utils.dart';
 import 'package:cap/shared/widgets/cached_image_widget.dart';
 import 'package:cap/shared/widgets/image_placeholder.dart';
 
-/// Renders uploaded image files or link-preview thumbnails for webpage URLs.
 class PostMediaPreview extends StatefulWidget {
   final String? mediaUrl;
   final BoxFit fit;

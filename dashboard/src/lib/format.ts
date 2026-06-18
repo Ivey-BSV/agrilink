@@ -11,4 +11,3 @@ export function formatDateLong(value: string | null | undefined) {
   if (Number.isNaN(d.getTime())) return "Not available";
   return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
 }
-

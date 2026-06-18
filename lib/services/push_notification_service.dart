@@ -102,21 +102,21 @@ class PushNotificationService {
   static Future<void> clearForLogout() async {
     try {
       await NotificationService().setFcmToken(null);
-    } catch (_) { /* ignored */ }
+    } catch (_) {}
     if (!_initialized) return;
     try {
       await FirebaseMessaging.instance.deleteToken();
-    } catch (_) { /* ignored */ }
+    } catch (_) {}
   }
 
   static Future<void> disableRemotePush() async {
     await NotificationService().setPushEnabled(false);
     try {
       await NotificationService().setFcmToken(null);
-    } catch (_) { /* ignored */ }
+    } catch (_) {}
     if (!_initialized) return;
     try {
       await FirebaseMessaging.instance.deleteToken();
-    } catch (_) { /* ignored */ }
+    } catch (_) {}
   }
 }

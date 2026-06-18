@@ -442,9 +442,8 @@ class _ChatUsersPageState extends State<ChatUsersPage>
                         child: NetworkCircleAvatar(
                           radius: 28,
                           imageUrl: user.avatarUrl,
-                          fallbackLetter: _getInitialLetter(user.fullName ??
-                              user.displayUsername ??
-                              'U'),
+                          fallbackLetter: _getInitialLetter(
+                              user.fullName ?? user.displayUsername ?? 'U'),
                           fallbackTextStyle: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -653,9 +652,10 @@ class _ChatUsersPageState extends State<ChatUsersPage>
                         child: NetworkCircleAvatar(
                           radius: 28,
                           imageUrl: user.user.avatarUrl,
-                          fallbackLetter: _getInitialLetter(user.user.fullName ??
-                              user.user.displayUsername ??
-                              'U'),
+                          fallbackLetter: _getInitialLetter(
+                              user.user.fullName ??
+                                  user.user.displayUsername ??
+                                  'U'),
                           fallbackTextStyle: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

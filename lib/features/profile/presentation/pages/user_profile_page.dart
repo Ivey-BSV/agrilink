@@ -421,9 +421,8 @@ class _UserProfilePageState extends State<UserProfilePage>
                     child: NetworkCircleAvatar(
                       radius: 40,
                       imageUrl: profile.avatarUrl,
-                      fallbackLetter: _getInitialLetter(profile.fullName ??
-                          profile.displayUsername ??
-                          'U'),
+                      fallbackLetter: _getInitialLetter(
+                          profile.fullName ?? profile.displayUsername ?? 'U'),
                       fallbackTextStyle: const TextStyle(
                         color: Colors.white,
                         fontSize: 40,

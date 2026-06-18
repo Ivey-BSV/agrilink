@@ -195,8 +195,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   decoration: BoxDecoration(
                     color: AppTheme.errorRed.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border:
-                        Border.all(color: AppTheme.errorRed.withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: AppTheme.errorRed.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     _errorMessage!,

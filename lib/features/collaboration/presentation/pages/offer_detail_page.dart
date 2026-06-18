@@ -100,8 +100,8 @@ class _OfferDetailPageState extends State<OfferDetailPage> {
                             children: [
                               CircleAvatar(
                                 radius: 18,
-                                backgroundColor:
-                                    AppTheme.primaryGreen.withValues(alpha: 0.15),
+                                backgroundColor: AppTheme.primaryGreen
+                                    .withValues(alpha: 0.15),
                                 child: Text(
                                   widget.offer['avatar'] as String,
                                   style: const TextStyle(

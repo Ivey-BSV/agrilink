@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cap/core/theme/app_theme.dart';
+import 'package:cap/shared/utils/relative_time_format.dart';
 import 'package:cap/shared/widgets/image_placeholder.dart';
 import 'package:cap/shared/widgets/listing_media_tile.dart';
 
@@ -7,7 +8,6 @@ class MarketplaceCard extends StatelessWidget {
   final String title;
   final String price;
   final String location;
-  final String condition;
   final String? imageUrl;
   final VoidCallback onTap;
   final DateTime postedAt;
@@ -20,7 +20,6 @@ class MarketplaceCard extends StatelessWidget {
     required this.title,
     required this.price,
     required this.location,
-    required this.condition,
     this.imageUrl,
     required this.onTap,
     required this.postedAt,
@@ -82,7 +81,7 @@ class MarketplaceCard extends StatelessWidget {
                                 size: 12, color: Colors.white),
                             const SizedBox(width: 4),
                             Text(
-                              _formatFriendlyDate(postedAt),
+                              formatFriendlyRelativeTime(postedAt),
                               style: const TextStyle(
                                   fontSize: 11,
                                   color: Colors.white,
@@ -124,21 +123,11 @@ class MarketplaceCard extends StatelessWidget {
                   ),
                 ],
               ),
-              Offstage(child: Text(condition)),
             ],
           ),
         ),
       ),
     );
-  }
-
-  String _formatFriendlyDate(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-    if (difference.inDays > 0) return '${difference.inDays}d ago';
-    if (difference.inHours > 0) return '${difference.inHours}h ago';
-    if (difference.inMinutes > 0) return '${difference.inMinutes}m ago';
-    return 'Just now';
   }
 
   Widget _buildPriceBadge(String price) {

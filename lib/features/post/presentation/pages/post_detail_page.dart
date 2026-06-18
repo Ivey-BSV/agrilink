@@ -394,22 +394,22 @@ class _PostDetailPageState extends State<PostDetailPage> {
         if (sanitizeImageUrl(_post!.imageUrl) != null) ...[
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: isDirectImageUrl(_post!.imageUrl) &&
-                    _imageAspectRatio != null
-                ? AspectRatio(
-                    aspectRatio: _imageAspectRatio!,
-                    child: PostMediaPreview(
-                      mediaUrl: _post!.imageUrl,
-                      fit: BoxFit.contain,
-                    ),
-                  )
-                : AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: PostMediaPreview(
-                      mediaUrl: _post!.imageUrl,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+            child:
+                isDirectImageUrl(_post!.imageUrl) && _imageAspectRatio != null
+                    ? AspectRatio(
+                        aspectRatio: _imageAspectRatio!,
+                        child: PostMediaPreview(
+                          mediaUrl: _post!.imageUrl,
+                          fit: BoxFit.contain,
+                        ),
+                      )
+                    : AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: PostMediaPreview(
+                          mediaUrl: _post!.imageUrl,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
           ),
           const SizedBox(height: 16),
         ],

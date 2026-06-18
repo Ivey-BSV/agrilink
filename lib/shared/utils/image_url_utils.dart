@@ -1,13 +1,11 @@
 import 'dart:convert';
 
-/// Normalizes image URLs from the API (trim whitespace, drop empty values).
 String? sanitizeImageUrl(String? raw) {
   if (raw == null) return null;
   final trimmed = raw.trim();
   return trimmed.isEmpty ? null : trimmed;
 }
 
-/// Optional cache-bust query param used for profile avatars in app bars.
 String? imageUrlWithCacheBust(String? raw, String cacheKey) {
   final url = sanitizeImageUrl(raw);
   if (url == null) return null;
@@ -20,7 +18,6 @@ bool isNetworkImageUrl(String? raw) {
   return url.startsWith('http://') || url.startsWith('https://');
 }
 
-/// Parses `image_urls` from a Supabase posts row (array of strings).
 List<String> parsePostImageUrls(dynamic raw) {
   if (raw == null) return [];
   if (raw is List) {
@@ -36,9 +33,7 @@ List<String> parsePostImageUrls(dynamic raw) {
       try {
         final decoded = jsonDecode(trimmed);
         if (decoded is List) return parsePostImageUrls(decoded);
-      } catch (_) {
-        // fall through to single-url handling
-      }
+      } catch (_) {}
     }
     if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
       final inner = trimmed.substring(1, trimmed.length - 1).trim();
@@ -63,19 +58,17 @@ String? firstPostImageUrl(dynamic raw) {
 const _supabaseObjectPublic = '/storage/v1/object/public/';
 const _supabaseRenderPublic = '/storage/v1/render/image/public/';
 
-/// Supabase render endpoint transcodes HEIC/large uploads for Flutter decoders.
-/// Returns null when [raw] is not a Supabase storage object URL.
 String? supabaseRenderImageUrl(String? raw, {int width = 1200}) {
   final url = sanitizeImageUrl(raw);
   if (url == null || !url.contains(_supabaseObjectPublic)) return null;
-  final uri = Uri.parse(url.replaceFirst(_supabaseObjectPublic, _supabaseRenderPublic));
+  final uri =
+      Uri.parse(url.replaceFirst(_supabaseObjectPublic, _supabaseRenderPublic));
   return uri.replace(queryParameters: {
     ...uri.queryParameters,
     'width': width.toString(),
   }).toString();
 }
 
-/// Primary URL for in-app image widgets.
 String? networkDisplayImageUrl(String? raw, {int renderWidth = 1200}) {
   final url = sanitizeImageUrl(raw);
   if (url == null) return null;
@@ -86,7 +79,6 @@ String? networkDisplayImageUrl(String? raw, {int renderWidth = 1200}) {
   return url;
 }
 
-/// True when the URL likely points at an image file, not a webpage.
 bool isDirectImageUrl(String? raw) {
   final url = sanitizeImageUrl(raw);
   if (url == null) return false;

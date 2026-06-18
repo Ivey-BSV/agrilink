@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cap/shared/models/marketplace_listing.dart';
+import 'package:cap/shared/utils/user_block_utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MarketplaceProvider extends ChangeNotifier {
@@ -13,38 +14,13 @@ class MarketplaceProvider extends ChangeNotifier {
 
   MarketplaceProvider();
 
-  Future<Set<String>> _getExcludedUserIds(SupabaseClient supabase) async {
-    final user = supabase.auth.currentUser;
-    if (user == null) return <String>{};
-    try {
-      final rows = await supabase
-          .from('user_blocks')
-          .select('blocker_id, blocked_id')
-          .or('blocker_id.eq.${user.id},blocked_id.eq.${user.id}');
-      final Set<String> ids = <String>{};
-      for (final raw in rows as List<dynamic>) {
-        final row = raw as Map<String, dynamic>;
-        final blocker = row['blocker_id'] as String;
-        final blocked = row['blocked_id'] as String;
-        if (blocker == user.id) {
-          ids.add(blocked);
-        } else if (blocked == user.id) {
-          ids.add(blocker);
-        }
-      }
-      return ids;
-    } catch (_) {
-      return <String>{};
-    }
-  }
-
   Future<void> loadListingsFromSupabase() async {
     _isLoading = true;
     notifyListeners();
 
     try {
       final supabase = Supabase.instance.client;
-      final excludedUserIds = await _getExcludedUserIds(supabase);
+      final excludedUserIds = await blockedUserIdsForCurrentUser(supabase);
       final List<dynamic> rows = await supabase
           .from('marketplace_listings')
           .select(

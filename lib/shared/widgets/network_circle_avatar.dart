@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cap/shared/utils/image_url_utils.dart';
 
-/// Circle avatar that loads a remote image without throwing on 404/decode errors.
 class NetworkCircleAvatar extends StatelessWidget {
   final String? imageUrl;
   final double radius;

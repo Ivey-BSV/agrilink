@@ -22,12 +22,12 @@ function parseSuperAdminEmails() {
     .filter(Boolean);
 }
 
-export function isSuperAdminEmail(email: string | null | undefined) {
+function isSuperAdminEmail(email: string | null | undefined) {
   if (!email) return false;
   return parseSuperAdminEmails().includes(email.toLowerCase());
 }
 
-export function isAdminEmail(email: string | null | undefined) {
+function isAdminEmail(email: string | null | undefined) {
   if (!email) return false;
   const list = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
     .split(",")

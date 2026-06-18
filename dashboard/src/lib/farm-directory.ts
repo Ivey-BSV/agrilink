@@ -29,7 +29,7 @@ const FARM_SELECT =
 
 const CHUNK = 80;
 
-export function joinDirectoryMeta(parts: (string | null | undefined)[]): string {
+function joinDirectoryMeta(parts: (string | null | undefined)[]): string {
   return parts.map((p) => p?.trim()).filter(Boolean).join(" · ");
 }
 
@@ -62,7 +62,7 @@ export function directoryCertificationLine(farm: FarmDetailsRow | null): string 
 
 export type DirectoryDetailLine = { label: string; value: string };
 
-/** Detail rows shown on directory cards (aligned with mobile farm directory). */
+
 export function directoryFarmDetailLines(farm: FarmDetailsRow | null): DirectoryDetailLine[] {
   if (!farm) return [];
   const lines: DirectoryDetailLine[] = [];

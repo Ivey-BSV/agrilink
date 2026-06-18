@@ -294,7 +294,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
     try {
       await DefaultCacheManager().emptyCache();
-    } catch (e) { /* ignored */ }
+    } catch (e) {}
 
     await authProvider.logout();
     if (context.mounted) {
@@ -381,7 +381,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
       try {
         await DefaultCacheManager().emptyCache();
-      } catch (_) { /* ignored */ }
+      } catch (_) {}
 
       if (context.mounted) {
         context.go('/');

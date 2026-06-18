@@ -94,8 +94,8 @@ class _AskDetailPageState extends State<AskDetailPage> {
                             children: [
                               CircleAvatar(
                                 radius: 18,
-                                backgroundColor:
-                                    AppTheme.primaryGreen.withValues(alpha: 0.15),
+                                backgroundColor: AppTheme.primaryGreen
+                                    .withValues(alpha: 0.15),
                                 child: Text(
                                   widget.ask['avatar'] as String,
                                   style: const TextStyle(

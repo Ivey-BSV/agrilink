@@ -118,7 +118,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   Text(
                     'Enter your username or email, the reset code, and a new password.',
                     style: TextStyle(
-                        fontSize: 14, color: Colors.white.withValues(alpha: 0.9)),
+                        fontSize: 14,
+                        color: Colors.white.withValues(alpha: 0.9)),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),

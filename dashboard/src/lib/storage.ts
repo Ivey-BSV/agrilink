@@ -9,4 +9,3 @@ export function extractStoragePathFromPublicUrl(
   const [path] = pathWithParams.split("?");
   return path || null;
 }
-

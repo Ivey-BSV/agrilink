@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import { formatDate } from "@/lib/format";
 import { loadFarmDetailsFull, type FarmDetailsRow } from "@/lib/farm-details";
 import {
   blockUser,

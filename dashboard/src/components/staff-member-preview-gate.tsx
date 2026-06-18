@@ -7,7 +7,7 @@ import { useStaffMemberPreview } from "@/hooks/use-staff-member-preview";
 import { getStaffMemberPreview, shouldShowStaffMemberPreviewBanner } from "@/lib/member-preview";
 import { useStaffAccess } from "@/components/staff-access-context";
 
-/** Renders the member-preview banner for staff on member-facing routes. */
+
 export function StaffMemberPreviewGate() {
   const pathname = usePathname();
   const { staffAccess, ready } = useStaffAccess();

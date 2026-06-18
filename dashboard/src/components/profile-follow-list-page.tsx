@@ -20,7 +20,7 @@ type ProfileFollowListPageProps = {
   emptyMessage: string;
   followColumn: "follower_id" | "following_id";
   filterColumn: "following_id" | "follower_id";
-  /** When omitted, uses the signed-in user's id (my profile lists). */
+  
   userId?: string;
 };
 

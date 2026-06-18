@@ -13,6 +13,7 @@ import 'package:cap/providers/post_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/post.dart';
 import 'package:cap/shared/utils/image_url_utils.dart';
+import 'package:cap/shared/utils/relative_time_format.dart';
 import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -49,15 +50,6 @@ class _CommunityPageState extends State<CommunityPage>
         profileProvider.loadProfile(auth.userId!);
       }
     });
-  }
-
-  String _formatFriendlyDate(DateTime timestamp) {
-    final now = DateTime.now();
-    final difference = now.difference(timestamp);
-    if (difference.inDays > 0) return '${difference.inDays}d ago';
-    if (difference.inHours > 0) return '${difference.inHours}h ago';
-    if (difference.inMinutes > 0) return '${difference.inMinutes}m ago';
-    return 'Just now';
   }
 
   Widget _buildFilterBar() {
@@ -347,8 +339,8 @@ class _CommunityPageState extends State<CommunityPage>
                                       });
                                       setLocalState(() {});
                                     },
-                                    selectedColor:
-                                        AppTheme.primaryGreen.withValues(alpha: 0.2),
+                                    selectedColor: AppTheme.primaryGreen
+                                        .withValues(alpha: 0.2),
                                     checkmarkColor: AppTheme.primaryGreen,
                                     materialTapTargetSize:
                                         MaterialTapTargetSize.shrinkWrap,
@@ -634,7 +626,7 @@ class _CommunityPageState extends State<CommunityPage>
                             description: post.content,
                             author: post.userName,
                             authorAvatarUrl: post.userAvatar,
-                            date: _formatFriendlyDate(post.timestamp),
+                            date: formatFriendlyRelativeTime(post.timestamp),
                             replies: post.comments,
                             likes: post.likes,
                             imageUrl: post.imageUrl,
