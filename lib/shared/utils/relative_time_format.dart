@@ -6,3 +6,14 @@ String formatFriendlyRelativeTime(DateTime timestamp) {
   if (difference.inMinutes > 0) return '${difference.inMinutes}m ago';
   return 'Just now';
 }
+
+String formatFriendlyRelativeTimeFromIso(
+  String timestamp, {
+  String fallback = 'Recently',
+}) {
+  try {
+    return formatFriendlyRelativeTime(DateTime.parse(timestamp));
+  } catch (_) {
+    return fallback;
+  }
+}

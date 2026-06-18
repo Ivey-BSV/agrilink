@@ -4,8 +4,7 @@ import 'package:cap/features/chat/presentation/pages/chat_users_page.dart';
 import 'package:cap/features/notifications/presentation/widgets/notification_bell_button.dart';
 import 'package:cap/providers/auth_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
-import 'package:cap/features/profile/presentation/pages/profile_page.dart';
-import 'package:cap/shared/widgets/network_circle_avatar.dart';
+import 'package:cap/shared/widgets/user_profile_app_bar_avatar.dart';
 import 'package:cap/features/farm_network/presentation/pages/farm_directory_page.dart';
 import 'package:cap/features/resources/presentation/pages/knowledge_repository_page.dart';
 import 'package:cap/features/resources/presentation/pages/workshops_page.dart';
@@ -53,7 +52,7 @@ class _ResourcesPageState extends State<ResourcesPage>
       appBar: AppBar(
         backgroundColor: AppTheme.backgroundLight,
         elevation: 0,
-        leading: _buildUserAvatarLeading(context),
+        leading: const UserProfileAppBarAvatar(),
         titleSpacing: 16,
         title: Text(
           'Resources',
@@ -150,57 +149,6 @@ class _ResourcesPageState extends State<ResourcesPage>
     );
 
     return pageContent;
-  }
-
-  Widget _buildUserAvatarLeading(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
-    final profileProvider = context.watch<ProfileProvider>();
-    final profile = profileProvider.currentProfile;
-    final String? avatarUrl = profile?.avatarUrl;
-    final String displayLetter = (profile?.fullName ?? auth.userName ?? 'U')
-            .trim()
-            .isNotEmpty
-        ? (profile?.fullName ?? auth.userName ?? 'U').trim()[0].toUpperCase()
-        : 'U';
-
-    if (auth.userId != null &&
-        (profile == null || profile.id != auth.userId) &&
-        !profileProvider.isLoading) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        profileProvider.loadProfile(auth.userId!);
-      });
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ProfilePage()),
-          );
-        },
-        child: Container(
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: AppTheme.primaryGradient,
-          ),
-          child: NetworkCircleAvatar(
-            avatarKey: ValueKey('avatar_${auth.userId}_${avatarUrl ?? 'none'}'),
-            radius: 18,
-            imageUrl: avatarUrl,
-            cacheBustKey: auth.userId ?? 'none',
-            fallbackLetter: displayLetter,
-            fallbackTextStyle: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildFarmDirectoryTab() {

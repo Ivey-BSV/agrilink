@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cap/shared/utils/avatar_utils.dart';
 import 'package:flutter/services.dart';
 import 'package:cap/core/animations/app_animations.dart';
 import 'package:cap/core/theme/app_theme.dart';
@@ -160,11 +161,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _bioController.dispose();
     _locationController.dispose();
     super.dispose();
-  }
-
-  String _getInitialLetter(String name) {
-    if (name.isEmpty) return 'U';
-    return name[0];
   }
 
   @override
@@ -433,8 +429,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         : NetworkCircleAvatar(
                             radius: 60,
                             imageUrl: profile?.avatarUrl,
-                            fallbackLetter: _getInitialLetter(
-                                profile?.fullName ?? user.userName ?? 'U'),
+                            fallbackLetter: avatarInitialLetter(
+                              profile?.fullName ?? user.userName ?? 'U',
+                              uppercase: false,
+                            ),
                             fallbackTextStyle: const TextStyle(
                               color: Colors.white,
                               fontSize: 60,

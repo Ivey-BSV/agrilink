@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cap/shared/utils/avatar_utils.dart';
 import 'package:cap/core/animations/app_animations.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/features/edit_profile/presentation/pages/edit_profile_page.dart';
@@ -156,11 +157,6 @@ class _ProfilePageState extends State<ProfilePage>
     });
   }
 
-  String _getInitialLetter(String name) {
-    if (name.isEmpty) return 'U';
-    return name[0];
-  }
-
   bool _hasNoFarmData(farmDetails) {
     return (farmDetails.farmOverview == null ||
             farmDetails.farmOverview!.trim().isEmpty) &&
@@ -268,8 +264,10 @@ class _ProfilePageState extends State<ProfilePage>
                   child: NetworkCircleAvatar(
                     radius: 40,
                     imageUrl: profile?.avatarUrl,
-                    fallbackLetter: _getInitialLetter(
-                        profile?.fullName ?? user.userName ?? 'U'),
+                    fallbackLetter: avatarInitialLetter(
+                      profile?.fullName ?? user.userName ?? 'U',
+                      uppercase: false,
+                    ),
                     fallbackTextStyle: const TextStyle(
                       color: Colors.white,
                       fontSize: 40,

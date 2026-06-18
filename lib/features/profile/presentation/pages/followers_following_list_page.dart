@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cap/shared/utils/avatar_utils.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/providers/auth_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
@@ -102,7 +103,7 @@ class _FollowersFollowingListPageState
           radius: 28,
           imageUrl: user.avatarUrl,
           fallbackLetter:
-              _getInitialLetter(user.fullName ?? user.displayUsername ?? 'U'),
+              avatarInitialLetter(user.fullName ?? user.displayUsername ?? 'U'),
           fallbackTextStyle: const TextStyle(
             color: Colors.white,
             fontSize: 28,
@@ -161,11 +162,6 @@ class _FollowersFollowingListPageState
     }
 
     return statusBadge;
-  }
-
-  String _getInitialLetter(String name) {
-    if (name.isEmpty) return 'U';
-    return name[0].toUpperCase();
   }
 
   Widget _buildStatusBadge(String text, Color color, {VoidCallback? onTap}) {

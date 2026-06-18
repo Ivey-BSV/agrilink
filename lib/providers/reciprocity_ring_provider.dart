@@ -1,3 +1,5 @@
+import 'package:cap/shared/utils/avatar_utils.dart';
+import 'package:cap/shared/utils/relative_time_format.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -83,13 +85,14 @@ class ReciprocityRingProvider extends ChangeNotifier {
                   (profile['username'] as String?) ??
                   'User'
               : 'User';
-          final avatar = _getAvatarInitial(responderName);
+          final avatar = avatarInitialLetter(responderName);
 
           askResponses[askId]!.add({
             'responder': responderName,
             'avatar': avatar,
             'response': row['response'] as String,
-            'time': _formatTimeAgo(row['created_at'] as String),
+            'time':
+                formatFriendlyRelativeTimeFromIso(row['created_at'] as String),
             'created_at': row['created_at'] as String,
           });
         }
@@ -106,7 +109,7 @@ class ReciprocityRingProvider extends ChangeNotifier {
                 (profile['username'] as String?) ??
                 'User'
             : 'User';
-        final avatar = _getAvatarInitial(ownerName);
+        final avatar = avatarInitialLetter(ownerName);
         final location =
             row['location'] as String? ?? profile?['location'] as String?;
 
@@ -203,14 +206,15 @@ class ReciprocityRingProvider extends ChangeNotifier {
                   (profile['username'] as String?) ??
                   'User'
               : 'User';
-          final avatar = _getAvatarInitial(interestedName);
+          final avatar = avatarInitialLetter(interestedName);
 
           offerInterests[offerId]!.add({
             'user_id': interestUserId,
             'interested': interestedName,
             'avatar': avatar,
             'message': row['message'] as String,
-            'time': _formatTimeAgo(row['created_at'] as String),
+            'time':
+                formatFriendlyRelativeTimeFromIso(row['created_at'] as String),
             'created_at': row['created_at'] as String,
           });
         }
@@ -227,7 +231,7 @@ class ReciprocityRingProvider extends ChangeNotifier {
                 (profile['username'] as String?) ??
                 'User'
             : 'User';
-        final avatar = _getAvatarInitial(ownerName);
+        final avatar = avatarInitialLetter(ownerName);
         final location =
             row['location'] as String? ?? profile?['location'] as String?;
 
@@ -448,31 +452,6 @@ class ReciprocityRingProvider extends ChangeNotifier {
       return turnaroundTimes[middle];
     } else {
       return (turnaroundTimes[middle - 1] + turnaroundTimes[middle]) / 2.0;
-    }
-  }
-
-  String _getAvatarInitial(String name) {
-    if (name.isEmpty) return 'U';
-    return name[0].toUpperCase();
-  }
-
-  String _formatTimeAgo(String timestamp) {
-    try {
-      final dateTime = DateTime.parse(timestamp);
-      final now = DateTime.now();
-      final difference = now.difference(dateTime);
-
-      if (difference.inDays > 0) {
-        return '${difference.inDays}d ago';
-      } else if (difference.inHours > 0) {
-        return '${difference.inHours}h ago';
-      } else if (difference.inMinutes > 0) {
-        return '${difference.inMinutes}m ago';
-      } else {
-        return 'Just now';
-      }
-    } catch (e) {
-      return 'Recently';
     }
   }
 

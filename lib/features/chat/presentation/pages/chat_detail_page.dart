@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cap/shared/utils/avatar_utils.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/features/events/presentation/widgets/event_details_bottom_sheet.dart';
 import 'package:cap/shared/utils/event_date_format.dart';
@@ -381,11 +382,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
         _isSendingMessage = false;
       }
     }
-  }
-
-  String _getInitialLetter(String name) {
-    if (name.isEmpty) return 'U';
-    return name[0].toUpperCase();
   }
 
   void _showEventDetails(Event event) {
@@ -1367,7 +1363,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                     child: NetworkCircleAvatar(
                                       radius: 16,
                                       imageUrl: _currentUserAvatarUrl,
-                                      fallbackLetter: _getInitialLetter(
+                                      fallbackLetter: avatarInitialLetter(
                                           _currentUserName ?? 'Me'),
                                       fallbackTextStyle: const TextStyle(
                                         color: Colors.white,

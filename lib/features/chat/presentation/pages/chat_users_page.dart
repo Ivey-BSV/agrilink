@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cap/shared/utils/avatar_utils.dart';
+import 'package:cap/shared/utils/relative_time_format.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/features/chat/presentation/pages/chat_detail_page.dart';
 import 'package:cap/providers/auth_provider.dart';
@@ -102,26 +104,6 @@ class _ChatUsersPageState extends State<ChatUsersPage>
           _isLoading = false;
         });
       }
-    }
-  }
-
-  String _getInitialLetter(String name) {
-    if (name.isEmpty) return 'U';
-    return name[0].toUpperCase();
-  }
-
-  String _formatTimeAgo(DateTime time) {
-    final now = DateTime.now();
-    final difference = now.difference(time);
-
-    if (difference.inDays > 0) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inHours > 0) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inMinutes > 0) {
-      return '${difference.inMinutes}m ago';
-    } else {
-      return 'Just now';
     }
   }
 
@@ -442,7 +424,7 @@ class _ChatUsersPageState extends State<ChatUsersPage>
                         child: NetworkCircleAvatar(
                           radius: 28,
                           imageUrl: user.avatarUrl,
-                          fallbackLetter: _getInitialLetter(
+                          fallbackLetter: avatarInitialLetter(
                               user.fullName ?? user.displayUsername ?? 'U'),
                           fallbackTextStyle: const TextStyle(
                             color: Colors.white,
@@ -475,7 +457,7 @@ class _ChatUsersPageState extends State<ChatUsersPage>
                                   : lastMessageFromMe
                                       ? isSeen
                                           ? 'Seen'
-                                          : 'Sent ${_formatTimeAgo(lastMessageTime)}'
+                                          : 'Sent ${formatFriendlyRelativeTime(lastMessageTime)}'
                                       : hasUnread
                                           ? '$unreadCount new message${unreadCount > 1 ? 's' : ''}'
                                           : lastMessage,
@@ -652,7 +634,7 @@ class _ChatUsersPageState extends State<ChatUsersPage>
                         child: NetworkCircleAvatar(
                           radius: 28,
                           imageUrl: user.user.avatarUrl,
-                          fallbackLetter: _getInitialLetter(
+                          fallbackLetter: avatarInitialLetter(
                               user.user.fullName ??
                                   user.user.displayUsername ??
                                   'U'),

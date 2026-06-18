@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cap/shared/utils/relative_time_format.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/features/collaboration/presentation/pages/future_visualization_detail_page.dart';
 import 'package:cap/features/collaboration/presentation/pages/future_visualization_page.dart';
@@ -341,7 +342,7 @@ class _FutureVisualizationListPageState
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    _formatTimeAgo(plan['createdAt'] as DateTime),
+                    formatFriendlyRelativeTime(plan['createdAt'] as DateTime),
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[600],
@@ -354,14 +355,6 @@ class _FutureVisualizationListPageState
         ),
       ),
     );
-  }
-
-  String _formatTimeAgo(DateTime dt) {
-    final diff = DateTime.now().difference(dt);
-    if (diff.inDays >= 1) return '${diff.inDays}d ago';
-    if (diff.inHours >= 1) return '${diff.inHours}h ago';
-    if (diff.inMinutes >= 1) return '${diff.inMinutes}m ago';
-    return 'Just now';
   }
 
   void _openPlan(Map<String, dynamic> plan) {

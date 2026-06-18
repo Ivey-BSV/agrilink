@@ -6,7 +6,6 @@ import 'package:cap/features/community/presentation/data/forum_marketplace_tag_c
 import 'package:cap/features/events/presentation/pages/events_page.dart';
 import 'package:cap/features/community/presentation/widgets/create_post_button.dart';
 import 'package:cap/features/community/presentation/widgets/forum_post_card.dart';
-import 'package:cap/features/profile/presentation/pages/profile_page.dart';
 import 'package:cap/features/search/presentation/pages/search_page.dart';
 import 'package:cap/providers/auth_provider.dart';
 import 'package:cap/providers/post_provider.dart';
@@ -14,7 +13,8 @@ import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/post.dart';
 import 'package:cap/shared/utils/image_url_utils.dart';
 import 'package:cap/shared/utils/relative_time_format.dart';
-import 'package:cap/shared/widgets/network_circle_avatar.dart';
+import 'package:cap/shared/widgets/content_filter_chip.dart';
+import 'package:cap/shared/widgets/user_profile_app_bar_avatar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -69,22 +69,22 @@ class _CommunityPageState extends State<CommunityPage>
               Expanded(
                 child: Row(
                   children: [
-                    _buildFilterChip(
-                      'All',
-                      _contentFilter == 'all',
-                      () => setState(() => _contentFilter = 'all'),
+                    ContentFilterChip(
+                      label: 'All',
+                      isSelected: _contentFilter == 'all',
+                      onTap: () => setState(() => _contentFilter = 'all'),
                     ),
                     const SizedBox(width: 8),
-                    _buildFilterChip(
-                      'Photos',
-                      _contentFilter == 'photos',
-                      () => setState(() => _contentFilter = 'photos'),
+                    ContentFilterChip(
+                      label: 'Photos',
+                      isSelected: _contentFilter == 'photos',
+                      onTap: () => setState(() => _contentFilter = 'photos'),
                     ),
                     const SizedBox(width: 8),
-                    _buildFilterChip(
-                      'Videos',
-                      _contentFilter == 'videos',
-                      () => setState(() => _contentFilter = 'videos'),
+                    ContentFilterChip(
+                      label: 'Videos',
+                      isSelected: _contentFilter == 'videos',
+                      onTap: () => setState(() => _contentFilter = 'videos'),
                     ),
                   ],
                 ),
@@ -167,27 +167,6 @@ class _CommunityPageState extends State<CommunityPage>
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryGreen : Colors.grey[100],
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey[600],
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
       ),
     );
   }
@@ -397,7 +376,7 @@ class _CommunityPageState extends State<CommunityPage>
       appBar: AppBar(
         backgroundColor: AppTheme.backgroundLight,
         elevation: 0,
-        leading: _buildUserAvatarLeading(context),
+        leading: const UserProfileAppBarAvatar(),
         titleSpacing: 16,
         title: Text(
           'Community',
@@ -505,57 +484,6 @@ class _CommunityPageState extends State<CommunityPage>
     );
 
     return pageContent;
-  }
-
-  Widget _buildUserAvatarLeading(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
-    final profileProvider = context.watch<ProfileProvider>();
-    final profile = profileProvider.currentProfile;
-    final String? avatarUrl = profile?.avatarUrl;
-    final String displayLetter = (profile?.fullName ?? auth.userName ?? 'U')
-            .trim()
-            .isNotEmpty
-        ? (profile?.fullName ?? auth.userName ?? 'U').trim()[0].toUpperCase()
-        : 'U';
-
-    if (auth.userId != null &&
-        (profile == null || profile.id != auth.userId) &&
-        !profileProvider.isLoading) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        profileProvider.loadProfile(auth.userId!);
-      });
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ProfilePage()),
-          );
-        },
-        child: Container(
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: AppTheme.primaryGradient,
-          ),
-          child: NetworkCircleAvatar(
-            avatarKey: ValueKey('avatar_${auth.userId}_${avatarUrl ?? 'none'}'),
-            radius: 18,
-            imageUrl: avatarUrl,
-            cacheBustKey: auth.userId ?? 'none',
-            fallbackLetter: displayLetter,
-            fallbackTextStyle: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildForumsTab() {

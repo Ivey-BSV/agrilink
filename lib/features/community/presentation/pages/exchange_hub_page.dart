@@ -7,6 +7,7 @@ import 'package:cap/features/community/presentation/widgets/marketplace_card.dar
 import 'package:cap/features/marketplace/presentation/pages/create_listing_page.dart';
 import 'package:cap/providers/marketplace_provider.dart';
 import 'package:cap/shared/models/marketplace_listing.dart';
+import 'package:cap/shared/widgets/content_filter_chip.dart';
 import 'package:provider/provider.dart';
 
 class ExchangeHubPage extends StatefulWidget {
@@ -29,27 +30,6 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MarketplaceProvider>().loadListingsFromSupabase();
     });
-  }
-
-  Widget _buildFilterChip(String label, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryGreen : Colors.grey[100],
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : Colors.grey[600],
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
   }
 
   double _extractPriceValue(String priceText) {
@@ -354,22 +334,24 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                         Expanded(
                           child: Row(
                             children: [
-                              _buildFilterChip(
-                                'All',
-                                _marketFilter == 'all',
-                                () => setState(() => _marketFilter = 'all'),
+                              ContentFilterChip(
+                                label: 'All',
+                                isSelected: _marketFilter == 'all',
+                                onTap: () =>
+                                    setState(() => _marketFilter = 'all'),
                               ),
                               const SizedBox(width: 8),
-                              _buildFilterChip(
-                                'Free',
-                                _marketFilter == 'free',
-                                () => setState(() => _marketFilter = 'free'),
+                              ContentFilterChip(
+                                label: 'Free',
+                                isSelected: _marketFilter == 'free',
+                                onTap: () =>
+                                    setState(() => _marketFilter = 'free'),
                               ),
                               const SizedBox(width: 8),
-                              _buildFilterChip(
-                                'Favourites',
-                                _marketFilter == 'favourites',
-                                () => setState(
+                              ContentFilterChip(
+                                label: 'Favourites',
+                                isSelected: _marketFilter == 'favourites',
+                                onTap: () => setState(
                                     () => _marketFilter = 'favourites'),
                               ),
                             ],
