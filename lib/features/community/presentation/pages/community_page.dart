@@ -67,9 +67,11 @@ class _CommunityPageState extends State<CommunityPage>
           Row(
             children: [
               Expanded(
-                child: Row(
-                  children: [
-                    ContentFilterChip(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      ContentFilterChip(
                       label: 'All',
                       isSelected: _contentFilter == 'all',
                       onTap: () => setState(() => _contentFilter = 'all'),
@@ -86,7 +88,8 @@ class _CommunityPageState extends State<CommunityPage>
                       isSelected: _contentFilter == 'videos',
                       onTap: () => setState(() => _contentFilter = 'videos'),
                     ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               PopupMenuButton<String>(

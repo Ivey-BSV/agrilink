@@ -316,7 +316,6 @@ class ProfileProvider extends ChangeNotifier {
 
   Future<UserProfile?> loadUserProfileById(
       String userId, String currentUserId) async {
-    _setLoading(true);
     _clearError();
 
     try {
@@ -357,8 +356,6 @@ class ProfileProvider extends ChangeNotifier {
     } catch (e) {
       _setError('Failed to load profile: ${e.toString()}');
       return null;
-    } finally {
-      _setLoading(false);
     }
   }
 

@@ -59,12 +59,14 @@ class _FutureVisualizationDetailPageState
     try {
       final planData =
           await _service.getFutureVisualizationById(widget.planId!);
+      if (!mounted) return;
       setState(() {
         _plan = _service.formatVisualizationForUI(planData);
         _checkOwnership();
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _hasError = true;
         _errorMessage = e.toString();

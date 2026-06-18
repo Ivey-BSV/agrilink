@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const RESET_CODE = "1234";
+const DEFAULT_RESET_CODE = "1234";
+const RESET_CODE = Deno.env.get("PASSWORD_RESET_CODE") ?? DEFAULT_RESET_CODE;
 
 const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",

@@ -7,8 +7,33 @@ import 'package:cap/shared/utils/avatar_utils.dart';
 import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:provider/provider.dart';
 
-class UserProfileAppBarAvatar extends StatelessWidget {
+class UserProfileAppBarAvatar extends StatefulWidget {
   const UserProfileAppBarAvatar({super.key});
+
+  @override
+  State<UserProfileAppBarAvatar> createState() =>
+      _UserProfileAppBarAvatarState();
+}
+
+class _UserProfileAppBarAvatarState extends State<UserProfileAppBarAvatar> {
+  String? _requestedUserId;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final auth = context.read<AuthProvider>();
+    final profileProvider = context.read<ProfileProvider>();
+    final userId = auth.userId;
+    final profile = profileProvider.currentProfile;
+
+    if (userId != null &&
+        (profile == null || profile.id != userId) &&
+        !profileProvider.isLoading &&
+        _requestedUserId != userId) {
+      _requestedUserId = userId;
+      profileProvider.loadProfile(userId);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +44,6 @@ class UserProfileAppBarAvatar extends StatelessWidget {
     final displayName = (profile?.fullName ?? auth.userName ?? 'U').trim();
     final displayLetter =
         displayName.isNotEmpty ? avatarInitialLetter(displayName) : 'U';
-
-    if (auth.userId != null &&
-        (profile == null || profile.id != auth.userId) &&
-        !profileProvider.isLoading) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        profileProvider.loadProfile(auth.userId!);
-      });
-    }
 
     return Padding(
       padding: const EdgeInsets.only(left: 16),

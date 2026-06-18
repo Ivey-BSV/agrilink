@@ -9,22 +9,23 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class AuthProvider extends ChangeNotifier {
   static const String currentBuildVersion = 'web-2025-09-22-1';
 
+  AuthProvider({required ProfileProvider profileProvider})
+      : _profileProvider = profileProvider {
+    _loadAuthState();
+  }
+
   bool _isAuthenticated = false;
   String? _userId;
   String? _userName;
   String? _userEmail;
   String? _userAvatar;
-  ProfileProvider? _profileProvider;
+  final ProfileProvider _profileProvider;
 
   bool get isAuthenticated => _isAuthenticated;
   String? get userId => _userId;
   String? get userName => _userName;
   String? get userEmail => _userEmail;
   String? get userAvatar => _userAvatar;
-  AuthProvider() {
-    _profileProvider = ProfileProvider();
-    _loadAuthState();
-  }
 
   Future<void> _loadAuthState() async {
     final prefs = await SharedPreferences.getInstance();
@@ -62,14 +63,14 @@ class AuthProvider extends ChangeNotifier {
     _userEmail = user.email;
     _userAvatar = user.userMetadata?['avatar_url'] as String?;
 
-    await _profileProvider?.loadProfile(user.id);
+    await _profileProvider.loadProfile(user.id);
 
     await _saveAuthState();
     notifyListeners();
   }
 
   Future<bool> login(String usernameOrEmail, String password) async {
-    _profileProvider?.clearProfile();
+    _profileProvider.clearProfile();
 
     final supabase = Supabase.instance.client;
 
@@ -112,7 +113,7 @@ class AuthProvider extends ChangeNotifier {
         _userEmail = user.email;
         _userAvatar = profileResponse['avatar_url'];
 
-        await _profileProvider?.loadProfile(user.id);
+        await _profileProvider.loadProfile(user.id);
 
         await _saveAuthState();
         notifyListeners();
@@ -126,8 +127,8 @@ class AuthProvider extends ChangeNotifier {
         _userEmail = user.email;
         _userAvatar = user.userMetadata?['avatar_url'] as String?;
 
-        await _profileProvider?.ensureProfile(user.id, _userName ?? 'user');
-        await _profileProvider?.loadProfile(user.id);
+        await _profileProvider.ensureProfile(user.id, _userName ?? 'user');
+        await _profileProvider.loadProfile(user.id);
 
         await _saveAuthState();
         notifyListeners();
@@ -161,7 +162,7 @@ class AuthProvider extends ChangeNotifier {
       return 'Username must be at least 2 characters.';
     }
     final taken =
-        await _profileProvider?.isUsernameTaken(normalizedUsername) ?? false;
+        await _profileProvider.isUsernameTaken(normalizedUsername);
     if (taken) {
       return 'That username is already taken. Please choose another.';
     }
@@ -177,7 +178,7 @@ class AuthProvider extends ChangeNotifier {
 
     final user = response.user;
     if (user != null) {
-      await _profileProvider?.ensureProfile(user.id, normalizedUsername,
+      await _profileProvider.ensureProfile(user.id, normalizedUsername,
           fullName: fullName);
 
       _isAuthenticated = true;
@@ -186,7 +187,7 @@ class AuthProvider extends ChangeNotifier {
       _userEmail = email;
       _userAvatar = null;
 
-      await _profileProvider?.loadProfile(user.id);
+      await _profileProvider.loadProfile(user.id);
 
       await _saveAuthState();
       notifyListeners();
@@ -209,7 +210,7 @@ class AuthProvider extends ChangeNotifier {
     _userEmail = null;
     _userAvatar = null;
 
-    _profileProvider?.clearProfile();
+    _profileProvider.clearProfile();
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
@@ -249,14 +250,11 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  static const String _resetCode = '1234';
-
   Future<String?> resetPasswordWithCode({
     required String usernameOrEmail,
     required String code,
     required String newPassword,
   }) async {
-    if (code != _resetCode) return 'Invalid code';
     if (newPassword.length < 6) return 'Password must be at least 6 characters';
     final supabase = Supabase.instance.client;
     try {

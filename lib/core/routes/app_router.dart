@@ -11,10 +11,30 @@ import 'package:cap/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
+  static const _publicPaths = {'/login', '/register', '/reset-password'};
+
   static GoRouter createRouter(AuthProvider auth) {
     return GoRouter(
       initialLocation: '/',
       refreshListenable: auth,
+      redirect: (context, state) {
+        final loggedIn = auth.isAuthenticated;
+        final path = state.uri.path;
+
+        if (path == '/') {
+          return null;
+        }
+        if (_publicPaths.contains(path)) {
+          if (loggedIn && (path == '/login' || path == '/register')) {
+            return '/';
+          }
+          return null;
+        }
+        if (!loggedIn) {
+          return '/login';
+        }
+        return null;
+      },
       routes: [
         GoRoute(
           path: '/',

@@ -7,10 +7,10 @@ import { supabase } from "@/lib/supabase";
 import { SiteBrandMark } from "@/components/site-brand";
 import { normalizeUsername } from "@/lib/username";
 import {
-  RESET_PASSWORD_CODE,
   resetPasswordViaEdgeFunction,
   resolveEmailForPasswordSignIn,
 } from "@/lib/web-auth";
+import { safeRedirectPath } from "@/lib/safe-redirect-path";
 
 type AuthMode = "signIn" | "register" | "forgotPassword";
 
@@ -36,7 +36,7 @@ export function SignInScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const nextPath = searchParams.get("next")?.trim() || "/platform/feed";
+  const nextPath = safeRedirectPath(searchParams.get("next"));
 
   useEffect(() => {
     setError(null);
@@ -99,10 +99,6 @@ export function SignInScreen() {
     setError(null);
     setInfo(null);
 
-    if (forgotCode.trim() !== RESET_PASSWORD_CODE) {
-      setError("Invalid reset code.");
-      return;
-    }
     if (forgotNewPassword.length < 6) {
       setError("New password must be at least 6 characters.");
       return;
@@ -504,7 +500,7 @@ export function SignInScreen() {
                 </h1>
                 <p className="subtle" style={{ marginTop: 8 }}>
                   Enter your email or username, the program reset code, and a new password — same flow as the mobile
-                  app. Reset code: <strong>{RESET_PASSWORD_CODE}</strong>.
+                  app.
                 </p>
               </div>
 
@@ -531,7 +527,7 @@ export function SignInScreen() {
                     required
                     value={forgotCode}
                     onChange={(e) => setForgotCode(e.target.value)}
-                    placeholder={RESET_PASSWORD_CODE}
+                    placeholder="1234"
                   />
                 </div>
                 <div className="field">

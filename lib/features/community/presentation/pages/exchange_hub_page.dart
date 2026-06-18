@@ -332,9 +332,11 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                     Row(
                       children: [
                         Expanded(
-                          child: Row(
-                            children: [
-                              ContentFilterChip(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                ContentFilterChip(
                                 label: 'All',
                                 isSelected: _marketFilter == 'all',
                                 onTap: () =>
@@ -356,6 +358,7 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                               ),
                             ],
                           ),
+                        ),
                         ),
                         PopupMenuButton<String>(
                           onSelected: (value) =>

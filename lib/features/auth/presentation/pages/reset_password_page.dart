@@ -21,8 +21,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   bool _obscureNewPassword = true;
   bool _obscureConfirmPassword = true;
 
-  static const String _resetCode = '1234';
-
   @override
   void dispose() {
     _usernameOrEmailController.dispose();
@@ -34,10 +32,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    if (_codeController.text.trim() != _resetCode) {
+    if (_codeController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Invalid code. Please try again.'),
+          content: Text('Enter the reset code.'),
           backgroundColor: Colors.red,
         ),
       );

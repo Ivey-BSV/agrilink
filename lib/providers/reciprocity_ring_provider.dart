@@ -15,11 +15,28 @@ class ReciprocityRingProvider extends ChangeNotifier {
   String? get error => _error;
 
   final SupabaseClient _supabase = Supabase.instance.client;
+  int _loadDepth = 0;
+
+  void _beginLoad() {
+    if (_loadDepth == 0) {
+      _isLoading = true;
+      notifyListeners();
+    }
+    _loadDepth++;
+  }
+
+  void _endLoad() {
+    _loadDepth--;
+    if (_loadDepth <= 0) {
+      _loadDepth = 0;
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
   Future<void> loadAsks() async {
-    _isLoading = true;
+    _beginLoad();
     _error = null;
-    notifyListeners();
 
     try {
       final List<dynamic> askRows = await _supabase
@@ -132,15 +149,13 @@ class ReciprocityRingProvider extends ChangeNotifier {
     } catch (e) {
       _error = 'Failed to load asks: ${e.toString()}';
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _endLoad();
     }
   }
 
   Future<void> loadOffers() async {
-    _isLoading = true;
+    _beginLoad();
     _error = null;
-    notifyListeners();
 
     try {
       final List<dynamic> offerRows = await _supabase
@@ -255,8 +270,7 @@ class ReciprocityRingProvider extends ChangeNotifier {
     } catch (e) {
       _error = 'Failed to load offers: ${e.toString()}';
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _endLoad();
     }
   }
 

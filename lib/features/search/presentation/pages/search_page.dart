@@ -59,6 +59,7 @@ class _SearchPageState extends State<SearchPage>
         }
       }
 
+      if (!mounted) return;
       setState(() {
         _recentSearches = uniqueSearches;
       });
@@ -141,6 +142,8 @@ class _SearchPageState extends State<SearchPage>
         marketplaceProvider.loadListingsFromSupabase(),
       ]);
 
+      if (!mounted) return;
+
       final query = _searchQuery.toLowerCase();
 
       _postResults = postProvider.posts.where((post) {
@@ -156,10 +159,12 @@ class _SearchPageState extends State<SearchPage>
             (listing.condition?.toLowerCase().contains(query) ?? false);
       }).toList();
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _searchError = 'Error searching: ${e.toString()}';
       });
     } finally {
+      if (!mounted) return;
       setState(() {
         _isSearching = false;
       });
@@ -354,6 +359,7 @@ class _SearchPageState extends State<SearchPage>
           .delete()
           .eq('user_id', authProvider.userId!);
 
+      if (!mounted) return;
       setState(() {
         _recentSearches = [];
       });

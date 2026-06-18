@@ -1,8 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { normalizeUsername } from "@/lib/username";
 
-export const RESET_PASSWORD_CODE = "1234";
-
 export async function resolveEmailForPasswordSignIn(
   supabase: SupabaseClient,
   usernameOrEmail: string,

@@ -6,8 +6,4 @@ class SupabaseConfig {
 
   static bool get isConfigured =>
       supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty;
-
-  static const String demoUsername = 'tester';
-  static const String demoPassword = 'ivey123';
-  static const String demoEmail = 'tester@cap.demo';
 }

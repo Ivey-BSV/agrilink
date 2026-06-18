@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { safeRedirectPath } from "@/lib/safe-redirect-path";
 import type { User } from "@supabase/supabase-js";
 
 type AuthGuardProps = {
@@ -26,7 +27,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
       if (!mounted) return;
 
       if (!session?.user) {
-        router.replace(`/?next=${encodeURIComponent(pathname || "/platform/feed")}`);
+        router.replace(`/?next=${encodeURIComponent(safeRedirectPath(pathname))}`);
         return;
       }
 
