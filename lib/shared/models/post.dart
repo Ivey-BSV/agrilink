@@ -98,6 +98,7 @@ class Post {
     required String userName,
     String? userAvatar,
     int commentCount = 0,
+    int likeCount = 0,
   }) {
     final List<dynamic>? tagsArray = row['tags'] as List<dynamic>?;
 
@@ -110,7 +111,7 @@ class Post {
       content: (row['content'] ?? '') as String,
       imageUrl: firstPostImageUrl(row['image_urls']),
       location: row['location'] as String?,
-      likes: 0,
+      likes: likeCount,
       comments: commentCount,
       timestamp: DateTime.parse(row['created_at'] as String),
       tags: tagsArray != null

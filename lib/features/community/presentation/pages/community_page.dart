@@ -6,13 +6,14 @@ import 'package:cap/features/community/presentation/data/forum_marketplace_tag_c
 import 'package:cap/features/events/presentation/pages/events_page.dart';
 import 'package:cap/features/community/presentation/widgets/create_post_button.dart';
 import 'package:cap/features/community/presentation/widgets/forum_post_card.dart';
+import 'package:cap/features/post/presentation/widgets/post_comments_bottom_sheet.dart';
+import 'package:cap/features/post/presentation/widgets/share_post_bottom_sheet.dart';
 import 'package:cap/features/search/presentation/pages/search_page.dart';
 import 'package:cap/providers/auth_provider.dart';
 import 'package:cap/providers/post_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/post.dart';
 import 'package:cap/shared/utils/image_url_utils.dart';
-import 'package:cap/shared/utils/relative_time_format.dart';
 import 'package:cap/shared/widgets/content_filter_chip.dart';
 import 'package:cap/shared/widgets/user_profile_app_bar_avatar.dart';
 import 'package:go_router/go_router.dart';
@@ -547,25 +548,34 @@ class _CommunityPageState extends State<CommunityPage>
                         ),
                       )
                     : ListView.builder(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.zero,
                         itemCount: filteredPosts.length,
                         itemBuilder: (context, index) {
                           final post = filteredPosts[index];
                           return ForumPostCard(
                             key: ValueKey(post.id),
-                            title: post.title,
-                            description: post.content,
-                            author: post.userName,
-                            authorAvatarUrl: post.userAvatar,
-                            date: formatFriendlyRelativeTime(post.timestamp),
-                            replies: post.comments,
-                            likes: post.likes,
-                            imageUrl: post.imageUrl,
-                            tags: post.tags,
-                            location: post.location,
+                            post: post,
                             isVideo: _isVideoPost(post),
-                            onTap: () {
+                            onOpenPost: () {
                               context.push('/post/${post.id}');
+                            },
+                            onComment: () {
+                              PostCommentsBottomSheet.show(
+                                context,
+                                postId: post.id,
+                                postTitle: post.title,
+                              );
+                            },
+                            onShare: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => SharePostBottomSheet(
+                                  postId: post.id,
+                                  postTitle: post.title,
+                                ),
+                              );
                             },
                           );
                         },

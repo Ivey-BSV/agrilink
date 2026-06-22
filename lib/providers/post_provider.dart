@@ -8,9 +8,19 @@ class PostProvider extends ChangeNotifier {
   List<Post> _posts = [];
   bool _isLoading = false;
   final Map<String, List<Comment>> _postComments = {};
+  final Set<String> _likedByMe = {};
+  final Map<String, int> _extraLikeCounts = {};
 
   List<Post> get posts => _posts;
   bool get isLoading => _isLoading;
+
+  bool isPostLikedByMe(String postId) => _likedByMe.contains(postId);
+
+  int likeCountForPost(String postId) {
+    final inList = _posts.where((p) => p.id == postId).firstOrNull;
+    if (inList != null) return inList.likes;
+    return _extraLikeCounts[postId] ?? 0;
+  }
 
   PostProvider();
 
@@ -67,6 +77,8 @@ class PostProvider extends ChangeNotifier {
         }
       }
 
+      final likeData = await _fetchLikeData(supabase, postIds);
+
       final fetched = filteredRows.map((raw) {
         final row = raw as Map<String, dynamic>;
         final profile = userIdToProfile[row['user_id'] as String];
@@ -80,13 +92,17 @@ class PostProvider extends ChangeNotifier {
         final postId = row['id'] as String;
         final commentCount = postCommentCounts[postId] ?? 0;
 
-        return Post.fromSupabaseRow(row,
-            userName: username,
-            userAvatar: avatarUrl,
-            commentCount: commentCount);
+        return Post.fromSupabaseRow(
+          row,
+          userName: username,
+          userAvatar: avatarUrl,
+          commentCount: commentCount,
+          likeCount: likeData.counts[postId] ?? 0,
+        );
       }).toList();
 
       _posts = fetched;
+      _applyLikedByMe(likeData.likedByMe, replace: true);
     } catch (_) {
     } finally {
       _isLoading = false;
@@ -128,11 +144,17 @@ class PostProvider extends ChangeNotifier {
           await supabase.from('comments').select('id').eq('post_id', postId);
       final commentCount = commentRows.length;
 
+      final likeData = await _fetchLikeData(supabase, {postId});
+      _applyLikedByMe(likeData.likedByMe, replace: false);
+      final likeCount = likeData.counts[postId] ?? 0;
+      _extraLikeCounts[postId] = likeCount;
+
       return Post.fromSupabaseRow(
         rowMap,
         userName: userName,
         userAvatar: avatarUrl,
         commentCount: commentCount,
+        likeCount: likeCount,
       );
     } catch (_) {
       return null;
@@ -356,10 +378,118 @@ class PostProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> togglePostLike(String postId) async {
+    final supabase = Supabase.instance.client;
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+
+    final wasLiked = _likedByMe.contains(postId);
+    final previousCount = likeCountForPost(postId);
+
+    if (wasLiked) {
+      _likedByMe.remove(postId);
+      _setLikeCount(postId, previousCount > 0 ? previousCount - 1 : 0);
+    } else {
+      _likedByMe.add(postId);
+      _setLikeCount(postId, previousCount + 1);
+    }
+    notifyListeners();
+
+    try {
+      if (wasLiked) {
+        await supabase
+            .from('post_likes')
+            .delete()
+            .eq('post_id', postId)
+            .eq('user_id', user.id);
+      } else {
+        await supabase.from('post_likes').insert({
+          'post_id': postId,
+          'user_id': user.id,
+        });
+      }
+    } catch (_) {
+      if (wasLiked) {
+        _likedByMe.add(postId);
+        _setLikeCount(postId, previousCount);
+      } else {
+        _likedByMe.remove(postId);
+        _setLikeCount(postId, previousCount);
+      }
+      notifyListeners();
+    }
+  }
+
+  Future<void> ensureLikesLoaded(String postId) async {
+    if (_posts.any((p) => p.id == postId) &&
+        (_extraLikeCounts.containsKey(postId) ||
+            _posts.any((p) => p.id == postId && p.likes > 0))) {
+      return;
+    }
+
+    try {
+      final supabase = Supabase.instance.client;
+      final likeData = await _fetchLikeData(supabase, {postId});
+      _applyLikedByMe(likeData.likedByMe, replace: false);
+      _setLikeCount(postId, likeData.counts[postId] ?? 0);
+      notifyListeners();
+    } catch (_) {}
+  }
+
   void clearPosts() {
     _posts = [];
     _postComments.clear();
+    _likedByMe.clear();
+    _extraLikeCounts.clear();
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<({Map<String, int> counts, Set<String> likedByMe})> _fetchLikeData(
+    SupabaseClient supabase,
+    Set<String> postIds,
+  ) async {
+    if (postIds.isEmpty) {
+      return (counts: <String, int>{}, likedByMe: <String>{});
+    }
+
+    final user = supabase.auth.currentUser;
+    final List<dynamic> likeRows = await supabase
+        .from('post_likes')
+        .select('post_id, user_id')
+        .inFilter('post_id', postIds.toList());
+
+    final counts = <String, int>{};
+    final likedByMe = <String>{};
+    for (final raw in likeRows) {
+      final row = raw as Map<String, dynamic>;
+      final postId = row['post_id'] as String;
+      counts[postId] = (counts[postId] ?? 0) + 1;
+      if (user != null && row['user_id'] == user.id) {
+        likedByMe.add(postId);
+      }
+    }
+
+    return (counts: counts, likedByMe: likedByMe);
+  }
+
+  void _applyLikedByMe(Set<String> likedPostIds, {required bool replace}) {
+    if (replace) {
+      _likedByMe
+        ..clear()
+        ..addAll(likedPostIds);
+      return;
+    }
+
+    _likedByMe.addAll(likedPostIds);
+  }
+
+  void _setLikeCount(String postId, int count) {
+    final index = _posts.indexWhere((p) => p.id == postId);
+    if (index != -1) {
+      _posts[index] = _posts[index].copyWith(likes: count);
+    } else {
+      _extraLikeCounts[postId] = count;
+    }
   }
 }
