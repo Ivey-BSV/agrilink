@@ -12,6 +12,7 @@ import { useStaffMemberPreview } from "@/hooks/use-staff-member-preview";
 function titleFromPath(pathname: string | null): string {
   if (!pathname) return "Forums";
   if (pathname.startsWith("/platform/feed")) return "Forums";
+  if (pathname.startsWith("/platform/post/")) return "Post";
   if (pathname.startsWith("/platform/directory")) return "Farm Directory";
   if (pathname.startsWith("/platform/profile/farm-details")) return "Farm Details";
   if (pathname.startsWith("/platform/profile")) return "My Profile";

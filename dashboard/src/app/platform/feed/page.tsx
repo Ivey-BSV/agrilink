@@ -1,16 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { formatDate } from "@/lib/format";
 import { isVideoMediaUrl } from "@/lib/image-urls";
 import { parseImageUrls } from "@/lib/media-urls";
-import { PostMediaPreview } from "@/components/post-media-preview";
-import { linkifyPlainText } from "@/lib/linkify-plain-text";
+import { FeedPostCard } from "@/components/feed-post-card";
 import { MotionListItem } from "@/components/motion-list";
-import { UserAvatar } from "@/components/user-avatar";
 import { ForumTagPicker } from "@/components/forum-tag-picker";
 import { useStaffAccess } from "@/components/staff-access-context";
 import { isSuperEffective } from "@/lib/staff-profile";
@@ -515,7 +511,7 @@ export default function PlatformFeedPage() {
       {loading ? <p className="subtle">Loading feed…</p> : null}
       {!loading && visiblePosts.length === 0 ? <p className="empty">No posts yet.</p> : null}
 
-      <div className="list">
+      <div className="list feed-post-list">
         {visiblePosts.map((post, index) => {
           const profile = profiles[post.user_id];
           const imageUrls = parseImageUrls(post.image_urls);
@@ -533,105 +529,26 @@ export default function PlatformFeedPage() {
           const authorProfileHref = mine ? "/platform/profile" : `/platform/user/${post.user_id}`;
 
           return (
-            <MotionListItem
-              key={post.id}
-              index={index}
-              className="list-item platform-post-card feed-post-item"
-            >
-              <article className="feed-post">
-                <header className="feed-post-header">
-                  <Link href={authorProfileHref} className="feed-post-author-link" aria-label={`View ${author}'s profile`}>
-                    <UserAvatar url={profile?.avatar_url} name={author} size={44} />
-                  </Link>
-                  <div className="feed-post-header-main">
-                    <div className="feed-post-header-top">
-                      <div className="feed-post-identity">
-                        <Link href={authorProfileHref} className="feed-post-name feed-post-author-link">
-                          {rawName ? rawName : uname ? `@${uname}` : "Farmer"}
-                        </Link>
-                      </div>
-                    </div>
-                    <div className="feed-post-meta-line">
-                      {rawName && uname ? <span className="feed-post-handle">@{uname}</span> : null}
-                      {rawName && uname ? (
-                        <span className="feed-post-sep" aria-hidden>
-                          ·
-                        </span>
-                      ) : null}
-                      <time className="feed-post-time" dateTime={post.created_at}>
-                        {formatDate(post.created_at)}
-                      </time>
-                    </div>
-                  </div>
-                </header>
-
-                {heading ? (
-                  <h2 className="feed-post-title">
-                    <Link href={`/platform/post/${post.id}`} className="feed-post-title-link">
-                      {heading}
-                    </Link>
-                  </h2>
-                ) : null}
-                <p className="feed-post-body">
-                  {post.content?.trim() ? linkifyPlainText(post.content, "inline-link feed-post-link") : "No content."}
-                </p>
-
-                {imageUrl ? (
-                  <div className="feed-post-media">
-                    <PostMediaPreview
-                      mediaUrl={imageUrl}
-                      triggerClassName="feed-post-media-trigger"
-                      imageClassName="feed-post-media-img"
-                      isVideo={isVideo}
-                      onOpen={() => router.push(`/platform/post/${post.id}`)}
-                    />
-                  </div>
-                ) : null}
-
-                {tags.length > 0 ? (
-                  <div className="platform-tag-row feed-post-tags">
-                    {tags.map((t) => (
-                      <span key={t} className="pill forum-post-tag-pill">
-                        #{t}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-
-                {post.location ? (
-                  <p className="feed-post-location">
-                    <span className="feed-post-location-label">Location</span> {post.location}
-                  </p>
-                ) : null}
-
-                <footer className="feed-post-footer">
-                  <div className="feed-post-actions">
-                    <button
-                      type="button"
-                      className={`feed-post-action${likedByMe[post.id] ? " active" : ""}`}
-                      onClick={() => void toggleLike(post)}
-                      aria-pressed={likedByMe[post.id]}
-                    >
-                      <span className="feed-post-action-label">{likedByMe[post.id] ? "Liked" : "Like"}</span>
-                      <span className="feed-post-action-count">{nLikes}</span>
-                    </button>
-                    <Link href={`/platform/post/${post.id}#comments`} className="feed-post-action">
-                      <span className="feed-post-action-label">Comment</span>
-                      <span className="feed-post-action-count">{nComments}</span>
-                    </Link>
-                    {canEditPost ? (
-                      <>
-                        <button type="button" className="feed-post-action feed-post-action-muted" onClick={() => openEdit(post)}>
-                          Edit
-                        </button>
-                        <button type="button" className="feed-post-action feed-post-action-danger" onClick={() => void deletePost(post)}>
-                          Delete
-                        </button>
-                      </>
-                    ) : null}
-                  </div>
-                </footer>
-              </article>
+            <MotionListItem key={post.id} index={index} className="list-item feed-post-item">
+              <FeedPostCard
+                post={post}
+                profile={profile}
+                imageUrl={imageUrl}
+                isVideo={isVideo}
+                tags={tags}
+                heading={heading}
+                likeCount={nLikes}
+                commentCount={nComments}
+                liked={!!likedByMe[post.id]}
+                authorProfileHref={authorProfileHref}
+                authorLabel={author}
+                canEditPost={canEditPost}
+                onLike={() => void toggleLike(post)}
+                onOpenPost={() => router.push(`/platform/post/${post.id}`)}
+                onComment={() => router.push(`/platform/post/${post.id}#comments`)}
+                onEdit={canEditPost ? () => openEdit(post) : undefined}
+                onDelete={canEditPost ? () => void deletePost(post) : undefined}
+              />
             </MotionListItem>
           );
         })}

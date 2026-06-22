@@ -5,10 +5,11 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import { formatDate } from "@/lib/format";
+import { formatRelativeTime } from "@/lib/format";
 import { isVideoMediaUrl } from "@/lib/image-urls";
 import { parseImageUrls } from "@/lib/media-urls";
 import { PostMediaPreview } from "@/components/post-media-preview";
+import { FeedPostActionBar } from "@/components/feed-post-action-bar";
 import { linkifyPlainText } from "@/lib/linkify-plain-text";
 import { UserAvatar } from "@/components/user-avatar";
 import { useStaffAccess } from "@/components/staff-access-context";
@@ -90,6 +91,20 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [commentSubmitting, setCommentSubmitting] = useState(false);
   const [imageLightboxUrl, setImageLightboxUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (window.location.hash === "#comments") return;
+    window.scrollTo(0, 0);
+  }, [postId]);
+
+  useEffect(() => {
+    if (loading) return;
+    if (window.location.hash === "#comments") {
+      document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    window.scrollTo(0, 0);
+  }, [loading, postId]);
 
   const mergeProfiles = useCallback((rows: ProfileRow[]) => {
     setCommentProfiles((prev) => {
@@ -283,24 +298,22 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
 
     return (
       <div key={c.id} className={`post-detail-comment${depth > 0 ? " is-reply" : ""}`}>
-        <div className="feed-author-row" style={{ justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-          <Link href={profileHref} className="feed-post-author-link" style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        <div className="post-detail-comment-head">
+          <Link href={profileHref} className="feed-post-author-link post-detail-comment-author">
             <UserAvatar url={cp?.avatar_url} name={name} size={32} />
-            <div>
-              <div className="workshop-line-title" style={{ fontSize: "0.84rem" }}>
-                {name}
-              </div>
-              <div className="workshop-line-meta">{formatDate(c.created_at)}</div>
+            <div className="post-detail-comment-author-text">
+              <div className="feed-post-name">{name}</div>
+              <div className="feed-post-meta-line">{formatRelativeTime(c.created_at)}</div>
             </div>
           </Link>
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="post-detail-comment-actions">
             {currentUserId ? (
-              <button type="button" className="btn btn-secondary" style={{ padding: "4px 10px", fontSize: "0.8rem" }} onClick={() => setReplyingToId(c.id)}>
+              <button type="button" className="feed-post-owner-btn" onClick={() => setReplyingToId(c.id)}>
                 Reply
               </button>
             ) : null}
             {canDelete ? (
-              <button type="button" className="btn btn-danger" style={{ padding: "4px 10px", fontSize: "0.8rem" }} onClick={() => void deleteComment(c.id)}>
+              <button type="button" className="feed-post-owner-btn feed-post-owner-btn--danger" onClick={() => void deleteComment(c.id)}>
                 Delete
               </button>
             ) : null}
@@ -314,7 +327,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
 
   if (loading) {
     return (
-      <motion.div className="content-card stack" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <motion.div className="post-detail-shell stack" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <p className="subtle">Loading post…</p>
       </motion.div>
     );
@@ -322,8 +335,8 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
 
   if (!post) {
     return (
-      <motion.div className="content-card stack" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        <button type="button" className="btn btn-secondary" onClick={() => router.back()}>
+      <motion.div className="post-detail-shell stack" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <button type="button" className="btn btn-secondary post-detail-back" onClick={() => router.back()}>
           Back
         </button>
         <p className="empty">{error ?? "Post not found."}</p>
@@ -346,90 +359,73 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       "member"
     : null;
 
+  const metaParts = [formatRelativeTime(post.created_at)];
+  if (post.location?.trim()) metaParts.push(post.location.trim());
+  const metaLine = metaParts.join(" · ");
+
   return (
-    <motion.div className="content-card stack post-detail-page" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+    <motion.div className="post-detail-shell stack" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
       <button type="button" className="btn btn-secondary post-detail-back" onClick={() => router.back()}>
         Back
       </button>
 
       {error ? <p className="error">{error}</p> : null}
 
-      <article className="feed-post post-detail-article">
-        <header className="feed-post-header">
-          <Link href={authorHref} className="feed-post-author-link" aria-label={`View ${authorLabel}'s profile`}>
-            <UserAvatar url={author?.avatar_url} name={authorLabel} size={48} />
-          </Link>
-          <div className="feed-post-header-main">
-            <Link href={authorHref} className="feed-post-name feed-post-author-link">
-              {rawName ? rawName : uname ? `@${uname}` : "Farmer"}
-            </Link>
-            <div className="feed-post-meta-line">
-              <time className="feed-post-time" dateTime={post.created_at}>
-                {formatDate(post.created_at)}
-              </time>
-              {post.location ? (
-                <>
-                  <span className="feed-post-sep" aria-hidden>
-                    ·
-                  </span>
-                  <span>{post.location}</span>
-                </>
-              ) : null}
+      <div className="list-item feed-post-item">
+        <article className="feed-post feed-post--social feed-post--detail">
+          <div className="feed-post-content-wrap">
+            <header className="feed-post-header feed-post-header--social">
+              <Link href={authorHref} className="feed-post-author-link" aria-label={`View ${authorLabel}'s profile`}>
+                <UserAvatar url={author?.avatar_url} name={authorLabel} size={36} />
+              </Link>
+              <div className="feed-post-header-main">
+                <Link href={authorHref} className="feed-post-name feed-post-author-link">
+                  {rawName ? rawName : uname ? `@${uname}` : "Farmer"}
+                </Link>
+                <div className="feed-post-meta-line">{metaLine}</div>
+              </div>
+            </header>
+
+            {heading ? <h1 className="feed-post-title feed-post-detail-title">{heading}</h1> : null}
+
+            {post.content?.trim() ? (
+              <p className="feed-post-body feed-post-body--plain">
+                {linkifyPlainText(post.content, "inline-link feed-post-link")}
+              </p>
+            ) : null}
+
+            {tags.length > 0 ? (
+              <p className="feed-post-tags-inline feed-post-tags-inline--detail">{tags.map((t) => `#${t}`).join(" ")}</p>
+            ) : null}
+          </div>
+
+          {imageUrl ? (
+            <div className="feed-post-media post-detail-media">
+              <PostMediaPreview
+                mediaUrl={imageUrl}
+                triggerClassName="feed-post-media-trigger post-detail-media-trigger"
+                imageClassName="feed-post-media-img post-detail-media-img"
+                isVideo={isVideo}
+                onOpen={(displayUrl) => setImageLightboxUrl(displayUrl)}
+              />
             </div>
-          </div>
-        </header>
+          ) : null}
 
-        {heading ? <h1 className="feed-post-title post-detail-title">{heading}</h1> : null}
+          <FeedPostActionBar
+            liked={likedByMe}
+            likeCount={likeCount}
+            commentCount={comments.length}
+            onLike={() => void toggleLike()}
+            onComment={() => {
+              document.getElementById("comments")?.scrollIntoView({ behavior: "smooth" });
+            }}
+            viewAllCommentsLabel={false}
+          />
+        </article>
+      </div>
 
-        {post.content?.trim() ? (
-          <p className="feed-post-body">{linkifyPlainText(post.content, "inline-link feed-post-link")}</p>
-        ) : null}
-
-        {tags.length > 0 ? (
-          <div className="platform-tag-row feed-post-tags">
-            {tags.map((t) => (
-              <span key={t} className="pill forum-post-tag-pill">
-                #{t}
-              </span>
-            ))}
-          </div>
-        ) : null}
-
-        {imageUrl ? (
-          <div className="feed-post-media post-detail-media">
-            <PostMediaPreview
-              mediaUrl={imageUrl}
-              triggerClassName="feed-post-media-trigger"
-              imageClassName="feed-post-media-img"
-              isVideo={isVideo}
-              onOpen={(displayUrl) => setImageLightboxUrl(displayUrl)}
-            />
-          </div>
-        ) : null}
-
-        <footer className="feed-post-footer">
-          <div className="feed-post-actions">
-            <button
-              type="button"
-              className={`feed-post-action${likedByMe ? " active" : ""}`}
-              onClick={() => void toggleLike()}
-              aria-pressed={likedByMe}
-            >
-              <span className="feed-post-action-label">{likedByMe ? "Liked" : "Like"}</span>
-              <span className="feed-post-action-count">{likeCount}</span>
-            </button>
-            <span className="feed-post-action">
-              <span className="feed-post-action-label">Comments</span>
-              <span className="feed-post-action-count">{comments.length}</span>
-            </span>
-          </div>
-        </footer>
-      </article>
-
-      <section className="post-detail-comments stack" id="comments">
-        <h2 className="section-title" style={{ fontSize: "1.1rem" }}>
-          Comments
-        </h2>
+      <section className="list-item post-detail-comments-card stack" id="comments">
+        <h2 className="post-detail-comments-heading">Comments</h2>
 
         <form onSubmit={addComment} className="stack post-detail-comment-form">
           {replyingToId && replyingName ? (
@@ -459,7 +455,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
           </div>
         </form>
 
-        <div className="platform-comment-list post-detail-comment-list">
+        <div className="post-detail-comment-list">
           {topLevelComments.length === 0 ? <p className="empty">No comments yet. Be the first.</p> : null}
           {topLevelComments.map((c) => renderComment(c))}
         </div>

@@ -8,6 +8,7 @@ import { extractStoragePathFromPublicUrl } from "@/lib/storage";
 import { getEffectiveStaffAccess, isModeratorPlusEffective, type EffectiveStaffAccess } from "@/lib/staff-profile";
 import { WORKSHOP_OPTIONS, workshopShortLabel } from "@/lib/workshops";
 import { splitGalleryAndDocuments, isGalleryImageFile } from "@/lib/file-browse-layout";
+import { FileUploadModal } from "@/components/file-upload-modal";
 import { FileBrowseGalleryDocumentsTabs } from "@/components/file-browse-gallery-documents-tabs";
 import { FileGalleryGrid } from "@/components/file-gallery-grid";
 import { FileRowThumb } from "@/components/file-row-thumb";
@@ -54,13 +55,13 @@ export default function WorkshopsFilesPage() {
 
   const [filterWorkshop, setFilterWorkshop] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("created_desc");
-  const [approvalFilter, setApprovalFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [uploadOpen, setUploadOpen] = useState(false);
 
   const isStaff = isModeratorPlusEffective(staffAccess);
   const heading = !accessResolved || isStaff ? "Workshop Files" : "My Workshop Files";
   const workshopInfo = isStaff
-    ? "Workshop materials are split into a photo gallery for visuals and a document list for PDFs, slides, and other files. Use filters, approvals, and search to review what members have uploaded."
+    ? "Workshop materials are split into a photo gallery for visuals and a document list for PDFs, slides, and other files. Use filters and search to browse what members have uploaded."
     : "Upload handouts and photos from your workshops. Images appear in the gallery; PDFs and other files stay in the document list. Click a row or thumbnail to preview when your browser supports it.";
 
   useEffect(() => {
@@ -124,14 +125,6 @@ export default function WorkshopsFilesPage() {
       out = out.filter((r) => r.workshop_id === filterWorkshop);
     }
 
-    if (isStaff && approvalFilter !== "all") {
-      out = out.filter((r) => {
-        const raw = (r.approval_status ?? "").trim().toLowerCase();
-        const norm = raw === "" ? "pending" : raw;
-        return norm === approvalFilter;
-      });
-    }
-
     const q = search.trim().toLowerCase();
     if (q) {
       out = out.filter(
@@ -164,7 +157,7 @@ export default function WorkshopsFilesPage() {
     });
 
     return out;
-  }, [items, filterWorkshop, sortKey, approvalFilter, search, isStaff]);
+  }, [items, filterWorkshop, sortKey, search]);
 
   const { gallery: galleryFromFilter, documents: documentFromFilter } = useMemo(
     () => splitGalleryAndDocuments(visibleItems),
@@ -267,11 +260,10 @@ export default function WorkshopsFilesPage() {
     setItems((prev) => [...uploadedRows, ...prev]);
     setUploadTitle("");
     setUploadFiles([]);
+    setUploadOpen(false);
     setSuccess(
       uploadedRows.length === 1
-        ? staff
-          ? "Workshop file uploaded (approved)."
-          : "Upload queued for admin review."
+        ? "Workshop file uploaded."
         : `${uploadedRows.length} workshop files uploaded.`
     );
     setUploading(false);
@@ -312,23 +304,6 @@ export default function WorkshopsFilesPage() {
     setEditingId(null);
   };
 
-  const setApproval = async (row: WorkshopDocRow, approval_status: string) => {
-    setError(null);
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { error: uErr } = await supabase
-      .from("workshop_documents")
-      .update({
-        approval_status,
-        reviewed_by: user?.id ?? null,
-        reviewed_at: new Date().toISOString(),
-      })
-      .eq("id", row.id);
-    if (uErr) setError(uErr.message);
-    else setItems((prev) => prev.map((p) => (p.id === row.id ? { ...p, approval_status } : p)));
-  };
-
   return (
     <motion.div
       className="content-card stack"
@@ -341,58 +316,31 @@ export default function WorkshopsFilesPage() {
         description={workshopInfo}
         action={
           <button
-            type="submit"
-            form="workshop-upload-form"
+            type="button"
             className="btn btn-primary btn-primary-compact"
-            disabled={uploading}
+            onClick={() => setUploadOpen(true)}
           >
-            {uploading ? "Uploading…" : "Upload file"}
+            Upload file
           </button>
         }
       />
       {error ? <p className="error">{error}</p> : null}
       {success ? <p className="success">{success}</p> : null}
 
-      <div className="list-item">
-        <form
-          id="workshop-upload-form"
-          className="stack"
-          style={{ width: "100%" }}
-          onSubmit={(e) => {
-            e.preventDefault();
-            void upload();
-          }}
-        >
-          <div style={{ fontWeight: 600 }}>Upload workshop file</div>
-          <div className="field">
-            <label>Workshop</label>
-            <select value={uploadWorkshopId} onChange={(e) => setUploadWorkshopId(e.target.value)}>
-              {WORKSHOP_OPTIONS.map((w) => (
-                <option key={w.id} value={w.id}>
-                  {w.id} — {w.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="field">
-            <label>Title</label>
-            <input
-              value={uploadTitle}
-              onChange={(e) => setUploadTitle(e.target.value)}
-              placeholder="e.g., Soil notes and resources"
-            />
-          </div>
-          <div className="field">
-            <label>File</label>
-            <input type="file" multiple onChange={(e) => setUploadFiles(Array.from(e.target.files ?? []))} />
-          </div>
-        </form>
-      </div>
+      {loading ? <p className="subtle">Loading workshop files…</p> : null}
+
+      {!loading && items.length === 0 ? (
+        <div className="file-library-empty">
+          <p>No workshop files yet. Upload handouts, slides, or photos to share with your cohort.</p>
+          <button type="button" className="btn btn-primary" onClick={() => setUploadOpen(true)}>
+            Upload file
+          </button>
+        </div>
+      ) : null}
 
       {!loading && items.length > 0 ? (
-        <div className="list-item stack" style={{ gap: 14 }}>
-          <div style={{ fontWeight: 600 }}>Browse uploads (gallery &amp; documents)</div>
-          <div className="workshop-toolbar">
+        <>
+          <div className="file-browse-toolbar workshop-toolbar">
             <div className="field">
               <label htmlFor="ws-filter">Workshop</label>
               <select
@@ -418,18 +366,7 @@ export default function WorkshopsFilesPage() {
                 <option value="workshop_then_date">Workshop order, then newest</option>
               </select>
             </div>
-            {isStaff ? (
-              <div className="field">
-                <label htmlFor="ws-approval">Approval</label>
-                <select id="ws-approval" value={approvalFilter} onChange={(e) => setApprovalFilter(e.target.value)}>
-                  <option value="all">All statuses</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                </select>
-              </div>
-            ) : null}
-            <div className="field" style={{ flex: "2 1 220px", minWidth: "200px" }}>
+            <div className="field file-browse-toolbar-search">
               <label htmlFor="ws-search">Search</label>
               <input
                 id="ws-search"
@@ -440,143 +377,155 @@ export default function WorkshopsFilesPage() {
               />
             </div>
             <div className="workshop-toolbar-meta">
-              Showing {visibleItems.length} of {items.length}
+              {visibleItems.length} of {items.length}
             </div>
           </div>
-        </div>
-      ) : null}
 
-      {loading ? <p className="subtle">Loading workshop files…</p> : null}
-      {!loading && items.length === 0 ? <p className="empty">No workshop files uploaded yet.</p> : null}
-      {!loading && items.length > 0 && visibleItems.length === 0 ? (
-        <p className="empty">No files match your filters. Try clearing search or choosing “All workshops”.</p>
-      ) : null}
-
-      {!loading && visibleItems.length > 0 ? (
-        <FileBrowseGalleryDocumentsTabs
-          galleryCount={galleryFromFilter.length}
-          documentCount={documentListItems.length}
-          preferDocumentsTab={editingIsGallery}
-          tabListAriaLabel="Workshop gallery and documents"
-          galleryDescription="Workshop image uploads — click a tile for a larger preview."
-          documentsDescription="PDFs, documents, video, audio, and other files — same row actions as before."
-          galleryPanel={
-            galleryItems.length === 0 && !editingIsGallery ? (
-              <p className="empty subtle">No image files in this view.</p>
-            ) : (
-              <FileGalleryGrid
-                items={galleryItems}
-                subtitle={(item) => workshopShortLabel(item.workshop_id)}
-                renderFooter={(item) => (
-                  <>
-                    <a href={item.file_url} target="_blank" rel="noreferrer" className="pill">
-                      Open
-                    </a>
-                    <button type="button" className="btn btn-secondary" onClick={() => startEdit(item)}>
-                      Edit
-                    </button>
-                    {isStaff ? (
+          {visibleItems.length === 0 ? (
+            <p className="empty">No files match your filters. Try clearing search or choosing “All workshops”.</p>
+          ) : (
+            <FileBrowseGalleryDocumentsTabs
+              galleryCount={galleryFromFilter.length}
+              documentCount={documentListItems.length}
+              preferDocumentsTab={editingIsGallery}
+              tabListAriaLabel="Workshop gallery and documents"
+              galleryDescription="Workshop photos and image uploads."
+              documentsDescription="PDFs, slides, video, audio, and other files."
+              galleryPanel={
+                galleryItems.length === 0 && !editingIsGallery ? (
+                  <p className="empty subtle">No image files in this view.</p>
+                ) : (
+                  <FileGalleryGrid
+                    items={galleryItems}
+                    subtitle={(item) => workshopShortLabel(item.workshop_id)}
+                    renderFooter={(item) => (
                       <>
-                        <button type="button" className="btn btn-secondary" onClick={() => void setApproval(item, "approved")}>
-                          Approve
+                        <a href={item.file_url} target="_blank" rel="noreferrer" className="pill">
+                          Open
+                        </a>
+                        <button type="button" className="btn btn-secondary" onClick={() => startEdit(item)}>
+                          Edit
                         </button>
-                        <button type="button" className="btn btn-secondary" onClick={() => void setApproval(item, "rejected")}>
-                          Reject
+                        <button type="button" className="btn btn-danger" onClick={() => void remove(item.id)}>
+                          Delete
                         </button>
                       </>
-                    ) : null}
-                    <button type="button" className="btn btn-danger" onClick={() => void remove(item.id)}>
-                      Delete
-                    </button>
-                  </>
-                )}
-              />
-            )
-          }
-          documentsPanel={
-            documentListItems.length === 0 ? (
-              <p className="empty subtle">No document-type files in this view.</p>
-            ) : (
-              <div className="list">
-                {documentListItems.map((item, index) => (
-                  <MotionListItem key={item.id} index={index} className="list-item file-list-row">
-                    <FileRowThumb
-                      fileUrl={item.file_url}
-                      fileName={item.file_name}
-                      mimeType={item.mime_type}
-                      editing={editingId === item.id}
-                    />
-                    <div className="stack workshop-file-body" style={{ gap: 6 }}>
-                      {editingId === item.id ? (
-                        <>
-                          <div className="field">
-                            <label>Title</label>
-                            <input value={draftTitle} onChange={(e) => setDraftTitle(e.target.value)} />
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="workshop-line-title">{item.title}</div>
-                          <div className="workshop-line-meta">{workshopShortLabel(item.workshop_id)}</div>
-                          {isStaff ? (
-                            <div className="workshop-line-meta">
-                              Owner {uploaderLabels[item.user_id] ?? "…"} · {item.approval_status ?? "pending"}
-                            </div>
-                          ) : null}
-                          <div className="workshop-line-meta">{item.file_name}</div>
-                          <div className="workshop-line-meta">Uploaded {formatDate(item.created_at)}</div>
-                          <a href={item.file_url} target="_blank" rel="noreferrer" className="pill">
-                            Open file
-                          </a>
-                        </>
-                      )}
-                    </div>
-                    <div className="actions">
-                      {editingId === item.id ? (
-                        <>
-                          <button type="button" className="btn btn-primary" onClick={() => void saveEdit(item.id)}>
-                            Save
-                          </button>
-                          <button type="button" className="btn btn-secondary" onClick={() => setEditingId(null)}>
-                            Cancel
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button type="button" className="btn btn-secondary" onClick={() => startEdit(item)}>
-                            Edit
-                          </button>
-                          {isStaff ? (
+                    )}
+                  />
+                )
+              }
+              documentsPanel={
+                documentListItems.length === 0 ? (
+                  <p className="empty subtle">No document-type files in this view.</p>
+                ) : (
+                  <div className="list">
+                    {documentListItems.map((item, index) => (
+                      <MotionListItem key={item.id} index={index} className="list-item file-list-row">
+                        <FileRowThumb
+                          fileUrl={item.file_url}
+                          fileName={item.file_name}
+                          mimeType={item.mime_type}
+                          editing={editingId === item.id}
+                        />
+                        <div className="stack workshop-file-body" style={{ gap: 6 }}>
+                          {editingId === item.id ? (
                             <>
-                              <button
-                                type="button"
-                                className="btn btn-secondary"
-                                onClick={() => void setApproval(item, "approved")}
-                              >
-                                Approve
+                              <div className="field">
+                                <label>Title</label>
+                                <input value={draftTitle} onChange={(e) => setDraftTitle(e.target.value)} />
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="workshop-line-title">{item.title}</div>
+                              <div className="workshop-line-meta">{workshopShortLabel(item.workshop_id)}</div>
+                              {isStaff ? (
+                                <div className="workshop-line-meta">
+                                  Owner {uploaderLabels[item.user_id] ?? "…"}
+                                </div>
+                              ) : null}
+                              <div className="workshop-line-meta">{item.file_name}</div>
+                              <div className="workshop-line-meta">Uploaded {formatDate(item.created_at)}</div>
+                              <a href={item.file_url} target="_blank" rel="noreferrer" className="pill">
+                                Open file
+                              </a>
+                            </>
+                          )}
+                        </div>
+                        <div className="actions">
+                          {editingId === item.id ? (
+                            <>
+                              <button type="button" className="btn btn-primary" onClick={() => void saveEdit(item.id)}>
+                                Save
                               </button>
-                              <button
-                                type="button"
-                                className="btn btn-secondary"
-                                onClick={() => void setApproval(item, "rejected")}
-                              >
-                                Reject
+                              <button type="button" className="btn btn-secondary" onClick={() => setEditingId(null)}>
+                                Cancel
                               </button>
                             </>
-                          ) : null}
-                          <button type="button" className="btn btn-danger" onClick={() => void remove(item.id)}>
-                            Delete
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </MotionListItem>
-                ))}
-              </div>
-            )
-          }
-        />
+                          ) : (
+                            <>
+                              <button type="button" className="btn btn-secondary" onClick={() => startEdit(item)}>
+                                Edit
+                              </button>
+                              <button type="button" className="btn btn-danger" onClick={() => void remove(item.id)}>
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </MotionListItem>
+                    ))}
+                  </div>
+                )
+              }
+            />
+          )}
+        </>
       ) : null}
+
+      <FileUploadModal
+        open={uploadOpen}
+        title="Upload workshop file"
+        submitting={uploading}
+        onClose={() => {
+          if (uploading) return;
+          setUploadOpen(false);
+        }}
+        onSubmit={upload}
+      >
+        <div className="field">
+          <label htmlFor="ws-upload-workshop">Workshop</label>
+          <select
+            id="ws-upload-workshop"
+            value={uploadWorkshopId}
+            onChange={(e) => setUploadWorkshopId(e.target.value)}
+          >
+            {WORKSHOP_OPTIONS.map((w) => (
+              <option key={w.id} value={w.id}>
+                {w.id} — {w.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <label htmlFor="ws-upload-title">Title</label>
+          <input
+            id="ws-upload-title"
+            value={uploadTitle}
+            onChange={(e) => setUploadTitle(e.target.value)}
+            placeholder="e.g., Soil notes and resources"
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="ws-upload-file">File</label>
+          <input
+            id="ws-upload-file"
+            type="file"
+            multiple
+            onChange={(e) => setUploadFiles(Array.from(e.target.files ?? []))}
+          />
+        </div>
+      </FileUploadModal>
     </motion.div>
   );
 }

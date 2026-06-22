@@ -4,7 +4,7 @@ const ROUTE_TITLES: { prefix: string; title: string }[] = [
   { prefix: "/dashboard/admin/staff", title: "Staff" },
   { prefix: "/dashboard/admin/audit", title: "Audit log" },
   { prefix: "/dashboard/admin/events", title: "All events" },
-  { prefix: "/dashboard/admin/documents", title: "Upload approvals" },
+  // { prefix: "/dashboard/admin/documents", title: "Upload approvals" },
   { prefix: "/dashboard/admin/communications", title: "Broadcasts" },
   { prefix: "/dashboard/admin/farmers", title: "Farmers" },
   { prefix: "/dashboard/admin", title: "Admin console" },
