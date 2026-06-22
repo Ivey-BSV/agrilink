@@ -5,13 +5,13 @@ import 'package:cap/providers/post_provider.dart';
 import 'package:cap/providers/profile_provider.dart';
 import 'package:cap/shared/models/comment.dart';
 import 'package:cap/shared/models/post.dart';
-import 'package:cap/shared/widgets/post_media_preview.dart';
+import 'package:cap/shared/utils/image_url_utils.dart';
 import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:cap/shared/widgets/linkified_text.dart';
-import 'package:cap/shared/utils/image_url_utils.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/features/post/presentation/widgets/forum_post_header.dart';
+import 'package:cap/features/post/presentation/widgets/forum_post_detail_media.dart';
+import 'package:cap/features/post/presentation/widgets/forum_post_text_content.dart';
 import 'package:cap/features/post/presentation/widgets/post_action_bar.dart';
-import 'package:cap/features/post/presentation/widgets/post_comments_bottom_sheet.dart';
 import 'package:cap/features/post/presentation/widgets/share_post_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +29,7 @@ class PostDetailPage extends StatefulWidget {
 class _PostDetailPageState extends State<PostDetailPage> {
   final TextEditingController _commentController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final GlobalKey _commentsSectionKey = GlobalKey();
   Post? _post;
   String? _currentUserAvatar;
   String _currentUserName = 'User';
@@ -36,7 +37,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
   String? _replyingToCommentId;
   final Set<String> _expandedReplies = {};
   bool _sortOldestFirst = true;
-  double? _imageAspectRatio;
 
   @override
   void initState() {
@@ -117,40 +117,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
     setState(() {
       _isLoading = false;
     });
-
-    final previewUrl = sanitizeImageUrl(_post?.imageUrl);
-    if (previewUrl != null && isDirectImageUrl(previewUrl)) {
-      _resolveImageAspectRatio(previewUrl);
-    }
-  }
-
-  void _resolveImageAspectRatio(String imageUrl) {
-    final sanitized = sanitizeImageUrl(imageUrl) ?? imageUrl;
-    final ImageProvider provider = isNetworkImageUrl(sanitized)
-        ? CachedNetworkImageProvider(sanitized)
-        : AssetImage(sanitized) as ImageProvider;
-    final ImageStream stream = provider.resolve(const ImageConfiguration());
-    ImageStreamListener? listener;
-    listener = ImageStreamListener((ImageInfo info, bool synchronousCall) {
-      final int w = info.image.width;
-      final int h = info.image.height;
-      if (mounted) {
-        setState(() {
-          if (h != 0) {
-            _imageAspectRatio = w / h;
-          }
-        });
-      }
-      stream.removeListener(listener!);
-    }, onError: (dynamic _, __) {
-      if (mounted) {
-        setState(() {
-          _imageAspectRatio = null;
-        });
-      }
-      stream.removeListener(listener!);
-    });
-    stream.addListener(listener);
   }
 
   Future<void> _addComment() async {
@@ -269,185 +235,54 @@ class _PostDetailPageState extends State<PostDetailPage> {
   Widget _buildPostContent() {
     if (_post == null) return const SizedBox.shrink();
 
-    final authProvider = context.read<AuthProvider>();
-    final currentUserId = authProvider.userId ?? '';
-    final isCurrentUser = _post!.userId == currentUserId;
+    final hasMedia = sanitizeImageUrl(_post!.imageUrl) != null;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        GestureDetector(
-          onTap: () {
-            context.push('/user-profile/${_post!.userId}');
-          },
-          child: Row(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: AppTheme.primaryGradient,
-                ),
-                child: NetworkCircleAvatar(
-                  radius: 24,
-                  imageUrl: _post!.userAvatar,
-                  fallbackLetter: _post!.userName.isNotEmpty
-                      ? _post!.userName[0].toUpperCase()
-                      : 'U',
-                  fallbackTextStyle: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _post!.userName,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        fontFamily: 'Poppins',
-                        decoration: isCurrentUser ? TextDecoration.none : null,
-                      ),
-                    ),
-                    Text.rich(
-                      TextSpan(
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 13,
-                          fontFamily: 'Poppins',
-                        ),
-                        children: [
-                          TextSpan(text: _formatTimestamp(_post!.timestamp)),
-                          if (_post!.location != null &&
-                              _post!.location!.isNotEmpty) ...[
-                            TextSpan(
-                              text: ' • ',
-                              style: TextStyle(color: Colors.grey[400]),
-                            ),
-                            TextSpan(text: _post!.location!),
-                          ],
-                        ],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
+              ForumPostHeader(post: _post!),
+              ForumPostTextContent(post: _post!, expandContent: true),
             ],
           ),
         ),
-        const SizedBox(height: 16),
-        if (_post!.title.isNotEmpty && _post!.title != 'Post')
-          Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Text(
-              _post!.title,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Poppins',
-              ),
-            ),
+        if (hasMedia) ...[
+          const SizedBox(height: 10),
+          ForumPostDetailMedia(
+            mediaUrl: _post!.imageUrl,
+            isVideo: isVideoMediaUrl(_post!.imageUrl),
           ),
-        if (_post!.content.isNotEmpty) ...[
-          LinkifiedText(
-            text: _post!.content,
-            style: const TextStyle(
-              fontSize: 15,
-              height: 1.5,
-              fontFamily: 'Poppins',
-            ),
-          ),
-          const SizedBox(height: 12),
         ],
-        if (_post!.tags.isNotEmpty) ...[
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: _post!.tags.map((tag) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppTheme.primaryGreen.withValues(alpha: 0.3),
-                  ),
-                ),
-                child: Text(
-                  '#$tag',
-                  style: TextStyle(
-                    color: AppTheme.primaryGreen,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Poppins',
-                  ),
-                ),
+        PostActionBar(
+          postId: _post!.id,
+          viewAllCommentsLabel: false,
+          onComment: () {
+            final target = _commentsSectionKey.currentContext;
+            if (target != null) {
+              Scrollable.ensureVisible(
+                target,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
               );
-            }).toList(),
-          ),
-          const SizedBox(height: 12),
-        ],
-        if (sanitizeImageUrl(_post!.imageUrl) != null) ...[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child:
-                isDirectImageUrl(_post!.imageUrl) && _imageAspectRatio != null
-                    ? AspectRatio(
-                        aspectRatio: _imageAspectRatio!,
-                        child: PostMediaPreview(
-                          mediaUrl: _post!.imageUrl,
-                          fit: BoxFit.contain,
-                        ),
-                      )
-                    : AspectRatio(
-                        aspectRatio: 16 / 9,
-                        child: PostMediaPreview(
-                          mediaUrl: _post!.imageUrl,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-          ),
-          const SizedBox(height: 16),
-        ],
-        Consumer<PostProvider>(
-          builder: (context, postProvider, _) {
-            if (_post == null) return const SizedBox.shrink();
-
-            return PostActionBar(
-              postId: _post!.id,
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-              viewAllCommentsLabel: false,
-              onComment: () {
-                PostCommentsBottomSheet.show(
-                  context,
-                  postId: _post!.id,
-                  postTitle: _post!.title,
-                );
-              },
-              onShare: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => SharePostBottomSheet(
-                    postId: _post!.id,
-                    postTitle: _post!.title,
-                  ),
-                );
-              },
+            }
+          },
+          onShare: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => SharePostBottomSheet(
+                postId: _post!.id,
+                postTitle: _post!.title,
+              ),
             );
           },
         ),
+        Divider(height: 1, thickness: 1, color: Colors.grey[200]),
       ],
     );
   }
@@ -718,12 +553,12 @@ class _PostDetailPageState extends State<PostDetailPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Forums Post',
-          style: TextStyle(
+        title: Text(
+          _post?.userName ?? 'Forums Post',
+          style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.w600,
-            fontFamily: 'Poppins',
+            fontSize: 16,
           ),
         ),
         actions: [
@@ -732,22 +567,6 @@ class _PostDetailPageState extends State<PostDetailPage> {
               icon: const Icon(Icons.delete_outline, color: Colors.black),
               onPressed: () => _deletePost(),
             ),
-          IconButton(
-            icon: const Icon(Icons.share, color: Colors.black),
-            onPressed: _post == null
-                ? null
-                : () {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      builder: (context) => SharePostBottomSheet(
-                        postId: _post!.id,
-                        postTitle: _post!.title,
-                      ),
-                    );
-                  },
-          ),
         ],
       ),
       body: _isLoading && _post == null
@@ -777,95 +596,80 @@ class _PostDetailPageState extends State<PostDetailPage> {
                         Expanded(
                           child: SingleChildScrollView(
                             controller: _scrollController,
-                            padding: const EdgeInsets.all(16),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildPostContent(),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    const Text(
-                                      'Comments',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                        fontFamily: 'Poppins',
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.primaryGreen
-                                            .withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        '${comments.length}',
+                                Padding(
+                                  key: _commentsSectionKey,
+                                  padding: const EdgeInsets.fromLTRB(
+                                      16, 16, 16, 0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Comments',
                                         style: TextStyle(
-                                          color: AppTheme.primaryGreen,
+                                          fontSize: 14,
                                           fontWeight: FontWeight.w600,
-                                          fontSize: 12,
-                                          fontFamily: 'Poppins',
+                                          color: Colors.grey[800],
                                         ),
                                       ),
-                                    ),
-                                    const Spacer(),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          _sortOldestFirst = !_sortOldestFirst;
-                                        });
-                                      },
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            _sortOldestFirst
-                                                ? Icons.arrow_upward
-                                                : Icons.arrow_downward,
-                                            size: 16,
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '${comments.length}',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      const Spacer(),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _sortOldestFirst =
+                                                !_sortOldestFirst;
+                                          });
+                                        },
+                                        child: Text(
+                                          _sortOldestFirst
+                                              ? 'Oldest'
+                                              : 'Newest',
+                                          style: TextStyle(
                                             color: AppTheme.primaryGreen,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
                                           ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            _sortOldestFirst
-                                                ? 'Oldest'
-                                                : 'Newest',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      16, 12, 16, 16),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (topLevelComments.isEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 24),
+                                          child: Text(
+                                            'No comments yet. Be the first to comment!',
                                             style: TextStyle(
-                                              color: AppTheme.primaryGreen,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              fontFamily: 'Poppins',
+                                              color: Colors.grey[600],
+                                              fontSize: 13,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                        )
+                                      else
+                                        ...topLevelComments.map((comment) =>
+                                            _buildCommentWithReplies(comment,
+                                                comments, currentUserId)),
+                                    ],
+                                  ),
                                 ),
-                                const SizedBox(height: 16),
-                                if (topLevelComments.isEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 32),
-                                    child: Text(
-                                      'No comments yet. Be the first to comment!',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 14,
-                                        fontFamily: 'Poppins',
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  )
-                                else
-                                  ...topLevelComments.map((comment) =>
-                                      _buildCommentWithReplies(
-                                          comment, comments, currentUserId)),
                               ],
                             ),
                           ),
