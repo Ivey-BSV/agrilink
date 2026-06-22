@@ -4,6 +4,39 @@ Use the **Short** version in Play Console when there’s a character limit (e.g.
 
 ---
 
+## 1.0.9 (build 20) — June 2026
+
+### Short (under 500 characters)
+
+**What’s new in 1.0.9**
+
+• **Forums feed** — Cleaner social-style posts with inline likes and comments  
+• **Post detail** — Improved layout for reading full posts and replying  
+• **Workshops & repository** — Organize files into folders (web dashboard)  
+• **Stability** — Bug fixes and performance improvements  
+
+Thank you for being part of CAP.
+
+### Full
+
+**What’s new in 1.0.9**
+
+This update improves how you browse and interact with the community, and adds better file organization on the web dashboard.
+
+**Forums & community**
+- Feed posts use a clearer social layout with heart likes and quick comments
+- Open a post for the full thread, likes, and comment replies
+- Image previews in the feed use a consistent wide crop; detail view shows the original photo
+
+**Resources (web)**
+- Workshop files and the knowledge repository use folders — each folder has a photo gallery and document list
+- Anyone can create folders; uploads go into the folder you choose
+
+**Other**
+- General fixes and polish across the app
+
+---
+
 ## Short (under 500 characters)
 
 **What’s in this release**

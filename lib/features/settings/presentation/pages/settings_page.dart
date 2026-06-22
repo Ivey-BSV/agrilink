@@ -128,7 +128,7 @@ class _SettingsPageState extends State<SettingsPage> {
           const SizedBox(height: 20),
           _buildInfoItem(
             'App Version',
-            '1.0.8 (19)',
+            '1.0.9 (20)',
             Icons.info_outline,
           ),
           const SizedBox(height: 20),

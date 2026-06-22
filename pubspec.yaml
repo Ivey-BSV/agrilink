@@ -2,7 +2,7 @@ name: cap
 description: "CAP - Collective Action Program for regenerative agriculture"
 publish_to: 'none'
 
-version: 1.0.8+19
+version: 1.0.9+20
 
 environment:
   sdk: ^3.5.0
