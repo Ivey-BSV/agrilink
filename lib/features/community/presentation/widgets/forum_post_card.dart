@@ -119,6 +119,8 @@ class ForumPostCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             _displayTitle,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
@@ -141,19 +143,15 @@ class ForumPostCard extends StatelessWidget {
         ],
         if (post.tags.isNotEmpty) ...[
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: post.tags.take(4).map((tag) {
-              return Text(
-                '#$tag',
-                style: TextStyle(
-                  color: AppTheme.primaryGreen,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              );
-            }).toList(),
+          Text(
+            post.tags.map((tag) => '#$tag').join(' '),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: AppTheme.primaryGreen,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ],
