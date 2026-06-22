@@ -1491,6 +1491,77 @@ a.welcome-tile:hover {
   max-width: 36rem;
 }
 
+.resource-folder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.resource-folder-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 16px 18px;
+  min-height: 112px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+.resource-folder-card:hover {
+  border-color: rgba(46, 125, 50, 0.32);
+  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.08);
+  transform: translateY(-1px);
+}
+
+.resource-folder-card-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.resource-folder-card-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.resource-folder-card-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.resource-folder-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.resource-folder-breadcrumb {
+  margin: -4px 0 0;
+  font-size: 0.84rem;
+}
+
+.resource-folder-breadcrumb-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: var(--accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.resource-folder-breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
 .file-list-row {
   display: grid;
   grid-template-columns: 88px minmax(0, 1fr) auto;
