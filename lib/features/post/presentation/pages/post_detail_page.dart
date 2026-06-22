@@ -10,6 +10,7 @@ import 'package:cap/shared/widgets/network_circle_avatar.dart';
 import 'package:cap/shared/widgets/linkified_text.dart';
 import 'package:cap/shared/utils/image_url_utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cap/features/post/presentation/widgets/post_action_bar.dart';
 import 'package:cap/features/post/presentation/widgets/post_comments_bottom_sheet.dart';
 import 'package:cap/features/post/presentation/widgets/share_post_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
@@ -422,74 +423,28 @@ class _PostDetailPageState extends State<PostDetailPage> {
           builder: (context, postProvider, _) {
             if (_post == null) return const SizedBox.shrink();
 
-            final likes = postProvider.likeCountForPost(_post!.id);
-            final comments = postProvider.commentCountForPost(_post!.id);
-            final isLiked = postProvider.isPostLikedByMe(_post!.id);
-
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: () =>
-                          postProvider.togglePostLike(_post!.id),
-                      icon: Icon(
-                        isLiked ? Icons.favorite : Icons.favorite_border,
-                        color: isLiked ? Colors.red : Colors.black87,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        PostCommentsBottomSheet.show(
-                          context,
-                          postId: _post!.id,
-                          postTitle: _post!.title,
-                        );
-                      },
-                      icon: const Icon(Icons.chat_bubble_outline,
-                          color: Colors.black87),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (context) => SharePostBottomSheet(
-                            postId: _post!.id,
-                            postTitle: _post!.title,
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.send_outlined,
-                          color: Colors.black87),
-                    ),
-                  ],
-                ),
-                if (likes > 0)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      likes == 1 ? '1 like' : '$likes likes',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
+            return PostActionBar(
+              postId: _post!.id,
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+              viewAllCommentsLabel: false,
+              onComment: () {
+                PostCommentsBottomSheet.show(
+                  context,
+                  postId: _post!.id,
+                  postTitle: _post!.title,
+                );
+              },
+              onShare: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => SharePostBottomSheet(
+                    postId: _post!.id,
+                    postTitle: _post!.title,
                   ),
-                if (comments > 0)
-                  Text(
-                    comments == 1 ? '1 comment' : '$comments comments',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                      fontFamily: 'Poppins',
-                    ),
-                  ),
-                const SizedBox(height: 8),
-              ],
+                );
+              },
             );
           },
         ),
