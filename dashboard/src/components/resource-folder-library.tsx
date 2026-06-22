@@ -36,6 +36,18 @@ type LibraryDocRow = {
 
 type SortKey = "created_desc" | "created_asc" | "title_asc" | "title_desc";
 
+function asResourceFolders(data: unknown): ResourceFolder[] {
+  return Array.isArray(data) ? (data as ResourceFolder[]) : [];
+}
+
+function asLibraryDocRows(data: unknown): LibraryDocRow[] {
+  return Array.isArray(data) ? (data as LibraryDocRow[]) : [];
+}
+
+function asLibraryDocRow(data: unknown): LibraryDocRow | null {
+  return data && typeof data === "object" ? (data as LibraryDocRow) : null;
+}
+
 type ResourceFolderLibraryProps = {
   scope: ResourceScope;
   heading: string;
@@ -124,7 +136,7 @@ export function ResourceFolderLibrary({
       setLoading(false);
       return;
     }
-    setFolders((folderData as ResourceFolder[]) ?? []);
+    setFolders(asResourceFolders(folderData));
 
     let q = supabase.from(tableName).select(docSelect).order("created_at", { ascending: false });
     if (!isModeratorPlusEffective(access)) {
@@ -138,7 +150,7 @@ export function ResourceFolderLibrary({
       setLoading(false);
       return;
     }
-    setItems((data as LibraryDocRow[]) ?? []);
+    setItems(asLibraryDocRows(data));
     setLoading(false);
   }, [scope, tableName, docSelect]);
 
@@ -278,7 +290,7 @@ export function ResourceFolderLibrary({
       return;
     }
 
-    const row = data as ResourceFolder;
+    const row = data as unknown as ResourceFolder;
     setFolders((prev) => [...prev, row].sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name)));
     setNewFolderName("");
     setNewFolderDescription("");
@@ -362,7 +374,8 @@ export function ResourceFolderLibrary({
         setUploading(false);
         return;
       }
-      uploadedRows.push(inserted as LibraryDocRow);
+      const insertedRow = asLibraryDocRow(inserted);
+      if (insertedRow) uploadedRows.push(insertedRow);
     }
 
     setItems((prev) => [...uploadedRows, ...prev]);
