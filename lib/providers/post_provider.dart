@@ -10,6 +10,7 @@ class PostProvider extends ChangeNotifier {
   final Map<String, List<Comment>> _postComments = {};
   final Set<String> _likedByMe = {};
   final Map<String, int> _extraLikeCounts = {};
+  final Map<String, int> _commentCountsByPostId = {};
 
   List<Post> get posts => _posts;
   bool get isLoading => _isLoading;
@@ -20,6 +21,16 @@ class PostProvider extends ChangeNotifier {
     final inList = _posts.where((p) => p.id == postId).firstOrNull;
     if (inList != null) return inList.likes;
     return _extraLikeCounts[postId] ?? 0;
+  }
+
+  int commentCountForPost(String postId) {
+    final loadedComments = _postComments[postId];
+    if (loadedComments != null) return loadedComments.length;
+
+    final inList = _posts.where((p) => p.id == postId).firstOrNull;
+    if (inList != null) return inList.comments;
+
+    return _commentCountsByPostId[postId] ?? 0;
   }
 
   PostProvider();
@@ -66,15 +77,16 @@ class PostProvider extends ChangeNotifier {
 
       Map<String, int> postCommentCounts = {};
       if (postIds.isNotEmpty) {
-        final List<dynamic> commentRows = await supabase
-            .from('comments')
-            .select('post_id')
-            .inFilter('post_id', postIds.toList());
-
-        for (final comment in commentRows) {
-          final postId = comment['post_id'] as String;
-          postCommentCounts[postId] = (postCommentCounts[postId] ?? 0) + 1;
-        }
+        postCommentCounts = await _fetchCommentCountsForPosts(
+          supabase,
+          postIds,
+          excludedUserIds,
+        );
+        _commentCountsByPostId
+          ..clear()
+          ..addAll(postCommentCounts);
+      } else {
+        _commentCountsByPostId.clear();
       }
 
       final likeData = await _fetchLikeData(supabase, postIds);
@@ -141,8 +153,14 @@ class PostProvider extends ChangeNotifier {
       }
 
       final List<dynamic> commentRows =
-          await supabase.from('comments').select('id').eq('post_id', postId);
-      final commentCount = commentRows.length;
+          await supabase.from('comments').select('user_id').eq('post_id', postId);
+      var commentCount = 0;
+      final excludedUserIds = await blockedUserIdsForCurrentUser(supabase);
+      for (final raw in commentRows) {
+        final uid = raw['user_id'] as String;
+        if (!excludedUserIds.contains(uid)) commentCount++;
+      }
+      _commentCountsByPostId[postId] = commentCount;
 
       final likeData = await _fetchLikeData(supabase, {postId});
       _applyLikedByMe(likeData.likedByMe, replace: false);
@@ -328,14 +346,14 @@ class PostProvider extends ChangeNotifier {
   }
 
   void _updateCommentCounts() {
-    for (var post in _posts) {
-      final commentList = _postComments[post.id];
-      final index = _posts.indexWhere((p) => p.id == post.id);
+    for (final postId in _postComments.keys) {
+      final commentList = _postComments[postId];
+      final newCount = commentList?.length ?? 0;
+      _commentCountsByPostId[postId] = newCount;
+
+      final index = _posts.indexWhere((p) => p.id == postId);
       if (index != -1) {
-        final newCount = commentList?.length ?? 0;
-        _posts[index] = _posts[index].copyWith(
-          comments: newCount,
-        );
+        _posts[index] = _posts[index].copyWith(comments: newCount);
       }
     }
     notifyListeners();
@@ -441,8 +459,43 @@ class PostProvider extends ChangeNotifier {
     _postComments.clear();
     _likedByMe.clear();
     _extraLikeCounts.clear();
+    _commentCountsByPostId.clear();
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<Map<String, int>> _fetchCommentCountsForPosts(
+    SupabaseClient supabase,
+    Set<String> postIds,
+    Set<String> excludedUserIds,
+  ) async {
+    if (postIds.isEmpty) return {};
+
+    final counts = <String, int>{};
+    final ids = postIds.toList();
+    const chunkSize = 10;
+
+    for (var i = 0; i < ids.length; i += chunkSize) {
+      final chunk = ids.sublist(i, (i + chunkSize).clamp(0, ids.length));
+      await Future.wait(chunk.map((postId) async {
+        try {
+          final rows = await supabase
+              .from('comments')
+              .select('user_id')
+              .eq('post_id', postId);
+          var count = 0;
+          for (final raw in rows) {
+            final uid = raw['user_id'] as String;
+            if (!excludedUserIds.contains(uid)) count++;
+          }
+          counts[postId] = count;
+        } catch (_) {
+          counts[postId] = 0;
+        }
+      }));
+    }
+
+    return counts;
   }
 
   Future<({Map<String, int> counts, Set<String> likedByMe})> _fetchLikeData(

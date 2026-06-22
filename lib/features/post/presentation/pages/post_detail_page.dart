@@ -423,9 +423,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             if (_post == null) return const SizedBox.shrink();
 
             final likes = postProvider.likeCountForPost(_post!.id);
-            final comments =
-                postProvider.getCommentsForPost(widget.postId)?.length ??
-                    _post!.comments;
+            final comments = postProvider.commentCountForPost(_post!.id);
             final isLiked = postProvider.isPostLikedByMe(_post!.id);
 
             return Column(

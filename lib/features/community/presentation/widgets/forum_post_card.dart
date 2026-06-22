@@ -36,7 +36,7 @@ class ForumPostCard extends StatelessWidget {
                 .firstOrNull ??
             post;
         final likes = postProvider.likeCountForPost(post.id);
-        final comments = livePost.comments;
+        final comments = postProvider.commentCountForPost(post.id);
         final isLiked = postProvider.isPostLikedByMe(post.id);
 
         return Column(
