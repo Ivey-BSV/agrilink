@@ -138,12 +138,7 @@ export function ResourceFolderLibrary({
     }
     setFolders(asResourceFolders(folderData));
 
-    let q = supabase.from(tableName).select(docSelect).order("created_at", { ascending: false });
-    if (!isModeratorPlusEffective(access)) {
-      q = q.eq("user_id", user.id);
-    } else {
-      q = q.limit(800);
-    }
+    let q = supabase.from(tableName).select(docSelect).order("created_at", { ascending: false }).limit(800);
     const { data, error: fetchError } = await q;
     if (fetchError) {
       setError(fetchError.message);
@@ -327,8 +322,6 @@ export function ResourceFolderLibrary({
       return;
     }
 
-    const access = await getEffectiveStaffAccess(user.id, user.email);
-    const staff = isModeratorPlusEffective(access);
     const folder = folders.find((f) => f.id === selectedFolderId);
     const uploadedRows: LibraryDocRow[] = [];
 
@@ -356,7 +349,7 @@ export function ResourceFolderLibrary({
         file_name: file.name,
         file_url: publicUrl,
         mime_type: file.type || null,
-        approval_status: staff ? "approved" : "pending",
+        approval_status: "approved",
         visibility_rules: {},
       };
       if (tableName === "workshop_documents" && folder?.legacy_workshop_id) {

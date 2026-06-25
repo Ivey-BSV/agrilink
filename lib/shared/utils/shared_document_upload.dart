@@ -19,6 +19,7 @@ class SharedDocumentUploadTarget {
     this.folderId,
     this.legacyWorkshopId,
     this.uploadSuccessMessageWhenStaff,
+    this.publishImmediately = false,
   });
 
   final String storageBucket;
@@ -31,6 +32,8 @@ class SharedDocumentUploadTarget {
   final String? entityId;
   final String? folderId;
   final String? legacyWorkshopId;
+  /// When true, uploads are immediately visible to everyone (no admin review).
+  final bool publishImmediately;
 
   factory SharedDocumentUploadTarget.fromEntityConfig(
     EntitySharedFilesConfig config,
@@ -56,11 +59,11 @@ class SharedDocumentUploadTarget {
         storageBucket: 'knowledge-repository',
         documentsTable: 'knowledge_repository_documents',
         folderId: folderId,
-        consentDialogTitle: 'Share with admins for review',
+        publishImmediately: true,
+        consentDialogTitle: 'Share file',
         consentDialogBody:
-            'Uploads are reviewed by program staff before they appear in the shared library for other members.',
-        uploadSuccessMessage: 'Upload submitted for admin review.',
-        uploadSuccessMessageWhenStaff: 'Document published.',
+            'This file will be visible to all members in this folder.',
+        uploadSuccessMessage: 'File uploaded.',
       );
     }
     return SharedDocumentUploadTarget(
@@ -70,11 +73,11 @@ class SharedDocumentUploadTarget {
       legacyWorkshopId: legacyWorkshopId,
       entityIdColumn: legacyWorkshopId != null ? 'workshop_id' : null,
       entityId: legacyWorkshopId,
-      consentDialogTitle: 'Workshop file review',
+      publishImmediately: true,
+      consentDialogTitle: 'Share file',
       consentDialogBody:
-          'Staff may review this file before it is treated as fully published for the workshop.',
-      uploadSuccessMessage: 'File shared with this folder.',
-      uploadSuccessMessageWhenStaff: 'File published.',
+          'This file will be visible to all members in this folder.',
+      uploadSuccessMessage: 'File uploaded.',
     );
   }
 
@@ -120,9 +123,11 @@ class SharedDocumentUploadTarget {
       'file_name': rawName,
       'file_url': publicUrl,
       'mime_type': mime,
-      'approval_status': isStaff ? 'approved' : 'pending',
-      'consent_agreed_at':
-          isStaff ? null : DateTime.now().toUtc().toIso8601String(),
+      'approval_status':
+          (publishImmediately || isStaff) ? 'approved' : 'pending',
+      'consent_agreed_at': (publishImmediately || isStaff)
+          ? null
+          : DateTime.now().toUtc().toIso8601String(),
       'visibility_rules': <String, dynamic>{},
     };
     if (entityIdColumn != null &&
@@ -221,7 +226,7 @@ Future<bool> uploadSharedDocumentBytes({
     final isStaff =
         prof != null && (prof['account_kind'] as String?) == 'staff';
 
-    if (!isStaff) {
+    if (!isStaff && !target.publishImmediately) {
       if (!context.mounted) return false;
       var consentChecked = false;
       final confirmed = await showDialog<bool>(

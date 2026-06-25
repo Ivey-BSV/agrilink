@@ -1,55 +1,25 @@
--- Folders for workshop files and knowledge repository (gallery + documents live inside folders).
-
-CREATE TABLE IF NOT EXISTS public.resource_folders (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  scope text NOT NULL CHECK (scope IN ('workshop', 'repository')),
-  name text NOT NULL,
-  description text,
-  sort_order integer NOT NULL DEFAULT 0,
-  legacy_workshop_id text,
-  created_by uuid REFERENCES public.user_profiles (id) ON DELETE SET NULL,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX IF NOT EXISTS idx_resource_folders_scope_sort
-  ON public.resource_folders (scope, sort_order ASC, name ASC);
-
-CREATE UNIQUE INDEX IF NOT EXISTS idx_resource_folders_workshop_legacy
-  ON public.resource_folders (scope, legacy_workshop_id)
-  WHERE legacy_workshop_id IS NOT NULL;
-
-ALTER TABLE public.resource_folders ENABLE ROW LEVEL SECURITY;
+-- Run this if 20260530120000_resource_folders.sql failed partway (policies already exist).
+-- Safe to re-run.
 
 DROP POLICY IF EXISTS "resource_folders_select_authenticated" ON public.resource_folders;
 CREATE POLICY "resource_folders_select_authenticated"
-  ON public.resource_folders
-  FOR SELECT
-  TO authenticated
-  USING (true);
+  ON public.resource_folders FOR SELECT TO authenticated USING (true);
 
 DROP POLICY IF EXISTS "resource_folders_insert_authenticated" ON public.resource_folders;
 CREATE POLICY "resource_folders_insert_authenticated"
-  ON public.resource_folders
-  FOR INSERT
-  TO authenticated
+  ON public.resource_folders FOR INSERT TO authenticated
   WITH CHECK (auth.uid() = created_by);
 
 DROP POLICY IF EXISTS "resource_folders_update_own" ON public.resource_folders;
 CREATE POLICY "resource_folders_update_own"
-  ON public.resource_folders
-  FOR UPDATE
-  TO authenticated
-  USING (auth.uid() = created_by)
-  WITH CHECK (auth.uid() = created_by);
+  ON public.resource_folders FOR UPDATE TO authenticated
+  USING (auth.uid() = created_by) WITH CHECK (auth.uid() = created_by);
 
 DROP POLICY IF EXISTS "resource_folders_delete_own" ON public.resource_folders;
 CREATE POLICY "resource_folders_delete_own"
-  ON public.resource_folders
-  FOR DELETE
-  TO authenticated
+  ON public.resource_folders FOR DELETE TO authenticated
   USING (auth.uid() = created_by);
 
--- Link documents to folders
 ALTER TABLE public.workshop_documents
   ADD COLUMN IF NOT EXISTS folder_id uuid REFERENCES public.resource_folders (id) ON DELETE SET NULL;
 
@@ -62,11 +32,9 @@ CREATE INDEX IF NOT EXISTS idx_workshop_documents_folder
 CREATE INDEX IF NOT EXISTS idx_knowledge_repo_folder
   ON public.knowledge_repository_documents (folder_id, created_at DESC);
 
--- workshop_id no longer required for new uploads (folders replace workshop picker)
 ALTER TABLE public.workshop_documents
   ALTER COLUMN workshop_id DROP NOT NULL;
 
--- Seed workshop folders (legacy_workshop_id maps existing uploads)
 INSERT INTO public.resource_folders (scope, name, sort_order, legacy_workshop_id)
 SELECT v.scope, v.name, v.sort_order, v.legacy_workshop_id
 FROM (
@@ -83,13 +51,10 @@ FROM (
     ('workshop', 'Workshops 8 & 9 — legacy uploads', 95, '10')
 ) AS v(scope, name, sort_order, legacy_workshop_id)
 WHERE NOT EXISTS (
-  SELECT 1
-  FROM public.resource_folders rf
-  WHERE rf.scope = v.scope
-    AND rf.legacy_workshop_id IS NOT DISTINCT FROM v.legacy_workshop_id
+  SELECT 1 FROM public.resource_folders rf
+  WHERE rf.scope = v.scope AND rf.legacy_workshop_id IS NOT DISTINCT FROM v.legacy_workshop_id
 );
 
--- New workshop folders (manager request)
 INSERT INTO public.resource_folders (scope, name, sort_order)
 SELECT v.scope, v.name, v.sort_order
 FROM (
@@ -107,14 +72,12 @@ WHERE NOT EXISTS (
   SELECT 1 FROM public.resource_folders rf WHERE rf.scope = v.scope AND rf.name = v.name
 );
 
--- Default repository folder
 INSERT INTO public.resource_folders (scope, name, sort_order)
 SELECT 'repository', 'General', 0
 WHERE NOT EXISTS (
   SELECT 1 FROM public.resource_folders WHERE scope = 'repository' AND name = 'General'
 );
 
--- Backfill folder_id from legacy workshop_id
 UPDATE public.workshop_documents wd
 SET folder_id = rf.id
 FROM public.resource_folders rf
@@ -130,11 +93,9 @@ WHERE kd.folder_id IS NULL
   AND rf.scope = 'repository'
   AND rf.name = 'General';
 
--- Repository storage: allow folder_id/user_id/... paths (split_part 2 = user id)
 DROP POLICY IF EXISTS "knowledge_repo_storage_insert" ON storage.objects;
 CREATE POLICY "knowledge_repo_storage_insert"
-  ON storage.objects FOR INSERT
-  TO authenticated
+  ON storage.objects FOR INSERT TO authenticated
   WITH CHECK (
     bucket_id = 'knowledge-repository'
     AND (
@@ -145,8 +106,7 @@ CREATE POLICY "knowledge_repo_storage_insert"
 
 DROP POLICY IF EXISTS "knowledge_repo_storage_delete_own" ON storage.objects;
 CREATE POLICY "knowledge_repo_storage_delete_own"
-  ON storage.objects FOR DELETE
-  TO authenticated
+  ON storage.objects FOR DELETE TO authenticated
   USING (
     bucket_id = 'knowledge-repository'
     AND (
