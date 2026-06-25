@@ -326,7 +326,7 @@ class _WorkshopDetailPageState extends State<WorkshopDetailPage> {
               ),
             ),
             const SizedBox(height: 24),
-            WorkshopSharedFilesSection(workshopId: widget.workshopId),
+            WorkshopFolderFilesLink(workshopId: widget.workshopId),
             const SizedBox(height: 24),
             Row(
               children: [

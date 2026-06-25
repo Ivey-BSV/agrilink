@@ -188,7 +188,7 @@ class _ResourcesPageState extends State<ResourcesPage>
             title: 'Repository',
             subtitle: 'Knowledge sharing',
             description:
-                'Upload and browse shared documents — PDFs, slides, spreadsheets, and more',
+                'Browse shared folders — each has a photo gallery and document list',
             color: AppTheme.primaryGreen,
             onTap: () {
               Navigator.push(
@@ -202,9 +202,9 @@ class _ResourcesPageState extends State<ResourcesPage>
           _buildResourceCard(
             icon: Icons.groups,
             title: 'Workshops',
-            subtitle: 'Collaborate in sessions',
+            subtitle: 'Sessions & shared files',
             description:
-                'View upcoming and past sessions, then open each one for details and shared files.',
+                'View workshop sessions, notes, and browse file folders (gallery + documents)',
             color: AppTheme.primaryGreen,
             onTap: () {
               Navigator.push(

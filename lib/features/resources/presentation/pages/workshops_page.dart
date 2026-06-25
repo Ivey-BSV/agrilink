@@ -1,9 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/features/collaboration/presentation/pages/workshop_detail_page.dart';
+import 'package:cap/shared/models/resource_folder.dart';
+import 'package:cap/shared/widgets/resource_folder_library_page.dart';
 
-class WorkshopsPage extends StatelessWidget {
+class WorkshopsPage extends StatefulWidget {
   const WorkshopsPage({super.key});
+
+  @override
+  State<WorkshopsPage> createState() => _WorkshopsPageState();
+}
+
+class _WorkshopsPageState extends State<WorkshopsPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   Map<String, String?> _parseWorkshopTitle(String title) {
     final tentativeMatch = RegExp(
@@ -218,10 +240,6 @@ class WorkshopsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final workshops = _workshops();
-    final upcoming = workshops.where((w) => w['isUpcoming'] == true).toList();
-    final past = workshops.where((w) => w['isUpcoming'] == false).toList();
-
     return Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
@@ -234,39 +252,69 @@ class WorkshopsPage extends StatelessWidget {
             color: Colors.black,
           ),
         ),
+        bottom: TabBar(
+          controller: _tabController,
+          labelColor: AppTheme.primaryGreen,
+          unselectedLabelColor: Colors.grey[600],
+          indicatorColor: AppTheme.primaryGreen,
+          tabs: const [
+            Tab(text: 'Sessions'),
+            Tab(text: 'Files'),
+          ],
+        ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: TabBarView(
+        controller: _tabController,
         children: [
-          if (upcoming.isNotEmpty) ...[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12, top: 8),
-              child: Text(
-                'Upcoming',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-              ),
-            ),
-            ..._buildSeparatedWorkshopCards(context, upcoming),
-          ],
-          if (past.isNotEmpty) ...[
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                'Past Workshops',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-              ),
-            ),
-            ..._buildSeparatedWorkshopCards(context, past),
-          ],
+          _buildSessionsTab(context),
+          const ResourceFolderLibraryPage(
+            scope: ResourceScope.workshop,
+            title: 'Workshop Files',
+            description:
+                'Workshop photos and documents organized in folders — same as the web dashboard.',
+            embedded: true,
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSessionsTab(BuildContext context) {
+    final workshops = _workshops();
+    final upcoming = workshops.where((w) => w['isUpcoming'] == true).toList();
+    final past = workshops.where((w) => w['isUpcoming'] == false).toList();
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        if (upcoming.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12, top: 8),
+            child: Text(
+              'Upcoming',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+            ),
+          ),
+          ..._buildSeparatedWorkshopCards(context, upcoming),
+        ],
+        if (past.isNotEmpty) ...[
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              'Past Workshops',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+            ),
+          ),
+          ..._buildSeparatedWorkshopCards(context, past),
+        ],
+      ],
     );
   }
 

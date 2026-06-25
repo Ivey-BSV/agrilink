@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cap/core/theme/app_theme.dart';
+import 'package:cap/shared/models/resource_folder.dart';
 import 'package:cap/shared/utils/document_upload_utils.dart';
 import 'package:cap/shared/widgets/entity_shared_files_config.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ class SharedDocumentUploadTarget {
     required this.uploadSuccessMessage,
     this.entityIdColumn,
     this.entityId,
+    this.folderId,
+    this.legacyWorkshopId,
     this.uploadSuccessMessageWhenStaff,
   });
 
@@ -26,6 +29,8 @@ class SharedDocumentUploadTarget {
   final String? uploadSuccessMessageWhenStaff;
   final String? entityIdColumn;
   final String? entityId;
+  final String? folderId;
+  final String? legacyWorkshopId;
 
   factory SharedDocumentUploadTarget.fromEntityConfig(
     EntitySharedFilesConfig config,
@@ -41,6 +46,38 @@ class SharedDocumentUploadTarget {
     );
   }
 
+  static SharedDocumentUploadTarget forResourceFolder({
+    required ResourceScope scope,
+    required String folderId,
+    String? legacyWorkshopId,
+  }) {
+    if (scope == ResourceScope.repository) {
+      return SharedDocumentUploadTarget(
+        storageBucket: 'knowledge-repository',
+        documentsTable: 'knowledge_repository_documents',
+        folderId: folderId,
+        consentDialogTitle: 'Share with admins for review',
+        consentDialogBody:
+            'Uploads are reviewed by program staff before they appear in the shared library for other members.',
+        uploadSuccessMessage: 'Upload submitted for admin review.',
+        uploadSuccessMessageWhenStaff: 'Document published.',
+      );
+    }
+    return SharedDocumentUploadTarget(
+      storageBucket: 'workshop-repository',
+      documentsTable: 'workshop_documents',
+      folderId: folderId,
+      legacyWorkshopId: legacyWorkshopId,
+      entityIdColumn: legacyWorkshopId != null ? 'workshop_id' : null,
+      entityId: legacyWorkshopId,
+      consentDialogTitle: 'Workshop file review',
+      consentDialogBody:
+          'Staff may review this file before it is treated as fully published for the workshop.',
+      uploadSuccessMessage: 'File shared with this folder.',
+      uploadSuccessMessageWhenStaff: 'File published.',
+    );
+  }
+
   static const knowledgeRepository = SharedDocumentUploadTarget(
     storageBucket: 'knowledge-repository',
     documentsTable: 'knowledge_repository_documents',
@@ -53,6 +90,9 @@ class SharedDocumentUploadTarget {
 
   String buildStoragePath(String userId, String safeName) {
     final timestamp = DateTime.now().millisecondsSinceEpoch;
+    if (folderId != null && folderId!.isNotEmpty) {
+      return '$folderId/$userId/${timestamp}_$safeName';
+    }
     if (entityId != null && entityId!.isNotEmpty) {
       return '$entityId/$userId/${timestamp}_$safeName';
     }
@@ -89,6 +129,9 @@ class SharedDocumentUploadTarget {
         entityId != null &&
         entityIdColumn!.isNotEmpty) {
       row[entityIdColumn!] = entityId;
+    }
+    if (folderId != null && folderId!.isNotEmpty) {
+      row['folder_id'] = folderId;
     }
     return row;
   }
