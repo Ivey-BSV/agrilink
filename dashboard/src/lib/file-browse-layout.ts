@@ -1,4 +1,5 @@
 import { isPreviewableImage } from "@/lib/media-preview";
+import { isResourceLinkRow } from "@/lib/resource-links";
 
 function fileNameFromPublicUrl(fileUrl: string | null | undefined): string | null {
   if (!fileUrl || !fileUrl.trim()) return null;
@@ -32,14 +33,31 @@ export function isGalleryImageFile(
 export function splitGalleryAndDocuments<
   T extends { file_name: string; mime_type?: string | null; file_url?: string | null; title?: string }
 >(items: T[]): { gallery: T[]; documents: T[] } {
+  const split = splitGalleryDocumentsAndLinks(items, "/knowledge-repository/", false);
+  return { gallery: split.gallery, documents: split.documents };
+}
+
+export function splitGalleryDocumentsAndLinks<
+  T extends { file_name: string; mime_type?: string | null; file_url?: string | null; title?: string }
+>(
+  items: T[],
+  storageUrlMarker: string,
+  includeLinks = true
+): { gallery: T[]; documents: T[]; links: T[] } {
   const gallery: T[] = [];
   const documents: T[] = [];
+  const links: T[] = [];
   for (const item of items) {
     if (isGalleryImageFile(item.file_name, item.mime_type, item.file_url ?? null, item.title ?? null)) {
       gallery.push(item);
+    } else if (
+      includeLinks &&
+      isResourceLinkRow(item.file_url ?? null, item.mime_type ?? null, storageUrlMarker)
+    ) {
+      links.push(item);
     } else {
       documents.push(item);
     }
   }
-  return { gallery, documents };
+  return { gallery, documents, links };
 }
