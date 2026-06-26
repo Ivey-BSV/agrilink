@@ -58,9 +58,11 @@ class FolderFileStats {
     this.total = 0,
     this.gallery = 0,
     this.documents = 0,
+    this.links = 0,
   });
 
   final int total;
   final int gallery;
   final int documents;
+  final int links;
 }

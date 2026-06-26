@@ -146,6 +146,7 @@ Future<void> showSharedDocumentUploadSheet(
   BuildContext context, {
   required void Function(String userId) onPickFiles,
   required void Function(String userId) onPickGallery,
+  VoidCallback? onAddLink,
   String signInRequiredMessage = 'Sign in to upload files.',
 }) async {
   final user = Supabase.instance.client.auth.currentUser;
@@ -188,6 +189,16 @@ Future<void> showSharedDocumentUploadSheet(
                 onPickGallery(user.id);
               },
             ),
+            if (onAddLink != null)
+              ListTile(
+                leading: Icon(Icons.link, color: AppTheme.primaryGreen),
+                title: const Text('Link'),
+                subtitle: const Text('YouTube videos and web links'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  onAddLink();
+                },
+              ),
           ],
         ),
       ),

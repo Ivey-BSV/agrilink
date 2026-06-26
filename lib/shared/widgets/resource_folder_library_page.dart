@@ -2,8 +2,10 @@ import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/shared/models/resource_folder.dart';
 import 'package:cap/shared/utils/file_browse_categories.dart';
 import 'package:cap/shared/utils/file_browse_ui_utils.dart';
+import 'package:cap/shared/utils/resource_link_utils.dart';
 import 'package:cap/shared/utils/shared_document_upload.dart';
 import 'package:cap/shared/widgets/file_browse_gallery_grid.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -46,7 +48,7 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: _tabCount, vsync: this);
     _selectedFolderId = widget.initialFolderId;
     _load();
   }
@@ -69,6 +71,10 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
       ? '/workshop-repository/'
       : '/knowledge-repository/';
 
+  bool get _supportsLinks => widget.scope == ResourceScope.repository;
+
+  int get _tabCount => _supportsLinks ? 3 : 2;
+
   String get _docSelect =>
       'id, folder_id, user_id, title, file_name, file_url, mime_type, created_at, approval_status, consent_agreed_at';
 
@@ -83,6 +89,14 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
   List<Map<String, dynamic>> get _folderRows {
     if (_selectedFolderId == null) return [];
     return _allRows.where((r) => r['folder_id'] == _selectedFolderId).toList();
+  }
+
+  FileBrowseSplit _splitRows(List<Map<String, dynamic>> rows) {
+    return splitGalleryDocumentsAndLinks(
+      rows,
+      storageUrlMarker: _storageUrlMarker,
+      includeLinks: _supportsLinks,
+    );
   }
 
   Map<String, FolderFileStats> get _folderStats {
@@ -100,18 +114,39 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
         row['file_url'] as String?,
         row['title'] as String?,
       );
+      final isLink = !isGallery &&
+          _supportsLinks &&
+          isResourceLinkRow(
+            row['file_url'] as String?,
+            row['mime_type'] as String?,
+            storageUrlMarker: _storageUrlMarker,
+          );
       stats[folderId] = FolderFileStats(
         total: current.total + 1,
         gallery: current.gallery + (isGallery ? 1 : 0),
-        documents: current.documents + (isGallery ? 0 : 1),
+        documents: current.documents + (isGallery || isLink ? 0 : 1),
+        links: current.links + (isLink ? 1 : 0),
       );
     }
     return stats;
   }
 
   void _syncTabToContent(List<Map<String, dynamic>> rows) {
-    final split = splitGalleryAndDocuments(rows);
     if (_tabController == null) return;
+    if (_supportsLinks) {
+      final split = _splitRows(rows);
+      if (split.gallery.isNotEmpty) {
+        _tabController!.index = 0;
+      } else if (split.documents.isNotEmpty) {
+        _tabController!.index = 1;
+      } else if (split.links.isNotEmpty) {
+        _tabController!.index = 2;
+      } else {
+        _tabController!.index = 0;
+      }
+      return;
+    }
+    final split = splitGalleryAndDocuments(rows);
     if (split.gallery.isEmpty && split.documents.isNotEmpty) {
       _tabController!.index = 1;
     } else {
@@ -329,7 +364,119 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
       signInRequiredMessage: 'Sign in to upload files.',
       onPickFiles: _pickFromFiles,
       onPickGallery: _pickFromGallery,
+      onAddLink: _supportsLinks ? _showAddLinkDialog : null,
     );
+  }
+
+  Future<void> _showAddLinkDialog() async {
+    if (_selectedFolderId == null) return;
+
+    final user = _supabase.auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Sign in to add links.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final titleController = TextEditingController();
+    final urlController = TextEditingController();
+
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Add link'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title (optional)',
+                  hintText: 'e.g., Soil health lecture',
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: urlController,
+                autofocus: true,
+                keyboardType: TextInputType.url,
+                autocorrect: false,
+                decoration: const InputDecoration(
+                  labelText: 'URL',
+                  hintText: 'https://youtube.com/watch?v=…',
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (normalizeResourceLinkUrl(urlController.text) == null) return;
+              Navigator.pop(ctx, true);
+            },
+            child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+
+    if (saved != true || !mounted) {
+      titleController.dispose();
+      urlController.dispose();
+      return;
+    }
+
+    final normalized = normalizeResourceLinkUrl(urlController.text);
+    final linkTitle = titleController.text.trim();
+    titleController.dispose();
+    urlController.dispose();
+
+    if (normalized == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Enter a valid http or https URL.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final displayTitle =
+        linkTitle.isEmpty ? linkDisplayHost(normalized) : linkTitle;
+
+    try {
+      await _supabase.from(_documentsTable).insert(
+            buildResourceLinkInsertRow(
+              folderId: _selectedFolderId!,
+              userId: user.id,
+              title: displayTitle,
+              url: normalized,
+            ),
+          );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Link added.'),
+          backgroundColor: AppTheme.primaryGreen,
+        ),
+      );
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not add link: $e')),
+      );
+    }
   }
 
   Future<void> _pickFromFiles(String userId) async {
@@ -493,7 +640,9 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
         final s = stats[folder.id] ?? const FolderFileStats();
         final meta = s.total == 0
             ? 'Empty'
-            : '${s.total} file${s.total == 1 ? '' : 's'} · ${s.gallery} photo${s.gallery == 1 ? '' : 's'}';
+            : _supportsLinks
+                ? '${s.total} item${s.total == 1 ? '' : 's'} · ${s.gallery} photo${s.gallery == 1 ? '' : 's'}${s.links > 0 ? ' · ${s.links} link${s.links == 1 ? '' : 's'}' : ''}'
+                : '${s.total} file${s.total == 1 ? '' : 's'} · ${s.gallery} photo${s.gallery == 1 ? '' : 's'}';
 
         return Card(
           elevation: 2,
@@ -657,10 +806,130 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
     );
   }
 
+  Widget _buildLinksTab(List<Map<String, dynamic>> links) {
+    final currentId = _supabase.auth.currentUser?.id;
+    if (links.isEmpty) {
+      return ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(24, 48, 24, 100),
+        children: [
+          Icon(Icons.link, size: 56, color: Colors.grey[400]),
+          const SizedBox(height: 12),
+          Text(
+            'No links in this folder yet.\nAdd YouTube videos or web pages from Upload → Link.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 15, color: Colors.grey[700], height: 1.4),
+          ),
+        ],
+      );
+    }
+    return ListView.separated(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+      itemCount: links.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        final row = links[index];
+        final title = row['title'] as String? ?? 'Untitled';
+        final url = row['file_url'] as String? ?? '';
+        final created = row['created_at'] as String?;
+        DateTime? dt;
+        if (created != null) dt = DateTime.tryParse(created);
+        final dateStr =
+            dt != null ? DateFormat.yMMMd().add_jm().format(dt.toLocal()) : '';
+        final contributor = fileBrowseContributorLabel(row);
+        final isMine = row['user_id'] == currentId;
+        final thumb = youTubeThumbnailUrl(url);
+        final host = linkDisplayHost(url);
+
+        return Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: url.isEmpty ? null : () => _openRow(row),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (thumb != null)
+                  AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: thumb,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Container(
+                            color: Colors.grey[200],
+                            child: const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                          errorWidget: (_, __, ___) => Container(
+                            color: Colors.grey[200],
+                            child: Icon(Icons.play_circle_outline,
+                                size: 48, color: Colors.grey[500]),
+                          ),
+                        ),
+                        Center(
+                          child: Icon(Icons.play_circle_filled,
+                              size: 52, color: Colors.white.withValues(alpha: 0.92)),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  Container(
+                    height: 72,
+                    color: AppTheme.primaryGreen.withValues(alpha: 0.08),
+                    child: Icon(Icons.link, size: 32, color: AppTheme.primaryGreen),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '$host · $contributor · $dateStr',
+                              style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (isMine)
+                        IconButton(
+                          icon: Icon(Icons.delete_outline,
+                              color: Colors.grey[600], size: 22),
+                          onPressed: () => _confirmDelete(row),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildFolderContents() {
     final folder = _selectedFolder;
     final rows = _folderRows;
-    final split = splitGalleryAndDocuments(rows);
+    final split = _splitRows(rows);
 
     if (rows.isEmpty) {
       return ListView(
@@ -670,7 +939,9 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
           Icon(Icons.upload_file, size: 56, color: Colors.grey[400]),
           const SizedBox(height: 12),
           Text(
-            'This folder is empty. Upload photos or documents to get started.',
+            _supportsLinks
+                ? 'This folder is empty. Upload photos or documents, or add links (YouTube, articles).'
+                : 'This folder is empty. Upload photos or documents to get started.',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 15, color: Colors.grey[700], height: 1.5),
           ),
@@ -678,8 +949,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
           Center(
             child: ElevatedButton.icon(
               onPressed: _upload,
-              icon: const Icon(Icons.upload_file),
-              label: const Text('Upload file'),
+              icon: const Icon(Icons.add),
+              label: Text(_supportsLinks ? 'Add content' : 'Upload file'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryGreen,
                 foregroundColor: Colors.white,
@@ -711,6 +982,7 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
             tabs: [
               Tab(text: 'Gallery (${split.gallery.length})'),
               Tab(text: 'Documents (${split.documents.length})'),
+              if (_supportsLinks) Tab(text: 'Links (${split.links.length})'),
             ],
           ),
         ),
@@ -720,6 +992,7 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
             children: [
               _buildGalleryTab(split.gallery),
               _buildDocumentsTab(split.documents),
+              if (_supportsLinks) _buildLinksTab(split.links),
             ],
           ),
         ),
@@ -854,8 +1127,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
               onPressed: _upload,
               backgroundColor: AppTheme.primaryGreen,
               foregroundColor: Colors.white,
-              icon: const Icon(Icons.upload_file),
-              label: const Text('Upload'),
+              icon: const Icon(Icons.add),
+              label: const Text('Add'),
             )
           : null,
       body: body,
