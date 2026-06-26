@@ -193,6 +193,24 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
     setState(() => _selectedFolderId = null);
   }
 
+  /// True when this screen was pushed already scoped to one folder (e.g. workshop detail).
+  bool get _openedDirectlyIntoFolder => widget.initialFolderId != null;
+
+  void _handleBack() {
+    if (_selectedFolderId != null) {
+      if (_openedDirectlyIntoFolder) {
+        Navigator.pop(context);
+      } else {
+        _backToFolders();
+      }
+      return;
+    }
+    Navigator.pop(context);
+  }
+
+  bool get _canPopRoute =>
+      _selectedFolderId == null || _openedDirectlyIntoFolder;
+
   Future<void> _showCreateFolderDialog() async {
     final nameController = TextEditingController();
     final descController = TextEditingController();
@@ -798,23 +816,20 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
       );
     }
 
-    return Scaffold(
+    return PopScope(
+      canPop: _canPopRoute,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_selectedFolderId != null) _backToFolders();
+      },
+      child: Scaffold(
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         backgroundColor: AppTheme.backgroundLight,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            inFolder ? Icons.arrow_back : Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            if (inFolder) {
-              _backToFolders();
-            } else {
-              Navigator.pop(context);
-            }
-          },
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: _handleBack,
         ),
         title: Text(
           inFolder ? folderName : widget.title,
@@ -844,6 +859,7 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
             )
           : null,
       body: body,
+    ),
     );
   }
 }
