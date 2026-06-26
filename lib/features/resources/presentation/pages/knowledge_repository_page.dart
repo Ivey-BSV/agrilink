@@ -12,7 +12,7 @@ class KnowledgeRepositoryPage extends StatelessWidget {
       scope: ResourceScope.repository,
       title: 'Repository',
       description:
-          'Browse shared folders. Each folder has a photo gallery and a document list.',
+          'Browse shared folders. Each folder has a photo gallery, documents, and links.',
     );
   }
 }

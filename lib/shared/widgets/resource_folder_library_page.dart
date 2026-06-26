@@ -71,7 +71,7 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
       ? '/workshop-repository/'
       : '/knowledge-repository/';
 
-  bool get _supportsLinks => widget.scope == ResourceScope.repository;
+  bool get _supportsLinks => true;
 
   int get _tabCount => _supportsLinks ? 3 : 2;
 
@@ -1149,7 +1149,7 @@ Future<void> openWorkshopFolderLibrary(
         scope: ResourceScope.workshop,
         title: 'Workshop Files',
         description:
-            'Browse workshop folders. Each folder has a photo gallery and document list.',
+            'Browse workshop folders. Each folder has a photo gallery, documents, and links.',
         initialFolderId: initialFolderId,
       ),
     ),
