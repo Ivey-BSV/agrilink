@@ -12,7 +12,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Folder grid + per-folder gallery/documents browse (matches web dashboard).
 class ResourceFolderLibraryPage extends StatefulWidget {
   const ResourceFolderLibraryPage({
     super.key,
@@ -168,7 +167,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
           .order('name', ascending: true);
 
       final folders = (folderRes as List)
-          .map((e) => ResourceFolder.fromMap(Map<String, dynamic>.from(e as Map)))
+          .map((e) =>
+              ResourceFolder.fromMap(Map<String, dynamic>.from(e as Map)))
           .toList();
 
       final docRes = await _supabase
@@ -228,7 +228,6 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
     setState(() => _selectedFolderId = null);
   }
 
-  /// True when this screen was pushed already scoped to one folder (e.g. workshop detail).
   bool get _openedDirectlyIntoFolder => widget.initialFolderId != null;
 
   void _handleBack() {
@@ -299,7 +298,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
     if (user == null) return;
 
     final name = nameController.text.trim();
-    final maxSort = _folders.fold<int>(0, (m, f) => f.sortOrder > m ? f.sortOrder : m);
+    final maxSort =
+        _folders.fold<int>(0, (m, f) => f.sortOrder > m ? f.sortOrder : m);
 
     try {
       final inserted = await _supabase
@@ -320,10 +320,10 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
           ResourceFolder.fromMap(Map<String, dynamic>.from(inserted as Map));
       if (!mounted) return;
       setState(() {
-        _folders = [..._folders, folder]
-          ..sort((a, b) => a.sortOrder != b.sortOrder
-              ? a.sortOrder.compareTo(b.sortOrder)
-              : a.name.compareTo(b.name));
+        _folders = [..._folders, folder]..sort((a, b) =>
+            a.sortOrder != b.sortOrder
+                ? a.sortOrder.compareTo(b.sortOrder)
+                : a.name.compareTo(b.name));
       });
       _openFolder(folder.id);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -551,7 +551,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Remove file?'),
-        content: const Text('This removes the file for everyone who can see it.'),
+        content:
+            const Text('This removes the file for everyone who can see it.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -607,7 +608,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
           Text(
             'No folders yet. Tap New folder to organize photos and documents.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 15, color: Colors.grey[700], height: 1.5),
+            style:
+                TextStyle(fontSize: 15, color: Colors.grey[700], height: 1.5),
           ),
           const SizedBox(height: 16),
           Center(
@@ -646,7 +648,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
 
         return Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: () => _openFolder(folder.id),
@@ -674,7 +677,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
                     meta,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 10, color: Colors.grey[600], height: 1.2),
+                    style: TextStyle(
+                        fontSize: 10, color: Colors.grey[600], height: 1.2),
                   ),
                 ],
               ),
@@ -749,7 +753,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
 
         return Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: url.isEmpty ? null : () => _openRow(row),
@@ -786,7 +791,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
                         const SizedBox(height: 4),
                         Text(
                           '$contributor · $dateStr',
-                          style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                          style:
+                              TextStyle(fontSize: 11, color: Colors.grey[600]),
                         ),
                       ],
                     ),
@@ -818,7 +824,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
           Text(
             'No links in this folder yet.\nAdd YouTube videos or web pages from Upload → Link.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 15, color: Colors.grey[700], height: 1.4),
+            style:
+                TextStyle(fontSize: 15, color: Colors.grey[700], height: 1.4),
           ),
         ],
       );
@@ -844,7 +851,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
 
         return Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: url.isEmpty ? null : () => _openRow(row),
@@ -874,7 +882,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
                         ),
                         Center(
                           child: Icon(Icons.play_circle_filled,
-                              size: 52, color: Colors.white.withValues(alpha: 0.92)),
+                              size: 52,
+                              color: Colors.white.withValues(alpha: 0.92)),
                         ),
                       ],
                     ),
@@ -883,7 +892,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
                   Container(
                     height: 72,
                     color: AppTheme.primaryGreen.withValues(alpha: 0.08),
-                    child: Icon(Icons.link, size: 32, color: AppTheme.primaryGreen),
+                    child: Icon(Icons.link,
+                        size: 32, color: AppTheme.primaryGreen),
                   ),
                 Padding(
                   padding: const EdgeInsets.all(12),
@@ -904,7 +914,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
                             const SizedBox(height: 4),
                             Text(
                               '$host · $contributor · $dateStr',
-                              style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                              style: TextStyle(
+                                  fontSize: 11, color: Colors.grey[600]),
                             ),
                           ],
                         ),
@@ -943,7 +954,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
                 ? 'This folder is empty. Upload photos or documents, or add links (YouTube, articles).'
                 : 'This folder is empty. Upload photos or documents to get started.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 15, color: Colors.grey[700], height: 1.5),
+            style:
+                TextStyle(fontSize: 15, color: Colors.grey[700], height: 1.5),
           ),
           const SizedBox(height: 16),
           Center(
@@ -969,7 +981,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Text(
               folder!.description!.trim(),
-              style: TextStyle(fontSize: 13, color: Colors.grey[700], height: 1.35),
+              style: TextStyle(
+                  fontSize: 13, color: Colors.grey[700], height: 1.35),
             ),
           ),
         Material(
@@ -1059,7 +1072,9 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
                   ),
                   IconButton(
                     onPressed: inFolder ? _upload : _showCreateFolderDialog,
-                    icon: Icon(inFolder ? Icons.upload_file : Icons.create_new_folder_outlined),
+                    icon: Icon(inFolder
+                        ? Icons.upload_file
+                        : Icons.create_new_folder_outlined),
                     color: AppTheme.primaryGreen,
                   ),
                 ],
@@ -1078,7 +1093,8 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
                   ),
                   TextButton.icon(
                     onPressed: _showCreateFolderDialog,
-                    icon: const Icon(Icons.create_new_folder_outlined, size: 18),
+                    icon:
+                        const Icon(Icons.create_new_folder_outlined, size: 18),
                     label: const Text('New folder'),
                   ),
                 ],
@@ -1096,48 +1112,49 @@ class _ResourceFolderLibraryPageState extends State<ResourceFolderLibraryPage>
         if (_selectedFolderId != null) _backToFolders();
       },
       child: Scaffold(
-      backgroundColor: AppTheme.backgroundLight,
-      appBar: AppBar(
         backgroundColor: AppTheme.backgroundLight,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: _handleBack,
+        appBar: AppBar(
+          backgroundColor: AppTheme.backgroundLight,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: _handleBack,
+          ),
+          title: Text(
+            inFolder ? folderName : widget.title,
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.w600),
+          ),
+          actions: [
+            if (inFolder)
+              IconButton(
+                icon: const Icon(Icons.upload_file, color: Colors.black),
+                onPressed: _upload,
+              )
+            else
+              IconButton(
+                icon: const Icon(Icons.create_new_folder_outlined,
+                    color: Colors.black),
+                onPressed: _showCreateFolderDialog,
+                tooltip: 'New folder',
+              ),
+          ],
         ),
-        title: Text(
-          inFolder ? folderName : widget.title,
-          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
-        ),
-        actions: [
-          if (inFolder)
-            IconButton(
-              icon: const Icon(Icons.upload_file, color: Colors.black),
-              onPressed: _upload,
-            )
-          else
-            IconButton(
-              icon: const Icon(Icons.create_new_folder_outlined, color: Colors.black),
-              onPressed: _showCreateFolderDialog,
-              tooltip: 'New folder',
-            ),
-        ],
+        floatingActionButton: inFolder
+            ? FloatingActionButton.extended(
+                onPressed: _upload,
+                backgroundColor: AppTheme.primaryGreen,
+                foregroundColor: Colors.white,
+                icon: const Icon(Icons.add),
+                label: const Text('Add'),
+              )
+            : null,
+        body: body,
       ),
-      floatingActionButton: inFolder
-          ? FloatingActionButton.extended(
-              onPressed: _upload,
-              backgroundColor: AppTheme.primaryGreen,
-              foregroundColor: Colors.white,
-              icon: const Icon(Icons.add),
-              label: const Text('Add'),
-            )
-          : null,
-      body: body,
-    ),
     );
   }
 }
 
-/// Opens the folder library scoped to workshop files, optionally pre-selecting a folder.
 Future<void> openWorkshopFolderLibrary(
   BuildContext context, {
   String? initialFolderId,
@@ -1156,7 +1173,6 @@ Future<void> openWorkshopFolderLibrary(
   );
 }
 
-/// Resolves a folder id from legacy workshop_id (e.g. "3" → folder row).
 Future<String?> folderIdForLegacyWorkshop(String workshopId) async {
   try {
     final res = await Supabase.instance.client

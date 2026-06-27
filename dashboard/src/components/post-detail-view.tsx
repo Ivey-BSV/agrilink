@@ -50,9 +50,7 @@ function parseTextArray(raw: unknown): string[] {
     try {
       const j = JSON.parse(raw) as unknown;
       if (Array.isArray(j)) return j.map((v) => String(v).trim()).filter((v) => v.length > 0);
-    } catch {
-      /* ignore */
-    }
+    } catch {}
   }
   return [];
 }

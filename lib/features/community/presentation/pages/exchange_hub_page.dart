@@ -337,28 +337,28 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                             child: Row(
                               children: [
                                 ContentFilterChip(
-                                label: 'All',
-                                isSelected: _marketFilter == 'all',
-                                onTap: () =>
-                                    setState(() => _marketFilter = 'all'),
-                              ),
-                              const SizedBox(width: 8),
-                              ContentFilterChip(
-                                label: 'Free',
-                                isSelected: _marketFilter == 'free',
-                                onTap: () =>
-                                    setState(() => _marketFilter = 'free'),
-                              ),
-                              const SizedBox(width: 8),
-                              ContentFilterChip(
-                                label: 'Favourites',
-                                isSelected: _marketFilter == 'favourites',
-                                onTap: () => setState(
-                                    () => _marketFilter = 'favourites'),
-                              ),
-                            ],
+                                  label: 'All',
+                                  isSelected: _marketFilter == 'all',
+                                  onTap: () =>
+                                      setState(() => _marketFilter = 'all'),
+                                ),
+                                const SizedBox(width: 8),
+                                ContentFilterChip(
+                                  label: 'Free',
+                                  isSelected: _marketFilter == 'free',
+                                  onTap: () =>
+                                      setState(() => _marketFilter = 'free'),
+                                ),
+                                const SizedBox(width: 8),
+                                ContentFilterChip(
+                                  label: 'Favourites',
+                                  isSelected: _marketFilter == 'favourites',
+                                  onTap: () => setState(
+                                      () => _marketFilter = 'favourites'),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                         ),
                         PopupMenuButton<String>(
                           onSelected: (value) =>

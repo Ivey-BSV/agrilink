@@ -1,6 +1,5 @@
 import 'package:cap/shared/utils/image_url_utils.dart';
 
-/// MIME types for external links stored in repository/workshop document rows.
 const String kMimeResourceLink = 'text/uri-list';
 const String kMimeYouTubeLink = 'video/youtube';
 
@@ -16,7 +15,6 @@ final List<RegExp> _youTubeIdPatterns = [
   RegExp(r'shorts/([a-zA-Z0-9_-]{11})', caseSensitive: false),
 ];
 
-/// Normalizes user input to an https URL, or null if invalid.
 String? normalizeResourceLinkUrl(String raw) {
   var trimmed = raw.trim();
   if (trimmed.isEmpty) return null;
@@ -78,7 +76,6 @@ bool isStoredBucketFileUrl(String? fileUrl, String storageUrlMarker) {
       url.contains('/storage/v1/object/public/');
 }
 
-/// External link row (YouTube, article URL, etc.) — not a uploaded storage file.
 bool isResourceLinkRow(
   String? fileUrl,
   String? mimeType, {

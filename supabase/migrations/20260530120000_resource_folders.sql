@@ -1,4 +1,3 @@
--- Folders for workshop files and knowledge repository (gallery + documents live inside folders).
 
 CREATE TABLE IF NOT EXISTS public.resource_folders (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -49,7 +48,6 @@ CREATE POLICY "resource_folders_delete_own"
   TO authenticated
   USING (auth.uid() = created_by);
 
--- Link documents to folders
 ALTER TABLE public.workshop_documents
   ADD COLUMN IF NOT EXISTS folder_id uuid REFERENCES public.resource_folders (id) ON DELETE SET NULL;
 
@@ -62,11 +60,9 @@ CREATE INDEX IF NOT EXISTS idx_workshop_documents_folder
 CREATE INDEX IF NOT EXISTS idx_knowledge_repo_folder
   ON public.knowledge_repository_documents (folder_id, created_at DESC);
 
--- workshop_id no longer required for new uploads (folders replace workshop picker)
 ALTER TABLE public.workshop_documents
   ALTER COLUMN workshop_id DROP NOT NULL;
 
--- Seed workshop folders (legacy_workshop_id maps existing uploads)
 INSERT INTO public.resource_folders (scope, name, sort_order, legacy_workshop_id)
 SELECT v.scope, v.name, v.sort_order, v.legacy_workshop_id
 FROM (
@@ -89,7 +85,6 @@ WHERE NOT EXISTS (
     AND rf.legacy_workshop_id IS NOT DISTINCT FROM v.legacy_workshop_id
 );
 
--- New workshop folders (manager request)
 INSERT INTO public.resource_folders (scope, name, sort_order)
 SELECT v.scope, v.name, v.sort_order
 FROM (
@@ -107,14 +102,12 @@ WHERE NOT EXISTS (
   SELECT 1 FROM public.resource_folders rf WHERE rf.scope = v.scope AND rf.name = v.name
 );
 
--- Default repository folder
 INSERT INTO public.resource_folders (scope, name, sort_order)
 SELECT 'repository', 'General', 0
 WHERE NOT EXISTS (
   SELECT 1 FROM public.resource_folders WHERE scope = 'repository' AND name = 'General'
 );
 
--- Backfill folder_id from legacy workshop_id
 UPDATE public.workshop_documents wd
 SET folder_id = rf.id
 FROM public.resource_folders rf
@@ -130,7 +123,6 @@ WHERE kd.folder_id IS NULL
   AND rf.scope = 'repository'
   AND rf.name = 'General';
 
--- Repository storage: allow folder_id/user_id/... paths (split_part 2 = user id)
 DROP POLICY IF EXISTS "knowledge_repo_storage_insert" ON storage.objects;
 CREATE POLICY "knowledge_repo_storage_insert"
   ON storage.objects FOR INSERT

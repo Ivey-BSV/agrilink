@@ -66,8 +66,9 @@ class _ForumPostDetailMediaState extends State<ForumPostDetailMedia> {
   @override
   Widget build(BuildContext context) {
     final useNativeRatio = !widget.isVideo && _aspectRatio != null;
-    final aspectRatio =
-        widget.isVideo ? kForumPostMediaAspectRatio : (_aspectRatio ?? kForumPostMediaAspectRatio);
+    final aspectRatio = widget.isVideo
+        ? kForumPostMediaAspectRatio
+        : (_aspectRatio ?? kForumPostMediaAspectRatio);
 
     return Stack(
       alignment: Alignment.center,

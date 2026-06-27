@@ -602,8 +602,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                 _buildPostContent(),
                                 Padding(
                                   key: _commentsSectionKey,
-                                  padding: const EdgeInsets.fromLTRB(
-                                      16, 16, 16, 0),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 16, 16, 0),
                                   child: Row(
                                     children: [
                                       Text(
@@ -645,8 +645,8 @@ class _PostDetailPageState extends State<PostDetailPage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.fromLTRB(
-                                      16, 12, 16, 16),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 12, 16, 16),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,

@@ -32,7 +32,6 @@ class SharedDocumentUploadTarget {
   final String? entityId;
   final String? folderId;
   final String? legacyWorkshopId;
-  /// When true, uploads are immediately visible to everyone (no admin review).
   final bool publishImmediately;
 
   factory SharedDocumentUploadTarget.fromEntityConfig(

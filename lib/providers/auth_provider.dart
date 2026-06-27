@@ -161,8 +161,7 @@ class AuthProvider extends ChangeNotifier {
     if (normalizedUsername.length < 2) {
       return 'Username must be at least 2 characters.';
     }
-    final taken =
-        await _profileProvider.isUsernameTaken(normalizedUsername);
+    final taken = await _profileProvider.isUsernameTaken(normalizedUsername);
     if (taken) {
       return 'That username is already taken. Please choose another.';
     }

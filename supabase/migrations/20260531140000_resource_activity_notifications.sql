@@ -1,4 +1,3 @@
--- In-app (and push webhook) notifications for repository & workshop folders/files/links.
 
 ALTER TABLE public.user_notification_settings
   ADD COLUMN IF NOT EXISTS notify_repository_activity boolean NOT NULL DEFAULT true;

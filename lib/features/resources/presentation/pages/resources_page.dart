@@ -187,8 +187,7 @@ class _ResourcesPageState extends State<ResourcesPage>
             icon: Icons.folder_shared,
             title: 'Repository',
             subtitle: 'Knowledge sharing',
-            description:
-                'Browse shared folders — photos, documents, and links',
+            description: 'Browse shared folders — photos, documents, and links',
             color: AppTheme.primaryGreen,
             onTap: () {
               Navigator.push(

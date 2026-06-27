@@ -17,9 +17,7 @@ export function setStaffMemberPreview(active: boolean) {
     if (active) window.localStorage.setItem(STORAGE_KEY, "1");
     else window.localStorage.removeItem(STORAGE_KEY);
     window.dispatchEvent(new Event(MEMBER_PREVIEW_CHANGED_EVENT));
-  } catch {
-    /* ignore */
-  }
+  } catch {}
 }
 
 

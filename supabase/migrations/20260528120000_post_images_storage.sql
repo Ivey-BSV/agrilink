@@ -1,6 +1,3 @@
--- Post and marketplace media buckets must be public-read so the mobile app
--- can load images via getPublicUrl() without auth headers.
-
 INSERT INTO storage.buckets (id, name, public)
 VALUES
   ('post-images', 'post-images', true),
@@ -9,7 +6,6 @@ VALUES
   ('avatars', 'avatars', true)
 ON CONFLICT (id) DO UPDATE SET public = true;
 
--- post-images
 DROP POLICY IF EXISTS post_images_storage_select ON storage.objects;
 CREATE POLICY post_images_storage_select
   ON storage.objects FOR SELECT
@@ -34,7 +30,6 @@ CREATE POLICY post_images_storage_delete_own
     AND split_part(name, '/', 1) = auth.uid()::text
   );
 
--- post-videos
 DROP POLICY IF EXISTS post_videos_storage_select ON storage.objects;
 CREATE POLICY post_videos_storage_select
   ON storage.objects FOR SELECT
@@ -59,7 +54,6 @@ CREATE POLICY post_videos_storage_delete_own
     AND split_part(name, '/', 1) = auth.uid()::text
   );
 
--- marketplace-images
 DROP POLICY IF EXISTS marketplace_images_storage_select ON storage.objects;
 CREATE POLICY marketplace_images_storage_select
   ON storage.objects FOR SELECT
@@ -84,7 +78,6 @@ CREATE POLICY marketplace_images_storage_delete_own
     AND split_part(name, '/', 1) = auth.uid()::text
   );
 
--- avatars
 DROP POLICY IF EXISTS avatars_storage_select ON storage.objects;
 CREATE POLICY avatars_storage_select
   ON storage.objects FOR SELECT

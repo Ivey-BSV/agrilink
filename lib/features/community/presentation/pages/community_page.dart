@@ -73,22 +73,22 @@ class _CommunityPageState extends State<CommunityPage>
                   child: Row(
                     children: [
                       ContentFilterChip(
-                      label: 'All',
-                      isSelected: _contentFilter == 'all',
-                      onTap: () => setState(() => _contentFilter = 'all'),
-                    ),
-                    const SizedBox(width: 8),
-                    ContentFilterChip(
-                      label: 'Photos',
-                      isSelected: _contentFilter == 'photos',
-                      onTap: () => setState(() => _contentFilter = 'photos'),
-                    ),
-                    const SizedBox(width: 8),
-                    ContentFilterChip(
-                      label: 'Videos',
-                      isSelected: _contentFilter == 'videos',
-                      onTap: () => setState(() => _contentFilter = 'videos'),
-                    ),
+                        label: 'All',
+                        isSelected: _contentFilter == 'all',
+                        onTap: () => setState(() => _contentFilter = 'all'),
+                      ),
+                      const SizedBox(width: 8),
+                      ContentFilterChip(
+                        label: 'Photos',
+                        isSelected: _contentFilter == 'photos',
+                        onTap: () => setState(() => _contentFilter = 'photos'),
+                      ),
+                      const SizedBox(width: 8),
+                      ContentFilterChip(
+                        label: 'Videos',
+                        isSelected: _contentFilter == 'videos',
+                        onTap: () => setState(() => _contentFilter = 'videos'),
+                      ),
                     ],
                   ),
                 ),

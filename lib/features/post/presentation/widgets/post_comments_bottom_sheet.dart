@@ -282,8 +282,7 @@ class _PostCommentsBottomSheetState extends State<PostCommentsBottomSheet> {
                   child: Consumer<PostProvider>(
                     builder: (context, postProvider, _) {
                       final comments =
-                          postProvider.getCommentsForPost(widget.postId) ??
-                              [];
+                          postProvider.getCommentsForPost(widget.postId) ?? [];
                       final authProvider = context.read<AuthProvider>();
                       final currentUserId = authProvider.userId ?? '';
 
@@ -315,8 +314,7 @@ class _PostCommentsBottomSheetState extends State<PostCommentsBottomSheet> {
                   Consumer<PostProvider>(
                     builder: (context, postProvider, _) {
                       final comments =
-                          postProvider.getCommentsForPost(widget.postId) ??
-                              [];
+                          postProvider.getCommentsForPost(widget.postId) ?? [];
                       return Container(
                         width: double.infinity,
                         margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),

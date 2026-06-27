@@ -1,7 +1,5 @@
 "use client";
 
-// Upload approval queue UI disabled for now. Backend approval_status columns remain unchanged.
-
 export default function AdminDocumentsQueuePage() {
   return (
     <div className="content-card stack" style={{ gap: 10 }}>

@@ -2,14 +2,14 @@ import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/shared/widgets/resource_folder_library_page.dart';
 import 'package:flutter/material.dart';
 
-/// Links from a legacy workshop session to its file folder (or all workshop folders).
 class WorkshopFolderFilesLink extends StatefulWidget {
   const WorkshopFolderFilesLink({super.key, required this.workshopId});
 
   final String workshopId;
 
   @override
-  State<WorkshopFolderFilesLink> createState() => _WorkshopFolderFilesLinkState();
+  State<WorkshopFolderFilesLink> createState() =>
+      _WorkshopFolderFilesLinkState();
 }
 
 class _WorkshopFolderFilesLinkState extends State<WorkshopFolderFilesLink> {
@@ -60,7 +60,8 @@ class _WorkshopFolderFilesLinkState extends State<WorkshopFolderFilesLink> {
         const SizedBox(height: 12),
         Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: _loading
@@ -104,7 +105,8 @@ class _WorkshopFolderFilesLinkState extends State<WorkshopFolderFilesLink> {
                         const SizedBox(height: 4),
                         Text(
                           'Gallery for photos · Documents for PDFs and files',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style:
+                              TextStyle(fontSize: 12, color: Colors.grey[600]),
                         ),
                       ],
                     ),

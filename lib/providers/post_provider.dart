@@ -152,8 +152,10 @@ class PostProvider extends ChangeNotifier {
         avatarUrl = profileRow['avatar_url'] as String?;
       }
 
-      final List<dynamic> commentRows =
-          await supabase.from('comments').select('user_id').eq('post_id', postId);
+      final List<dynamic> commentRows = await supabase
+          .from('comments')
+          .select('user_id')
+          .eq('post_id', postId);
       var commentCount = 0;
       final excludedUserIds = await blockedUserIdsForCurrentUser(supabase);
       for (final raw in commentRows) {

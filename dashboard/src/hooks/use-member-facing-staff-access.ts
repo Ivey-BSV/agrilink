@@ -10,10 +10,6 @@ import {
   type EffectiveStaffAccess,
 } from "@/lib/staff-profile";
 
-/**
- * Staff access as seen in member-facing UI. When "member preview" is on,
- * treats the signed-in user as a regular member (no staff / super-admin affordances).
- */
 export function useMemberFacingStaffAccess() {
   const { staffAccess: rawStaffAccess, ready } = useStaffAccess();
   const { active: memberPreview } = useStaffMemberPreview();

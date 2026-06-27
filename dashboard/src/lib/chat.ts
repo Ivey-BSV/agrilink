@@ -126,14 +126,11 @@ async function loadMutualFollowCacheOnce(
 
 async function loadMutualFollowCache(currentUserId: string, otherUserIds: string[]): Promise<FollowCache> {
   const unique = [...new Set(otherUserIds)];
-  let { cache, hadErrors } = await loadMutualFollowCacheOnce(currentUserId, unique, FOLLOW_IN_CHUNK);
+  const first = await loadMutualFollowCacheOnce(currentUserId, unique, FOLLOW_IN_CHUNK);
+  if (!first.hadErrors) return first.cache;
 
-  if (hadErrors) {
-    const retry = await loadMutualFollowCacheOnce(currentUserId, unique, unique.length);
-    cache = retry.cache;
-  }
-
-  return cache;
+  const retry = await loadMutualFollowCacheOnce(currentUserId, unique, unique.length);
+  return retry.cache;
 }
 
 function currentFollowsOther(cache: FollowCache, currentUserId: string, otherUserId: string): boolean {
