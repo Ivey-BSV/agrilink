@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { PageSectionHeader } from "@/components/page-section-header";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
 
@@ -13,9 +14,27 @@ type Row = {
   body: string | null;
   read_at: string | null;
   created_at: string;
+  data?: Record<string, unknown> | null;
 };
 
+const RESOURCE_TYPES = new Set([
+  "repository_item_new",
+  "repository_folder_new",
+  "workshop_item_new",
+  "workshop_folder_new",
+]);
+
+function resourceHref(type: string, data: Record<string, unknown> | null | undefined): string | null {
+  if (!data) return null;
+  const folderId = typeof data.folder_id === "string" ? data.folder_id : null;
+  const q = folderId ? `?folder=${encodeURIComponent(folderId)}` : "";
+  if (type.startsWith("repository_")) return `/dashboard/repository${q}`;
+  if (type.startsWith("workshop_")) return `/dashboard/workshops${q}`;
+  return null;
+}
+
 export default function NotificationsPage() {
+  const router = useRouter();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +44,7 @@ export default function NotificationsPage() {
     setError(null);
     const { data, error: e } = await supabase
       .from("user_notifications")
-      .select("id, type, title, body, read_at, created_at")
+      .select("id, type, title, body, read_at, created_at, data")
       .order("created_at", { ascending: false })
       .limit(100);
     if (e) setError(e.message);
@@ -43,7 +62,13 @@ export default function NotificationsPage() {
       .update({ read_at: new Date().toISOString() })
       .eq("id", id);
     if (e) setError(e.message);
-    else void load();
+    else {
+      setRows((prev) =>
+        prev.map((r) =>
+          r.id === id ? { ...r, read_at: new Date().toISOString() } : r
+        )
+      );
+    }
   };
 
   const markAllRead = async () => {
@@ -60,13 +85,19 @@ export default function NotificationsPage() {
     else void load();
   };
 
+  const openRow = async (row: Row) => {
+    if (!row.read_at) await markRead(row.id);
+    const href = resourceHref(row.type, row.data ?? null);
+    if (href) router.push(href);
+  };
+
   const unread = rows.filter((r) => !r.read_at).length;
 
   return (
     <motion.div className="content-card stack" style={{ gap: 16 }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
       <PageSectionHeader
         title="Notifications"
-        description="Alerts when something important happens on your account—new activity on posts, projects, polls, and more. Mark items read to keep the list manageable."
+        description="Alerts when something important happens on your account—new activity on posts, projects, polls, repository and workshop files, and more."
         action={
           unread > 0 ? (
             <button type="button" className="btn btn-secondary" onClick={() => void markAllRead()}>
@@ -79,36 +110,41 @@ export default function NotificationsPage() {
       {error ? <p className="error">{error}</p> : null}
       {!loading && rows.length === 0 ? <p className="empty">No notifications yet.</p> : null}
       <ul className="list" style={{ listStyle: "none", padding: 0, margin: 0 }}>
-        {rows.map((r) => (
-          <li
-            key={r.id}
-            className="list-item"
-            style={{
-              opacity: r.read_at ? 0.85 : 1,
-              borderLeft: r.read_at ? undefined : "3px solid var(--primary-green, #2d6a4f)",
-              paddingLeft: r.read_at ? undefined : 10,
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => void markRead(r.id)}
+        {rows.map((r) => {
+          const href = resourceHref(r.type, r.data ?? null);
+          const clickable = !!href;
+          return (
+            <li
+              key={r.id}
+              className="list-item"
               style={{
-                all: "unset",
-                cursor: "pointer",
-                display: "block",
-                width: "100%",
-                textAlign: "left",
+                opacity: r.read_at ? 0.85 : 1,
+                borderLeft: r.read_at ? undefined : "3px solid var(--primary-green, #2d6a4f)",
+                paddingLeft: r.read_at ? undefined : 10,
               }}
             >
-              <div style={{ fontWeight: r.read_at ? 500 : 700 }}>{r.title}</div>
-              {r.body ? <div className="subtle" style={{ marginTop: 4, fontSize: "0.92rem" }}>{r.body}</div> : null}
-              <div className="subtle" style={{ marginTop: 6, fontSize: "0.82rem" }}>
-                {formatDate(r.created_at)} · {r.type}
-                {!r.read_at ? <span> · Click to mark read</span> : null}
-              </div>
-            </button>
-          </li>
-        ))}
+              <button
+                type="button"
+                onClick={() => (clickable ? void openRow(r) : void markRead(r.id))}
+                style={{
+                  all: "unset",
+                  cursor: "pointer",
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left",
+                }}
+              >
+                <div style={{ fontWeight: r.read_at ? 500 : 700 }}>{r.title}</div>
+                {r.body ? <div className="subtle" style={{ marginTop: 4, fontSize: "0.92rem" }}>{r.body}</div> : null}
+                <div className="subtle" style={{ marginTop: 6, fontSize: "0.82rem" }}>
+                  {formatDate(r.created_at)}
+                  {RESOURCE_TYPES.has(r.type) ? <span> · Open folder</span> : null}
+                  {!r.read_at && !clickable ? <span> · Click to mark read</span> : null}
+                </div>
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </motion.div>
   );

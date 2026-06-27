@@ -149,6 +149,14 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                       'Community project activity',
                       'notify_project_activity',
                     ),
+                    _toggle(
+                      'Repository files and links',
+                      'notify_repository_activity',
+                    ),
+                    _toggle(
+                      'Workshop files and links',
+                      'notify_workshop_activity',
+                    ),
                     const Divider(height: 32),
                     SwitchListTile(
                       title: const Text('Push notifications (permission)'),

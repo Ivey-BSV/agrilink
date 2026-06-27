@@ -17,6 +17,8 @@ const TOGGLES: { key: string; label: string }[] = [
   { key: "notify_new_followers", label: "New followers" },
   { key: "notify_chat_messages", label: "Chat messages" },
   { key: "notify_project_activity", label: "Community project activity" },
+  { key: "notify_repository_activity", label: "Repository files and links" },
+  { key: "notify_workshop_activity", label: "Workshop files and links" },
   { key: "push_enabled", label: "Push enabled (FCM token from mobile)" },
 ];
 

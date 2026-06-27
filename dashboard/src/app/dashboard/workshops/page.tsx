@@ -1,11 +1,15 @@
 "use client";
 
 import { ResourceFolderLibrary } from "@/components/resource-folder-library";
+import { useSearchParams } from "next/navigation";
 
 const WORKSHOP_DOC_SELECT =
   "id, folder_id, user_id, title, file_name, file_url, mime_type, created_at, approval_status, visibility_rules";
 
 export default function WorkshopsFilesPage() {
+  const searchParams = useSearchParams();
+  const initialFolderId = searchParams.get("folder");
+
   return (
     <ResourceFolderLibrary
       scope="workshop"
@@ -21,6 +25,7 @@ export default function WorkshopsFilesPage() {
       uploadSuccessSingular="Workshop file uploaded."
       uploadSuccessPlural="{n} workshop files uploaded."
       deleteConfirmMessage="Delete this workshop file?"
+      initialFolderId={initialFolderId}
     />
   );
 }

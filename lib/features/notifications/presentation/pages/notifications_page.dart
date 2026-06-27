@@ -1,6 +1,8 @@
 import 'package:cap/core/theme/app_theme.dart';
 import 'package:cap/features/collaboration/presentation/pages/goal_detail_page.dart';
 import 'package:cap/features/polls/presentation/pages/poll_detail_page.dart';
+import 'package:cap/features/resources/presentation/pages/knowledge_repository_page.dart';
+import 'package:cap/features/resources/presentation/pages/workshops_page.dart';
 import 'package:cap/features/settings/presentation/pages/notification_settings_page.dart';
 import 'package:cap/providers/notification_provider.dart';
 import 'package:cap/services/goal_service.dart';
@@ -34,6 +36,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
     'social': ['follow_new'],
     'chat': ['chat_message'],
     'projects': ['project_join'],
+    'resources': [
+      'repository_item_new',
+      'repository_folder_new',
+      'workshop_item_new',
+      'workshop_folder_new',
+    ],
   };
 
   @override
@@ -139,9 +147,37 @@ class _NotificationsPageState extends State<NotificationsPage> {
         final goalId = data['goal_id'] as String?;
         if (goalId != null) await _openGoal(goalId);
         break;
+      case 'repository_item_new':
+      case 'repository_folder_new':
+        await _openResourceLibrary(
+          isRepository: true,
+          folderId: data['folder_id'] as String?,
+        );
+        break;
+      case 'workshop_item_new':
+      case 'workshop_folder_new':
+        await _openResourceLibrary(
+          isRepository: false,
+          folderId: data['folder_id'] as String?,
+        );
+        break;
       default:
         break;
     }
+  }
+
+  Future<void> _openResourceLibrary({
+    required bool isRepository,
+    String? folderId,
+  }) async {
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => isRepository
+            ? KnowledgeRepositoryPage(initialFolderId: folderId)
+            : WorkshopsPage(initialFolderId: folderId),
+      ),
+    );
   }
 
   Future<void> _openGoal(String goalId) async {
@@ -414,6 +450,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
         return 'Chat';
       case 'projects':
         return 'Projects';
+      case 'resources':
+        return 'Resources';
       default:
         return key;
     }
@@ -445,6 +483,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
         return Icons.chat_bubble_outline;
       case 'project_join':
         return Icons.groups_2_outlined;
+      case 'repository_item_new':
+      case 'repository_folder_new':
+        return Icons.folder_shared_outlined;
+      case 'workshop_item_new':
+      case 'workshop_folder_new':
+        return Icons.groups_outlined;
       default:
         return Icons.notifications_outlined;
     }

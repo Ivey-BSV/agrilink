@@ -69,6 +69,7 @@ type ResourceFolderLibraryProps = {
   uploadSuccessSingular: string;
   uploadSuccessPlural: string;
   deleteConfirmMessage: string;
+  initialFolderId?: string | null;
 };
 
 export function ResourceFolderLibrary({
@@ -85,10 +86,11 @@ export function ResourceFolderLibrary({
   uploadSuccessSingular,
   uploadSuccessPlural,
   deleteConfirmMessage,
+  initialFolderId = null,
 }: ResourceFolderLibraryProps) {
   const [folders, setFolders] = useState<ResourceFolder[]>([]);
   const [items, setItems] = useState<LibraryDocRow[]>([]);
-  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(initialFolderId);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState("");
   const [uploadTitle, setUploadTitle] = useState("");
@@ -164,6 +166,12 @@ export function ResourceFolderLibrary({
   useEffect(() => {
     void loadData();
   }, [loadData]);
+
+  useEffect(() => {
+    if (initialFolderId) {
+      setSelectedFolderId(initialFolderId);
+    }
+  }, [initialFolderId]);
 
   useEffect(() => {
     const ids = items.map((i) => i.user_id);
