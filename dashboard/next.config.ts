@@ -25,10 +25,19 @@ loadRootEnvFile();
 const supabaseUrl = process.env.SUPABASE_URL ?? "";
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY ?? "";
 
+// Firebase web push — values come from the root .env file.
+// Register a web app in the ivey-cap Firebase Console to get
+// FIREBASE_WEB_APP_ID, then add a Web Push certificate to get
+// FIREBASE_VAPID_KEY.
+const firebaseWebAppId = process.env.FIREBASE_WEB_APP_ID ?? "";
+const firebaseVapidKey = process.env.FIREBASE_VAPID_KEY ?? "";
+
 const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_SUPABASE_URL: supabaseUrl,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: supabaseAnonKey,
+    NEXT_PUBLIC_FIREBASE_WEB_APP_ID: firebaseWebAppId,
+    NEXT_PUBLIC_FIREBASE_VAPID_KEY: firebaseVapidKey,
   },
   turbopack: {
     root: path.resolve(__dirname),

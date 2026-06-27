@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (!DefaultFirebaseOptions.isConfigured) return;
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  debugPrint('Background message: ${message.notification?.title}');
 }
 
 class PushNotificationService {
@@ -19,7 +20,7 @@ class PushNotificationService {
     if (_initialized) return;
     if (!DefaultFirebaseOptions.isConfigured) {
       debugPrint(
-        'PushNotificationService: Firebase not configured (run flutterfire configure).',
+        'PushNotificationService: Firebase not configured for this platform.',
       );
       return;
     }
@@ -27,17 +28,54 @@ class PushNotificationService {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
       await FirebaseMessaging.instance
           .setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
         sound: true,
       );
-      FirebaseMessaging.instance.onTokenRefresh.listen((t) async {
-        await _persistToken(t);
+
+      // Foreground messages — app is open and in the foreground.
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        debugPrint(
+          'PushNotificationService: foreground message '
+          '"${message.notification?.title}"',
+        );
+        // The OS does not show a notification banner when the app is in the
+        // foreground on iOS unless you present it yourself.  The
+        // setForegroundNotificationPresentationOptions call above handles
+        // this on iOS; on Android the system notification is shown
+        // automatically because we requested the channel in the manifest.
       });
+
+      // User tapped a notification while the app was in the background
+      // (not terminated).
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        debugPrint(
+          'PushNotificationService: app opened from background notification '
+          '"${message.notification?.title}"',
+        );
+      });
+
+      // App was terminated and the user tapped the notification to launch it.
+      final initialMessage =
+          await FirebaseMessaging.instance.getInitialMessage();
+      if (initialMessage != null) {
+        debugPrint(
+          'PushNotificationService: launched from notification '
+          '"${initialMessage.notification?.title}"',
+        );
+      }
+
+      FirebaseMessaging.instance.onTokenRefresh.listen((token) async {
+        await _persistToken(token);
+      });
+
       _initialized = true;
+      debugPrint('PushNotificationService: initialized successfully.');
     } catch (e, st) {
       debugPrint('PushNotificationService: init failed: $e\n$st');
     }
