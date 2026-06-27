@@ -4,6 +4,39 @@ Use the **Short** version in Play Console when there’s a character limit (e.g.
 
 ---
 
+## 1.0.10 (build 21) — June 2026
+
+### Short (under 500 characters)
+
+**What’s new in 1.0.10**
+
+• **Workshops & repository** — Folder library on mobile (gallery, documents, links)  
+• **Links** — Add YouTube and web links in resource folders (mobile & web)  
+• **Notifications** — Alerts when files or links are added to shared folders  
+• **Stability** — Bug fixes and polish  
+
+Thank you for being part of CAP.
+
+### Full
+
+**What’s new in 1.0.10**
+
+This update brings workshop and repository folders to the mobile app, adds shared links, and notifies members when new content is posted.
+
+**Resources**
+- Workshops and repository use the same folder experience on mobile as the web dashboard
+- Each folder has Gallery, Documents, and Links tabs
+- Add YouTube videos and web URLs without uploading a file
+
+**Notifications**
+- Get in-app alerts when someone adds a file, link, or folder to the repository or workshops
+
+**Other**
+- Member preview on web hides staff tools correctly
+- General fixes and polish
+
+---
+
 ## 1.0.9 (build 20) — June 2026
 
 ### Short (under 500 characters)
