@@ -72,10 +72,11 @@ class NotificationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> requestPushPermissionAndFlag() async {
+  Future<bool> requestPushPermissionAndFlag() async {
     await PushNotificationService.initialize();
-    await PushNotificationService.registerAfterUserOptIn();
+    final tokenSaved = await PushNotificationService.registerAfterUserOptIn();
     notifyListeners();
+    return tokenSaved;
   }
 
   @override

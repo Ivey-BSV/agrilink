@@ -38,3 +38,4 @@ supabase/.temp/
 **/google-services.json
 **/GoogleService-Info.plist
 .env
+secrets/

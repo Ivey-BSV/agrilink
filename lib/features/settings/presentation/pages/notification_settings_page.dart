@@ -65,14 +65,34 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
   }
 
   Future<void> _requestPush() async {
-    await context.read<NotificationProvider>().requestPushPermissionAndFlag();
+    final tokenSaved =
+        await context.read<NotificationProvider>().requestPushPermissionAndFlag();
     await _load();
     if (!mounted) return;
+
+    final pushOn = _b('push_enabled', defaultValue: false);
+    final String message;
+    if (!pushOn) {
+      message =
+          'Notification permission was denied. Open Settings → AgriLink → Notifications to allow alerts.';
+    } else if (!tokenSaved) {
+      message =
+          'Push is on, but no device token was saved. Try again, or use a physical iPhone.';
+    } else {
+      message =
+          'Push notifications enabled. You’ll get alerts when the app is closed.';
+    }
+
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'If the Edge Function and webhook are configured, you should receive pushes when the app is closed.',
-        ),
+      SnackBar(
+        content: Text(message),
+        action: !pushOn
+            ? SnackBarAction(
+                label: 'Settings',
+                onPressed: PushNotificationService.openSystemNotificationSettings,
+              )
+            : null,
       ),
     );
   }
@@ -161,7 +181,7 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
                     SwitchListTile(
                       title: const Text('Push notifications (permission)'),
                       subtitle: const Text(
-                        'OS alerts when the app is in the background or closed. Requires Firebase, FCM token, and the push_notification Edge Function + webhook.',
+                        'Alerts when the app is in the background or closed.',
                       ),
                       value: _b('push_enabled', defaultValue: false),
                       onChanged: (v) async {

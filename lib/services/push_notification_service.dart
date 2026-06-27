@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cap/firebase_options.dart';
 import 'package:cap/services/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -91,31 +93,57 @@ class PushNotificationService {
     }
   }
 
-  static Future<void> registerAfterUserOptIn() async {
+  static Future<bool> registerAfterUserOptIn() async {
     if (!_initialized) await initialize();
-    if (!_initialized) return;
+    if (!_initialized) return false;
 
-    final perm = await Permission.notification.request();
-    final granted = perm.isGranted || perm.isLimited;
+    var granted = false;
+    try {
+      if (Platform.isIOS) {
+        final settings = await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+          provisional: false,
+        );
+        granted = settings.authorizationStatus ==
+                AuthorizationStatus.authorized ||
+            settings.authorizationStatus == AuthorizationStatus.provisional;
+      } else {
+        final perm = await Permission.notification.request();
+        granted = perm.isGranted || perm.isLimited;
+        if (!granted) {
+          await NotificationService().setPushEnabled(false);
+          return false;
+        }
+        final settings = await FirebaseMessaging.instance.requestPermission(
+          alert: true,
+          badge: true,
+          sound: true,
+          provisional: false,
+        );
+        granted = settings.authorizationStatus !=
+            AuthorizationStatus.denied;
+      }
+    } catch (e) {
+      debugPrint('PushNotificationService: permission request failed: $e');
+    }
+
     await NotificationService().setPushEnabled(granted);
-    if (!granted) return;
+    if (!granted) return false;
 
     try {
-      final settings = await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-        provisional: false,
-      );
-      if (settings.authorizationStatus == AuthorizationStatus.denied) {
-        await NotificationService().setPushEnabled(false);
-        return;
-      }
       final token = await FirebaseMessaging.instance.getToken();
       await _persistToken(token);
+      return token != null && token.isNotEmpty;
     } catch (e) {
       debugPrint('PushNotificationService: register failed: $e');
+      return false;
     }
+  }
+
+  static Future<void> openSystemNotificationSettings() async {
+    await openAppSettings();
   }
 
   static Future<void> syncTokenIfAllowed() async {
@@ -123,8 +151,17 @@ class PushNotificationService {
     if (!_initialized) return;
     if (Supabase.instance.client.auth.currentUser == null) return;
 
-    final perm = await Permission.notification.status;
-    if (!perm.isGranted && !perm.isLimited) return;
+    if (Platform.isIOS) {
+      final settings =
+          await FirebaseMessaging.instance.getNotificationSettings();
+      final allowed = settings.authorizationStatus ==
+              AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional;
+      if (!allowed) return;
+    } else {
+      final perm = await Permission.notification.status;
+      if (!perm.isGranted && !perm.isLimited) return;
+    }
 
     final settings = await NotificationService().getSettings();
     if (settings != null && settings['push_enabled'] != true) return;
