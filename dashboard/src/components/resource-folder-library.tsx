@@ -5,7 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
 import { extractStoragePathFromPublicUrl } from "@/lib/storage";
-import { getEffectiveStaffAccess, isModeratorPlusEffective, type EffectiveStaffAccess } from "@/lib/staff-profile";
+import { isModeratorPlusEffective } from "@/lib/staff-profile";
+import { useMemberFacingStaffAccess } from "@/hooks/use-member-facing-staff-access";
 import { splitGalleryDocumentsAndLinks, isGalleryImageFile } from "@/lib/file-browse-layout";
 import {
   buildResourceLinkInsertRow,
@@ -99,8 +100,7 @@ export function ResourceFolderLibrary({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [staffAccess, setStaffAccess] = useState<EffectiveStaffAccess | null>(null);
-  const [accessResolved, setAccessResolved] = useState(false);
+  const { staffAccess, ready: accessResolved } = useMemberFacingStaffAccess();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [uploaderLabels, setUploaderLabels] = useState<Record<string, string>>({});
 
@@ -134,9 +134,6 @@ export function ResourceFolderLibrary({
       return;
     }
     setCurrentUserId(user.id);
-    const access = await getEffectiveStaffAccess(user.id, user.email);
-    setStaffAccess(access);
-    setAccessResolved(true);
 
     const { data: folderData, error: folderError } = await supabase
       .from("resource_folders")

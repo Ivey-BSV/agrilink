@@ -8,8 +8,7 @@ import { parseImageUrls } from "@/lib/media-urls";
 import { FeedPostCard } from "@/components/feed-post-card";
 import { MotionListItem } from "@/components/motion-list";
 import { ForumTagPicker } from "@/components/forum-tag-picker";
-import { useStaffAccess } from "@/components/staff-access-context";
-import { isSuperEffective } from "@/lib/staff-profile";
+import { useMemberFacingStaffAccess } from "@/hooks/use-member-facing-staff-access";
 import { ONTARIO_COUNTIES } from "@/lib/ontario-counties";
 
 type ContentFilter = "all" | "photos" | "videos";
@@ -94,8 +93,7 @@ async function removePostImages(post: PostRow) {
 
 export default function PlatformFeedPage() {
   const router = useRouter();
-  const { staffAccess, ready: staffReady } = useStaffAccess();
-  const isSuper = staffReady && isSuperEffective(staffAccess);
+  const { isSuper } = useMemberFacingStaffAccess();
 
   const [posts, setPosts] = useState<PostRow[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ProfileRow>>({});

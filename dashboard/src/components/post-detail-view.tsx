@@ -12,8 +12,7 @@ import { PostMediaPreview } from "@/components/post-media-preview";
 import { FeedPostActionBar } from "@/components/feed-post-action-bar";
 import { linkifyPlainText } from "@/lib/linkify-plain-text";
 import { UserAvatar } from "@/components/user-avatar";
-import { useStaffAccess } from "@/components/staff-access-context";
-import { isSuperEffective } from "@/lib/staff-profile";
+import { useMemberFacingStaffAccess } from "@/hooks/use-member-facing-staff-access";
 
 type PostRow = {
   id: string;
@@ -75,8 +74,7 @@ type PostDetailViewProps = {
 
 export function PostDetailView({ postId }: PostDetailViewProps) {
   const router = useRouter();
-  const { staffAccess, ready: staffReady } = useStaffAccess();
-  const isSuper = staffReady && isSuperEffective(staffAccess);
+  const { isSuper } = useMemberFacingStaffAccess();
 
   const [post, setPost] = useState<PostRow | null>(null);
   const [author, setAuthor] = useState<ProfileRow | null>(null);

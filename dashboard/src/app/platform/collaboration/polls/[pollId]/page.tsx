@@ -13,14 +13,12 @@ import {
   updatePollRecord,
   type PollDetail,
 } from "@/lib/polls";
-import { isSuperEffective } from "@/lib/staff-profile";
-import { useStaffAccess } from "@/components/staff-access-context";
+import { useMemberFacingStaffAccess } from "@/hooks/use-member-facing-staff-access";
 
 export default function PollDetailPage() {
   const params = useParams();
   const pollId = typeof params.pollId === "string" ? params.pollId : "";
-  const { staffAccess, ready: staffReady } = useStaffAccess();
-  const isSuper = staffReady && isSuperEffective(staffAccess);
+  const { isSuper } = useMemberFacingStaffAccess();
 
   const [poll, setPoll] = useState<PollDetail | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());

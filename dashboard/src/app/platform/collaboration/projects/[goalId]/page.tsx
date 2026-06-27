@@ -18,8 +18,7 @@ import {
 } from "@/lib/goals";
 import { ProjectGoalFiles } from "@/components/project-goal-files";
 import { UserAvatar } from "@/components/user-avatar";
-import { useStaffAccess } from "@/components/staff-access-context";
-import { isSuperEffective } from "@/lib/staff-profile";
+import { useMemberFacingStaffAccess } from "@/hooks/use-member-facing-staff-access";
 
 function ProgressBar({ value }: { value: number }) {
   const pct = Math.round(value * 100);
@@ -44,8 +43,7 @@ export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
   const goalId = typeof params.goalId === "string" ? params.goalId : "";
-  const { staffAccess, ready: staffReady } = useStaffAccess();
-  const isSuper = staffReady && isSuperEffective(staffAccess);
+  const { isSuper } = useMemberFacingStaffAccess();
 
   const [goal, setGoal] = useState<GoalDetail | null>(null);
   const [loading, setLoading] = useState(true);
