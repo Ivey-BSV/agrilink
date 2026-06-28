@@ -37,6 +37,13 @@ class _NotificationSettingsPageState extends State<NotificationSettingsPage> {
         _row = row;
         _loading = false;
       });
+      if (row?['push_enabled'] == true) {
+        await PushNotificationService.ensureRegistrationIfEnabled();
+        if (!mounted) return;
+        final refreshed = await _service.getSettings();
+        if (!mounted) return;
+        setState(() => _row = refreshed);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {

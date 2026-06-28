@@ -79,6 +79,19 @@ class NotificationService {
     await updateSettings({'push_enabled': enabled});
   }
 
+  Future<String?> getFcmToken() async {
+    final uid = _uid;
+    if (uid == null) return null;
+    final row = await _client
+        .from('user_profiles')
+        .select('fcm_token')
+        .eq('id', uid)
+        .maybeSingle();
+    if (row == null) return null;
+    final token = row['fcm_token'];
+    return token is String && token.isNotEmpty ? token : null;
+  }
+
   Future<void> setFcmToken(String? token) async {
     final uid = _uid;
     if (uid == null) return;

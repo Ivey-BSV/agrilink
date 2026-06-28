@@ -146,32 +146,51 @@ class PushNotificationService {
     await openAppSettings();
   }
 
-  static Future<void> syncTokenIfAllowed() async {
-    if (!_initialized) await initialize();
-    if (!_initialized) return;
-    if (Supabase.instance.client.auth.currentUser == null) return;
-
+  static Future<bool> _hasOsNotificationPermission() async {
     if (Platform.isIOS) {
       final settings =
           await FirebaseMessaging.instance.getNotificationSettings();
-      final allowed = settings.authorizationStatus ==
-              AuthorizationStatus.authorized ||
+      return settings.authorizationStatus == AuthorizationStatus.authorized ||
           settings.authorizationStatus == AuthorizationStatus.provisional;
-      if (!allowed) return;
-    } else {
-      final perm = await Permission.notification.status;
-      if (!perm.isGranted && !perm.isLimited) return;
     }
+    final perm = await Permission.notification.status;
+    return perm.isGranted || perm.isLimited;
+  }
+
+  /// When [push_enabled] is true in Supabase but this device has not registered
+  /// (no permission, missing token, or stale token from another install), fix it.
+  static Future<bool> ensureRegistrationIfEnabled() async {
+    if (!_initialized) await initialize();
+    if (!_initialized) return false;
+    if (Supabase.instance.client.auth.currentUser == null) return false;
 
     final settings = await NotificationService().getSettings();
-    if (settings != null && settings['push_enabled'] != true) return;
+    if (settings?['push_enabled'] != true) return false;
+
+    if (!await _hasOsNotificationPermission()) {
+      return registerAfterUserOptIn();
+    }
 
     try {
+      try {
+        await FirebaseMessaging.instance.deleteToken();
+      } catch (_) {}
+
       final token = await FirebaseMessaging.instance.getToken();
+      if (token == null || token.isEmpty) {
+        return registerAfterUserOptIn();
+      }
+
       await _persistToken(token);
+      return true;
     } catch (e) {
-      debugPrint('PushNotificationService: sync token failed: $e');
+      debugPrint('PushNotificationService: ensure registration failed: $e');
+      return false;
     }
+  }
+
+  static Future<void> syncTokenIfAllowed() async {
+    await ensureRegistrationIfEnabled();
   }
 
   static Future<void> clearForLogout() async {
