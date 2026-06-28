@@ -13,7 +13,10 @@ async function getFcmAccessToken(
 ): Promise<{ token: string; projectId: string }> {
   const auth = new GoogleAuth({
     credentials: serviceAccount as never,
-    scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
+    scopes: [
+      "https://www.googleapis.com/auth/firebase.messaging",
+      "https://www.googleapis.com/auth/cloud-platform",
+    ],
   });
   const client = await auth.getClient();
   const res = await client.getAccessToken();

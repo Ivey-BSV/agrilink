@@ -20,7 +20,7 @@ if ! command -v supabase >/dev/null 2>&1; then
   exit 1
 fi
 
-PUSH_SECRET="$(openssl rand -hex 32)"
+PUSH_SECRET="${PUSH_WEBHOOK_SECRET:-cap-push-wh-2026-agrilink-secret}"
 echo "Setting Edge Function secrets on $PROJECT_REF ..."
 supabase secrets set \
   PUSH_WEBHOOK_SECRET="$PUSH_SECRET" \
