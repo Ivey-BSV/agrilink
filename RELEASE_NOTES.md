@@ -4,7 +4,27 @@ Use the **Short** version in Play Console when there’s a character limit (e.g.
 
 ---
 
-## 1.0.10 (build 21) — June 2026
+## 1.0.11 (build 24) — June 2026
+
+### Short (under 500 characters)
+
+**What’s new in 1.0.11**
+
+• **Push notifications** — Phone alerts when the app is closed (iOS TestFlight/App Store & Android)  
+• **Workshops & repository** — Folder library, links, and activity notifications  
+• **Stability** — Bug fixes and polish  
+
+Thank you for being part of CAP.
+
+### Full
+
+**What’s new in 1.0.11**
+
+Push notifications now deliver to your phone on iOS (App Store / TestFlight) and Android. Includes workshop and repository folder updates, shared links, and in-app notification improvements.
+
+---
+
+## 1.0.10 (build 23) — June 2026
 
 ### Short (under 500 characters)
 
