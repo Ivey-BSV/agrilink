@@ -151,6 +151,15 @@ class FarmDetailsProvider extends ChangeNotifier {
     }
   }
 
+  Future<List<String>> _loadFarmerUserIds() async {
+    final response = await _supabase
+        .from('user_profiles')
+        .select('id')
+        .eq('account_kind', 'farmer');
+
+    return (response as List).map((row) => row['id'] as String).toList();
+  }
+
   Future<List<FarmDetails>> searchFarms({
     String? location,
     String? farmingMethod,
@@ -164,7 +173,11 @@ class FarmDetailsProvider extends ChangeNotifier {
     int limit = 20,
   }) async {
     try {
-      var query = _supabase.from('farm_details').select('*');
+      final farmerIds = await _loadFarmerUserIds();
+      if (farmerIds.isEmpty) return [];
+
+      var query =
+          _supabase.from('farm_details').select('*').inFilter('user_id', farmerIds);
 
       if (farmingMethod != null && farmingMethod.isNotEmpty) {
         query = query.eq('farming_method', farmingMethod);
@@ -214,6 +227,7 @@ class FarmDetailsProvider extends ChangeNotifier {
       final profileResponse = await _supabase
           .from('user_profiles')
           .select('id')
+          .eq('account_kind', 'farmer')
           .ilike('location', '%$location%');
 
       if (profileResponse.isEmpty) return [];

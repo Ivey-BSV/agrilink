@@ -292,7 +292,8 @@ class ProfileProvider extends ChangeNotifier {
     int limit = 20,
   }) async {
     try {
-      var query = _supabase.from('user_profiles').select('*');
+      var query =
+          _supabase.from('user_profiles').select('*').eq('account_kind', 'farmer');
 
       if (location != null && location.isNotEmpty) {
         query = query.ilike('location', '%$location%');

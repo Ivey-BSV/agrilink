@@ -116,6 +116,7 @@ export async function loadDirectoryEntries(): Promise<{
   const { data: profiles, error: profileError } = await supabase
     .from("user_profiles")
     .select("id, full_name, username, avatar_url, location, farm_type, experience_level, bio")
+    .eq("account_kind", "farmer")
     .order("created_at", { ascending: true })
     .limit(200);
 
