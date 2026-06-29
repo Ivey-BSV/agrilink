@@ -4,6 +4,27 @@ Use the **Short** version in Play Console when there’s a character limit (e.g.
 
 ---
 
+## 1.0.12 (build 25) — June 2026
+
+### Short (under 500 characters)
+
+**What's new in 1.0.12**
+
+• **Play Store readiness** — Android build updates for store submission  
+• **Forums** — Workshop photo banner on the web dashboard  
+• **Farm directory** — Farmers-only listing  
+• **Stability** — Bug fixes and polish  
+
+Thank you for being part of CAP.
+
+### Full
+
+**What's new in 1.0.12**
+
+Android Play Store submission prep (advertising ID declaration alignment). Web forums workshop photo banner. Farm directory shows farmers only. Push notifications, workshops, and general stability improvements.
+
+---
+
 ## 1.0.11 (build 24) — June 2026
 
 ### Short (under 500 characters)
