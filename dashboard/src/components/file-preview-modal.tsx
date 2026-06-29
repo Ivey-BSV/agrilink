@@ -37,9 +37,19 @@ export type FilePreviewModalProps = {
   fileUrl: string;
   fileName: string;
   mimeType?: string | null;
+  subtitle?: string | null;
+  hideFooter?: boolean;
 };
 
-export function FilePreviewModal({ open, onClose, fileUrl, fileName, mimeType }: FilePreviewModalProps) {
+export function FilePreviewModal({
+  open,
+  onClose,
+  fileUrl,
+  fileName,
+  mimeType,
+  subtitle,
+  hideFooter = false,
+}: FilePreviewModalProps) {
   const titleId = useId();
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const [mediaError, setMediaError] = useState(false);
@@ -205,9 +215,12 @@ export function FilePreviewModal({ open, onClose, fileUrl, fileName, mimeType }:
             onMouseDown={(e) => e.stopPropagation()}
           >
             <header className="preview-modal-header">
-              <h2 id={titleId} className="preview-modal-title">
-                {fileName}
-              </h2>
+              <div className="preview-modal-heading">
+                <h2 id={titleId} className="preview-modal-title">
+                  {fileName}
+                </h2>
+                {subtitle ? <p className="preview-modal-subtitle">{subtitle}</p> : null}
+              </div>
               <button
                 ref={closeBtnRef}
                 type="button"
@@ -219,14 +232,16 @@ export function FilePreviewModal({ open, onClose, fileUrl, fileName, mimeType }:
               </button>
             </header>
             <div className="preview-modal-body">{body}</div>
-            <footer className="preview-modal-footer">
-              <a href={fileUrl} target="_blank" rel="noreferrer" className="btn btn-primary">
-                Open in new tab
-              </a>
-              <button type="button" className="btn btn-secondary" onClick={onClose}>
-                Close
-              </button>
-            </footer>
+            {!hideFooter ? (
+              <footer className="preview-modal-footer">
+                <a href={fileUrl} target="_blank" rel="noreferrer" className="btn btn-primary">
+                  Open in new tab
+                </a>
+                <button type="button" className="btn btn-secondary" onClick={onClose}>
+                  Close
+                </button>
+              </footer>
+            ) : null}
           </motion.div>
         </motion.div>
       ) : null}

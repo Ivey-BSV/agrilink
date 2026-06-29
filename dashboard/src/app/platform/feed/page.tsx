@@ -8,6 +8,7 @@ import { parseImageUrls } from "@/lib/media-urls";
 import { FeedPostCard } from "@/components/feed-post-card";
 import { MotionListItem } from "@/components/motion-list";
 import { ForumTagPicker } from "@/components/forum-tag-picker";
+import { WorkshopMarqueeBanner } from "@/components/workshop-marquee-banner";
 import { useMemberFacingStaffAccess } from "@/hooks/use-member-facing-staff-access";
 import { ONTARIO_COUNTIES } from "@/lib/ontario-counties";
 
@@ -504,6 +505,8 @@ export default function PlatformFeedPage() {
           Create New
         </button>
       </div>
+
+      <WorkshopMarqueeBanner />
 
       {error ? <p className="error">{error}</p> : null}
       {loading ? <p className="subtle">Loading feed…</p> : null}
