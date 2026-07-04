@@ -123,6 +123,77 @@ export type PollAdminPatch = {
   closes_at?: string | null;
 };
 
+export type PollVoteCounts = Record<string, number>;
+
+export type PollVoterRow = {
+  user_id: string;
+  option_id: string;
+  created_at: string;
+  full_name: string | null;
+  username: string | null;
+};
+
+export async function getPollVoteCounts(
+  pollId: string,
+): Promise<{ counts: PollVoteCounts; total: number; error: string | null }> {
+  const { data, error } = await supabase.rpc("get_poll_vote_counts", { p_poll_id: pollId });
+  if (error) return { counts: {}, total: 0, error: error.message };
+
+  const counts: PollVoteCounts = {};
+  let total = 0;
+  for (const row of (data ?? []) as { option_id: string; vote_count: number | string }[]) {
+    const n = Number(row.vote_count) || 0;
+    counts[String(row.option_id)] = n;
+    total += n;
+  }
+  return { counts, total, error: null };
+}
+
+export async function getPollVotersForSuperAdmin(
+  pollId: string,
+): Promise<{ rows: PollVoterRow[]; error: string | null }> {
+  const { data, error } = await supabase
+    .from("poll_votes")
+    .select("user_id, option_id, created_at")
+    .eq("poll_id", pollId)
+    .order("created_at", { ascending: true });
+
+  if (error) return { rows: [], error: error.message };
+
+  const voteRows = (data ?? []) as { user_id: string; option_id: string; created_at: string }[];
+  const userIds = [...new Set(voteRows.map((r) => r.user_id))];
+  const profiles = new Map<string, { full_name: string | null; username: string | null }>();
+
+  if (userIds.length > 0) {
+    const { data: profileRows, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("id, full_name, username")
+      .in("id", userIds);
+    if (profileError) return { rows: [], error: profileError.message };
+    for (const p of (profileRows ?? []) as {
+      id: string;
+      full_name: string | null;
+      username: string | null;
+    }[]) {
+      profiles.set(p.id, { full_name: p.full_name, username: p.username });
+    }
+  }
+
+  return {
+    rows: voteRows.map((row) => {
+      const profile = profiles.get(row.user_id);
+      return {
+        user_id: row.user_id,
+        option_id: row.option_id,
+        created_at: row.created_at,
+        full_name: profile?.full_name ?? null,
+        username: profile?.username ?? null,
+      };
+    }),
+    error: null,
+  };
+}
+
 export async function createPollWithOptions(input: {
   title: string;
   description?: string | null;

@@ -16,6 +16,7 @@ class PollDetailPage extends StatefulWidget {
 class _PollDetailPageState extends State<PollDetailPage> {
   final PollService _polls = PollService();
   Map<String, dynamic>? _detail;
+  Map<String, int> _voteCounts = {};
   bool _loading = true;
   String? _error;
   Set<String> _selected = {};
@@ -36,11 +37,15 @@ class _PollDetailPageState extends State<PollDetailPage> {
     });
     try {
       final d = await _polls.getPollDetail(widget.pollId);
+      final counts = await _polls.voteCountsByPollId(widget.pollId);
       final uid = _uid;
       if (!mounted) return;
       setState(() {
         _detail = d;
-        _selected = uid != null ? _polls.mySelectedOptionIds(d, uid) : {};
+        _voteCounts = counts;
+        _selected = uid != null
+            ? _polls.mySelectedOptionIdsForPoll(widget.pollId, uid)
+            : {};
         _loading = false;
       });
     } catch (e) {
@@ -234,7 +239,7 @@ class _PollDetailPageState extends State<PollDetailPage> {
         dt != null ? DateFormat.yMMMd().add_jm().format(dt.toLocal()) : '';
     final author = _polls.creatorLabel(d);
     final options = List<Map<String, dynamic>>.from(d['poll_options'] ?? []);
-    final counts = _polls.voteCountsByOptionId(d);
+    final counts = _voteCounts;
     final total = _polls.totalVotes(counts);
     final uid = _uid;
 

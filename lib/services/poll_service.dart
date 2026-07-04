@@ -36,10 +36,6 @@ class PollService {
             id,
             label,
             position
-          ),
-          poll_votes (
-            option_id,
-            user_id
           )
         ''').eq('id', pollId).single();
 
@@ -181,6 +177,33 @@ class PollService {
         .delete()
         .eq('id', pollId)
         .eq('created_by', uid);
+  }
+
+  Future<Set<String>> mySelectedOptionIdsForPoll(String pollId, String userId) async {
+    final res = await _supabase
+        .from('poll_votes')
+        .select('option_id')
+        .eq('poll_id', pollId)
+        .eq('user_id', userId);
+    final out = <String>{};
+    for (final row in res as List) {
+      final m = row as Map<String, dynamic>;
+      final oid = m['option_id'] as String?;
+      if (oid != null) out.add(oid);
+    }
+    return out;
+  }
+
+  Future<Map<String, int>> voteCountsByPollId(String pollId) async {
+    final res = await _supabase.rpc('get_poll_vote_counts', params: {'p_poll_id': pollId});
+    final counts = <String, int>{};
+    for (final row in res as List) {
+      final m = row as Map<String, dynamic>;
+      final oid = m['option_id'] as String?;
+      if (oid == null) continue;
+      counts[oid] = (m['vote_count'] as num?)?.toInt() ?? 0;
+    }
+    return counts;
   }
 
   Set<String> mySelectedOptionIds(
