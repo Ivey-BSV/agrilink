@@ -39,13 +39,14 @@ class _PollDetailPageState extends State<PollDetailPage> {
       final d = await _polls.getPollDetail(widget.pollId);
       final counts = await _polls.voteCountsByPollId(widget.pollId);
       final uid = _uid;
+      final selected = uid != null
+          ? await _polls.mySelectedOptionIdsForPoll(widget.pollId, uid)
+          : <String>{};
       if (!mounted) return;
       setState(() {
         _detail = d;
         _voteCounts = counts;
-        _selected = uid != null
-            ? _polls.mySelectedOptionIdsForPoll(widget.pollId, uid)
-            : {};
+        _selected = selected;
         _loading = false;
       });
     } catch (e) {
