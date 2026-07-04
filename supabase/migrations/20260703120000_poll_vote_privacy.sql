@@ -2,6 +2,8 @@
 -- Aggregated counts are exposed via get_poll_vote_counts() for everyone.
 
 DROP POLICY IF EXISTS poll_votes_select_auth ON public.poll_votes;
+DROP POLICY IF EXISTS poll_votes_select_own ON public.poll_votes;
+DROP POLICY IF EXISTS poll_votes_select_super_admin ON public.poll_votes;
 
 CREATE POLICY poll_votes_select_own
   ON public.poll_votes FOR SELECT TO authenticated

@@ -105,7 +105,10 @@ export async function loadExchangeHubListings(): Promise<{
   const filtered = rows.filter((row) => !excluded.has(row.user_id as string));
   const userIds = [...new Set(filtered.map((row) => row.user_id as string))];
 
-  const profiles = new Map<string, { full_name: string | null; username: string | null; avatar_url: string | null }>();
+  const profiles = new Map<
+    string,
+    { full_name: string | null; username: string | null; avatar_url: string | null; location: string | null }
+  >();
   if (userIds.length > 0) {
     const { data: profileRows } = await supabase
       .from("user_profiles")
@@ -116,7 +119,7 @@ export async function loadExchangeHubListings(): Promise<{
       full_name: string | null;
       username: string | null;
       avatar_url: string | null;
-      location?: string | null;
+      location: string | null;
     }[]) {
       profiles.set(p.id, p);
     }

@@ -124,6 +124,9 @@ Deno.serve(async (req) => {
   const type = String(record["type"] ?? "");
   const id = String(record["id"] ?? "");
   const rawData = record["data"];
+
+  // Flatten payload values into data so the app can deep link without
+  // re-parsing nested JSON (FCM data values must be strings).
   const data: Record<string, string> = {
     type,
     notification_id: id,
@@ -131,6 +134,28 @@ Deno.serve(async (req) => {
       ? JSON.stringify(rawData)
       : "{}",
   };
+  if (typeof rawData === "object" && rawData !== null) {
+    for (const [key, value] of Object.entries(rawData as Record<string, unknown>)) {
+      if (value === null || value === undefined) continue;
+      data[key] = String(value);
+    }
+  }
+
+  // iOS badge: number of unread notifications for this user.
+  let unreadCount = 0;
+  const { count } = await admin
+    .from("user_notifications")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .is("read_at", null);
+  if (typeof count === "number") unreadCount = count;
+
+  // Group chat pushes per conversation so a busy chat collapses into one
+  // thread instead of flooding the tray; other types group by category.
+  const chatId = typeof data["chat_id"] === "string" ? data["chat_id"] : null;
+  const threadKey = type === "chat_message" && chatId
+    ? `chat_${chatId}`
+    : `agrilink_${type || "general"}`;
 
   const fcmRes = await fetch(
     `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`,
@@ -145,6 +170,29 @@ Deno.serve(async (req) => {
           token: fcmToken,
           notification: { title, body: bodyText },
           data,
+          android: {
+            priority: "HIGH",
+            collapse_key: threadKey,
+            notification: {
+              sound: "default",
+              tag: threadKey,
+              // Tapping always launches/resumes the main activity; the app
+              // reads `data` to deep link to the right screen.
+              click_action: "FLUTTER_NOTIFICATION_CLICK",
+            },
+          },
+          apns: {
+            headers: {
+              "apns-priority": "10",
+            },
+            payload: {
+              aps: {
+                sound: "default",
+                badge: unreadCount,
+                "thread-id": threadKey,
+              },
+            },
+          },
         },
       }),
     },

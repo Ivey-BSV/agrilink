@@ -1,5 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:cap/core/routes/app_router.dart';
 import 'package:cap/firebase_options.dart';
 import 'package:cap/services/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -60,6 +63,7 @@ class PushNotificationService {
           'PushNotificationService: app opened from background notification '
           '"${message.notification?.title}"',
         );
+        _handleNotificationTap(message);
       });
 
       // App was terminated and the user tapped the notification to launch it.
@@ -70,6 +74,7 @@ class PushNotificationService {
           'PushNotificationService: launched from notification '
           '"${initialMessage.notification?.title}"',
         );
+        _handleNotificationTap(initialMessage, coldStart: true);
       }
 
       FirebaseMessaging.instance.onTokenRefresh.listen((token) async {
@@ -81,6 +86,100 @@ class PushNotificationService {
     } catch (e, st) {
       debugPrint('PushNotificationService: init failed: $e\n$st');
     }
+  }
+
+  /// Maps a push notification's data to an in-app route.
+  ///
+  /// Payload values are flattened into [data] by the push_notification edge
+  /// function; older pushes only carry a `payload` JSON string, so both are
+  /// checked.
+  static String? routeForNotification(Map<String, dynamic> data) {
+    final type = data['type'] as String? ?? '';
+
+    Map<String, dynamic> payload = {};
+    final rawPayload = data['payload'];
+    if (rawPayload is String && rawPayload.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(rawPayload);
+        if (decoded is Map<String, dynamic>) payload = decoded;
+      } catch (_) {}
+    }
+    String? value(String key) =>
+        (data[key] as String?) ?? (payload[key]?.toString());
+
+    switch (type) {
+      case 'chat_message':
+        final chatId = value('chat_id');
+        return chatId != null ? '/chat/$chatId' : null;
+      case 'post_new':
+      case 'post_like':
+      case 'post_comment':
+        final postId = value('post_id');
+        return postId != null ? '/post/$postId' : null;
+      case 'poll_new':
+      case 'poll_closed':
+        final pollId = value('poll_id');
+        return pollId != null ? '/poll/$pollId' : null;
+      case 'follow_new':
+        final followerId = value('follower_id');
+        return followerId != null ? '/user-profile/$followerId' : null;
+      case 'repository_item_new':
+      case 'repository_folder_new':
+        final folderId = value('folder_id');
+        return folderId != null ? '/repository?folder=$folderId' : '/repository';
+      case 'workshop_item_new':
+      case 'workshop_folder_new':
+        final folderId = value('folder_id');
+        return folderId != null ? '/workshops?folder=$folderId' : '/workshops';
+      default:
+        // Project joins and unknown types land on the notifications list,
+        // which knows how to open every notification kind.
+        return '/notifications';
+    }
+  }
+
+  static void _handleNotificationTap(
+    RemoteMessage message, {
+    bool coldStart = false,
+  }) {
+    final route = routeForNotification(message.data);
+    if (route == null) return;
+
+    final notificationId = message.data['notification_id'];
+    if (notificationId is String && notificationId.isNotEmpty) {
+      unawaited(NotificationService().markRead(notificationId));
+    }
+
+    unawaited(_navigateWhenReady(route, coldStart: coldStart));
+  }
+
+  static Future<void> _navigateWhenReady(
+    String route, {
+    required bool coldStart,
+  }) async {
+    // On cold start the router and Supabase session restore lag behind this
+    // handler, so poll briefly until both are ready.
+    final deadline = DateTime.now().add(
+      Duration(seconds: coldStart ? 12 : 3),
+    );
+    while (DateTime.now().isBefore(deadline)) {
+      final router = AppRouter.current;
+      final signedIn = Supabase.instance.client.auth.currentUser != null;
+      if (router != null && signedIn) {
+        try {
+          router.push(route);
+          debugPrint('PushNotificationService: opened $route from tap.');
+        } catch (e) {
+          debugPrint('PushNotificationService: failed to open $route: $e');
+        }
+        return;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 250));
+    }
+    debugPrint(
+      'PushNotificationService: gave up navigating to $route '
+      '(router/session not ready).',
+    );
   }
 
   static Future<void> _persistToken(String? token) async {
