@@ -32,16 +32,6 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
     });
   }
 
-  double _extractPriceValue(String priceText) {
-    if (priceText.trim().toLowerCase() == 'free') return 0.0;
-    final regex = RegExp(r'([0-9]+(?:\.[0-9]+)?)');
-    final match = regex.firstMatch(priceText.replaceAll(',', ''));
-    if (match != null) {
-      return double.tryParse(match.group(1)!) ?? double.infinity;
-    }
-    return double.infinity;
-  }
-
   void _openTagsBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -252,7 +242,6 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
           final supabaseItems = marketplaceProvider.listings.map((listing) {
             return {
               'title': listing.title,
-              'price': listing.price,
               'location': listing.location ?? 'Unknown',
               'condition': listing.condition ?? '',
               'image':
@@ -279,12 +268,7 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
             }).toList();
           }
 
-          if (_marketFilter == 'free') {
-            filteredItems = filteredItems
-                .where((m) =>
-                    (m['price'] as String).trim().toLowerCase() == 'free')
-                .toList();
-          } else if (_marketFilter == 'favourites') {
+          if (_marketFilter == 'favourites') {
             final favoriteIds = marketplaceProvider.favoriteListingIds;
             filteredItems = filteredItems.where((m) {
               final listing = m['listing'] as MarketplaceListing?;
@@ -297,16 +281,6 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
             case 'oldest':
               sortedItems.sort((a, b) => (a['postedAt'] as DateTime)
                   .compareTo(b['postedAt'] as DateTime));
-              break;
-            case 'price_low':
-              sortedItems.sort((a, b) =>
-                  _extractPriceValue(a['price'] as String)
-                      .compareTo(_extractPriceValue(b['price'] as String)));
-              break;
-            case 'price_high':
-              sortedItems.sort((a, b) =>
-                  _extractPriceValue(b['price'] as String)
-                      .compareTo(_extractPriceValue(a['price'] as String)));
               break;
             case 'newest':
             default:
@@ -341,13 +315,6 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                                   isSelected: _marketFilter == 'all',
                                   onTap: () =>
                                       setState(() => _marketFilter = 'all'),
-                                ),
-                                const SizedBox(width: 8),
-                                ContentFilterChip(
-                                  label: 'Free',
-                                  isSelected: _marketFilter == 'free',
-                                  onTap: () =>
-                                      setState(() => _marketFilter = 'free'),
                                 ),
                                 const SizedBox(width: 8),
                                 ContentFilterChip(
@@ -386,29 +353,6 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                                 ]
                               ]),
                             ),
-                            const PopupMenuDivider(),
-                            PopupMenuItem(
-                              value: 'price_low',
-                              child: Row(children: [
-                                const Text('Price: Low to High'),
-                                if (_marketSortBy == 'price_low') ...[
-                                  const Spacer(),
-                                  Icon(Icons.check,
-                                      color: AppTheme.primaryGreen, size: 16),
-                                ]
-                              ]),
-                            ),
-                            PopupMenuItem(
-                              value: 'price_high',
-                              child: Row(children: [
-                                const Text('Price: High to Low'),
-                                if (_marketSortBy == 'price_high') ...[
-                                  const Spacer(),
-                                  Icon(Icons.check,
-                                      color: AppTheme.primaryGreen, size: 16),
-                                ]
-                              ]),
-                            ),
                           ],
                           icon: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -416,13 +360,7 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                               Icon(Icons.sort, color: Colors.grey[600]),
                               const SizedBox(width: 4),
                               Text(
-                                _marketSortBy == 'newest'
-                                    ? 'Newest'
-                                    : _marketSortBy == 'oldest'
-                                        ? 'Oldest'
-                                        : _marketSortBy == 'price_low'
-                                            ? 'Price ↑'
-                                            : 'Price ↓',
+                                _marketSortBy == 'newest' ? 'Newest' : 'Oldest',
                                 style: TextStyle(
                                   color: Colors.grey[600],
                                   fontSize: 12,
@@ -461,7 +399,7 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  'No listings found',
+                                  'No shared assets found',
                                   style: TextStyle(
                                     fontSize: 18,
                                     color: Colors.grey[600],
@@ -483,7 +421,6 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                             final imageUrl = m['image'] as String?;
                             return MarketplaceCard(
                               title: m['title'] as String,
-                              price: m['price'] as String,
                               location: m['location'] as String,
                               imageUrl: imageUrl ?? '',
                               postedAt: m['postedAt'] as DateTime,
@@ -499,7 +436,6 @@ class _ExchangeHubPageState extends State<ExchangeHubPage> {
                                     builder: (context) => MarketplaceDetailPage(
                                       listingId: listing?.id,
                                       title: m['title'] as String,
-                                      price: m['price'] as String,
                                       location: m['location'] as String,
                                       condition: m['condition'] as String,
                                       imageUrl: imageUrl,

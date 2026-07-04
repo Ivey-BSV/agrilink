@@ -2449,6 +2449,224 @@ button.file-preview-trigger.workshop-thumb-placeholder {
   }
 }
 
+.exchange-hub-shell {
+  min-width: 0;
+}
+
+.exchange-hub-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.exchange-hub-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.exchange-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.exchange-hub-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.exchange-hub-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.exchange-hub-card-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--accent-soft);
+}
+
+.exchange-hub-card-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.exchange-hub-card-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+.exchange-hub-card-time {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.58);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.exchange-hub-card-body {
+  padding: 0 12px 12px;
+}
+
+.exchange-hub-card-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.exchange-hub-card-meta {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.exchange-hub-card-tags,
+.exchange-hub-detail-modal .exchange-hub-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.exchange-hub-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.exchange-hub-tag-pill--more {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+}
+
+.exchange-hub-detail-modal .exchange-hub-detail-media {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+}
+
+.exchange-hub-detail-img {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  background: #111;
+}
+
+.exchange-hub-detail-author-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.exchange-hub-detail-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.exchange-hub-spec-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.exchange-hub-spec-line {
+  display: grid;
+  grid-template-columns: minmax(0, 140px) minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  font-size: 0.9rem;
+}
+
+.exchange-hub-spec-label {
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.exchange-hub-fav-active {
+  border-color: rgba(46, 125, 50, 0.35);
+  color: var(--accent-hover);
+}
+
+.exchange-hub-form-preview-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.exchange-hub-form-preview {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.exchange-hub-spec-edit-row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .exchange-hub-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .exchange-hub-toolbar-actions {
+    width: 100%;
+  }
+
+  .exchange-hub-spec-edit-row {
+    grid-template-columns: 1fr;
+  }
+
+  .exchange-hub-spec-line {
+    grid-template-columns: 1fr;
+  }
+}
+
 .platform-chip {
   border: 1px solid rgba(46, 125, 50, 0.18);
   background: #fff;

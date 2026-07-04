@@ -6,7 +6,6 @@ import 'package:cap/shared/widgets/listing_media_tile.dart';
 
 class MarketplaceCard extends StatelessWidget {
   final String title;
-  final String price;
   final String location;
   final String? imageUrl;
   final VoidCallback onTap;
@@ -18,7 +17,6 @@ class MarketplaceCard extends StatelessWidget {
   const MarketplaceCard({
     super.key,
     required this.title,
-    required this.price,
     required this.location,
     this.imageUrl,
     required this.onTap,
@@ -105,9 +103,6 @@ class MarketplaceCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
-              const SizedBox(height: 4),
-              _buildPriceBadge(price),
               const SizedBox(height: 6),
               Row(
                 children: [
@@ -125,25 +120,6 @@ class MarketplaceCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPriceBadge(String price) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryGreen.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.primaryGreen, width: 1),
-      ),
-      child: Text(
-        price,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: AppTheme.primaryGreen,
         ),
       ),
     );

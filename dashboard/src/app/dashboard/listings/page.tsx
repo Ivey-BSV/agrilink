@@ -12,7 +12,6 @@ import { PageSectionHeader } from "@/components/page-section-header";
 type ListingRow = {
   id: string;
   title: string;
-  price: string | null;
   description: string | null;
   condition: string | null;
   created_at: string;
@@ -24,7 +23,6 @@ export default function ListingsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState({
     title: "",
-    price: "",
     description: "",
     condition: "",
   });
@@ -47,7 +45,7 @@ export default function ListingsPage() {
 
       const { data, error: fetchError } = await supabase
         .from("marketplace_listings")
-        .select("id, title, price, description, condition, image_urls, created_at")
+        .select("id, title, description, condition, image_urls, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -63,7 +61,7 @@ export default function ListingsPage() {
   }, []);
 
   const remove = async (id: string) => {
-    if (!confirm("Delete this listing?")) return;
+    if (!confirm("Delete this shared asset?")) return;
     const { error: deleteError } = await supabase.from("marketplace_listings").delete().eq("id", id);
     if (deleteError) {
       setError(deleteError.message);
@@ -76,7 +74,6 @@ export default function ListingsPage() {
     setEditingId(item.id);
     setDraft({
       title: item.title,
-      price: item.price ?? "",
       description: item.description ?? "",
       condition: item.condition ?? "",
     });
@@ -87,7 +84,6 @@ export default function ListingsPage() {
       .from("marketplace_listings")
       .update({
         title: draft.title,
-        price: draft.price || null,
         description: draft.description,
         condition: draft.condition || null,
         updated_at: new Date().toISOString(),
@@ -103,7 +99,6 @@ export default function ListingsPage() {
           ? {
               ...p,
               title: draft.title,
-              price: draft.price || null,
               description: draft.description || null,
               condition: draft.condition || null,
             }
@@ -121,12 +116,12 @@ export default function ListingsPage() {
       transition={{ duration: 0.2 }}
     >
       <PageSectionHeader
-        title="My listings"
-        description="Review marketplace items you have listed—title, price, location, and the first photo shown on each row."
+        title="My shared assets"
+        description="Review assets you have listed for the community—title, description, condition, and photo."
       />
       {error ? <p className="error">{error}</p> : null}
-      {loading ? <p className="subtle">Loading listings…</p> : null}
-      {!loading && items.length === 0 ? <p className="empty">No listings yet.</p> : null}
+      {loading ? <p className="subtle">Loading shared assets…</p> : null}
+      {!loading && items.length === 0 ? <p className="empty">No shared assets yet.</p> : null}
       <div className="list">
         {items.map((item, index) => {
           const firstImage = parseImageUrls(item.image_urls)[0] ?? null;
@@ -150,18 +145,12 @@ export default function ListingsPage() {
                       />
                     </div>
                     <div className="field">
-                      <label>Price</label>
-                      <input
-                        value={draft.price}
-                        onChange={(e) => setDraft((d) => ({ ...d, price: e.target.value }))}
-                      />
-                    </div>
-                    <div className="field">
                       <label>Description</label>
                       <textarea
                         rows={3}
                         value={draft.description}
                         onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
+                        placeholder="List the assets which you'd like to share with the community"
                       />
                     </div>
                     <div className="field">
@@ -175,7 +164,6 @@ export default function ListingsPage() {
                 ) : (
                   <>
                     <div className="workshop-line-title">{item.title}</div>
-                    <div className="workshop-line-meta">{item.price || "No price set"}</div>
                     <div className="workshop-line-meta">{item.description || "No description."}</div>
                   </>
                 )}

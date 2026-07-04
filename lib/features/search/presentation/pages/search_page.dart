@@ -439,7 +439,6 @@ class _SearchPageState extends State<SearchPage>
               'id': listing.id,
               'title': listing.title,
               'content': listing.description,
-              'price': listing.price,
               'condition': listing.condition,
               'location': listing.location,
               'date': _formatDate(listing.createdAt),
@@ -516,18 +515,6 @@ class _SearchPageState extends State<SearchPage>
                             color: Colors.black,
                           ),
                         ),
-                        if (result['price'] != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              result['price'] as String,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.primaryGreen,
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -600,7 +587,6 @@ class _SearchPageState extends State<SearchPage>
             builder: (context) => MarketplaceDetailPage(
               listingId: listing.id,
               title: listing.title,
-              price: listing.price,
               location: listing.location ?? 'Unknown',
               condition: listing.condition ?? 'Unknown',
               imageUrl:

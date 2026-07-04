@@ -18,7 +18,6 @@ class CreateListingPage extends StatefulWidget {
 
 class _CreateListingPageState extends State<CreateListingPage> {
   final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _conditionController = TextEditingController();
   bool _isLoading = false;
@@ -108,7 +107,6 @@ class _CreateListingPageState extends State<CreateListingPage> {
   @override
   void dispose() {
     _titleController.dispose();
-    _priceController.dispose();
     _descriptionController.dispose();
     _conditionController.dispose();
     for (var controller in _specValueControllers.values) {
@@ -179,23 +177,6 @@ class _CreateListingPageState extends State<CreateListingPage> {
     });
   }
 
-  String _normalizePrice(String priceInput) {
-    final trimmed = priceInput.trim();
-    if (trimmed.isEmpty) return trimmed;
-
-    if (trimmed.toLowerCase() == 'free') {
-      return 'Free';
-    }
-
-    final numericValue =
-        double.tryParse(trimmed.replaceAll(RegExp(r'[^\d.]'), ''));
-    if (numericValue != null && numericValue == 0.0) {
-      return 'Free';
-    }
-
-    return trimmed;
-  }
-
   Future<Size> _getImageSize(String imageUrl) async {
     try {
       final url = sanitizeImageUrl(imageUrl) ?? imageUrl;
@@ -245,14 +226,6 @@ class _CreateListingPageState extends State<CreateListingPage> {
       return;
     }
 
-    if (_priceController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Please enter a price'), backgroundColor: Colors.red),
-      );
-      return;
-    }
-
     if (_descriptionController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -278,11 +251,8 @@ class _CreateListingPageState extends State<CreateListingPage> {
         }
       }
 
-      final normalizedPrice = _normalizePrice(_priceController.text.trim());
-
       await provider.createListing(
         title: _titleController.text.trim(),
-        price: normalizedPrice,
         description: _descriptionController.text.trim(),
         condition: _conditionController.text.trim().isEmpty
             ? null
@@ -295,7 +265,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Listing created successfully!'),
+              content: Text('Shared with the community!'),
               backgroundColor: AppTheme.primaryGreen),
         );
         Navigator.pop(context);
@@ -329,7 +299,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Create Listing',
+          'Share Asset',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.w600,
@@ -389,19 +359,9 @@ class _CreateListingPageState extends State<CreateListingPage> {
                     maxLength: 80,
                     decoration: const InputDecoration(
                       labelText: 'Title *',
-                      hintText: 'Enter listing title',
+                      hintText: 'What are you sharing?',
                       border: OutlineInputBorder(),
                       counterText: '',
-                    ),
-                    style: const TextStyle(fontSize: 16, fontFamily: 'Poppins'),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _priceController,
-                    decoration: const InputDecoration(
-                      labelText: 'Price *',
-                      hintText: 'e.g., \$2.50/lb, \$150/day, Free',
-                      border: OutlineInputBorder(),
                     ),
                     style: const TextStyle(fontSize: 16, fontFamily: 'Poppins'),
                   ),
@@ -423,7 +383,8 @@ class _CreateListingPageState extends State<CreateListingPage> {
                     maxLength: 500,
                     decoration: const InputDecoration(
                       labelText: 'Description *',
-                      hintText: 'Describe your listing...',
+                      hintText:
+                          "List the assets which you'd like to share with the community",
                       border: OutlineInputBorder(),
                       counterText: '',
                     ),
@@ -767,7 +728,7 @@ class _CreateListingPageState extends State<CreateListingPage> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          '• Provide accurate descriptions and pricing\n'
+                          '• Provide accurate descriptions of what you are sharing\n'
                           '• Include clear, high-quality photos\n'
                           '• Be honest about condition and availability\n'
                           '• Respond promptly to inquiries',

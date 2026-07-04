@@ -147,7 +147,6 @@ class MarketplaceProvider extends ChangeNotifier {
 
   Future<void> createListing({
     required String title,
-    required String price,
     required String description,
     String? condition,
     required List<String> tags,
@@ -181,7 +180,7 @@ class MarketplaceProvider extends ChangeNotifier {
       await supabase.from('marketplace_listings').insert({
         'user_id': user.id,
         'title': title,
-        'price': price,
+        'price': '',
         'description': description,
         'condition': condition,
         'tags': tags,
@@ -196,7 +195,7 @@ class MarketplaceProvider extends ChangeNotifier {
         userName: displayName,
         userAvatar: avatarUrl,
         title: title,
-        price: price,
+        price: '',
         description: description,
         condition: condition,
         tags: tags,

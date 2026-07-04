@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 class MarketplaceDetailPage extends StatefulWidget {
   final String? listingId;
   final String title;
-  final String price;
   final String location;
   final String condition;
   final String? imageUrl;
@@ -26,7 +25,6 @@ class MarketplaceDetailPage extends StatefulWidget {
     super.key,
     this.listingId,
     required this.title,
-    required this.price,
     required this.location,
     required this.condition,
     this.imageUrl,
@@ -287,8 +285,6 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      _buildPriceBadge(widget.price),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -550,29 +546,6 @@ class _MarketplaceDetailPageState extends State<MarketplaceDetailPage> {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildPriceBadge(String price) {
-    final isFree = price.trim().toLowerCase() == 'free';
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: isFree
-            ? Colors.green.withValues(alpha: 0.1)
-            : AppTheme.primaryGreen.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: isFree ? Colors.green : AppTheme.primaryGreen, width: 1),
-      ),
-      child: Text(
-        price,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          color: isFree ? Colors.green[700] : AppTheme.primaryGreen,
-        ),
-      ),
     );
   }
 
