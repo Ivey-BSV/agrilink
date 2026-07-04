@@ -2203,6 +2203,202 @@ button.file-preview-trigger.workshop-thumb-placeholder {
   flex-shrink: 0;
 }
 
+/* Platform cohesion — shared patterns from poll detail UX */
+.platform-page-card {
+  gap: 16px;
+  min-width: 0;
+}
+
+.platform-page-shell {
+  gap: 16px;
+  min-width: 0;
+}
+
+.platform-section-card {
+  gap: 12px;
+}
+
+.platform-section-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.platform-section-intro--split {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.platform-section-intro-main {
+  min-width: 0;
+}
+
+.platform-section-intro--split .platform-section-intro-main {
+  flex: 1 1 12rem;
+}
+
+.platform-section-intro-action {
+  flex-shrink: 0;
+}
+
+.platform-section-intro-title {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.platform-section-intro-desc {
+  margin: 6px 0 0;
+  line-height: 1.45;
+}
+
+.platform-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.platform-toolbar,
+.exchange-hub-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+}
+
+.platform-toolbar-actions,
+.exchange-hub-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.platform-list-rows {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.platform-list-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.platform-list-row:hover {
+  border-color: rgba(46, 125, 50, 0.25);
+  box-shadow: var(--shadow-sm);
+}
+
+.platform-list-row a.workshop-line-title {
+  text-decoration: none;
+  color: inherit;
+}
+
+.platform-list-row--read {
+  opacity: 0.88;
+}
+
+.platform-list-row--unread {
+  border-left: 3px solid var(--primary-green, #2d6a4f);
+  padding-left: 13px;
+}
+
+.platform-staff-panel,
+.poll-admin-panel {
+  border-color: rgba(46, 125, 50, 0.2);
+  background: linear-gradient(180deg, #fff 0%, rgba(232, 245, 233, 0.35) 100%);
+}
+
+.platform-staff-panel-head,
+.poll-admin-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.platform-staff-badge,
+.poll-admin-badge {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+  font-weight: 700;
+}
+
+.platform-staff-tab-panel,
+.poll-admin-tab-panel {
+  padding-top: 4px;
+}
+
+.platform-data-table-wrap,
+.poll-voter-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #fff;
+}
+
+.platform-data-table,
+.poll-voter-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.platform-data-table th,
+.platform-data-table td,
+.poll-voter-table th,
+.poll-voter-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.platform-data-table th,
+.poll-voter-table th {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--bg-subtle);
+}
+
+.platform-data-table tbody tr:last-child td,
+.poll-voter-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.platform-data-table-link,
+.poll-voter-link {
+  color: var(--accent-hover);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.platform-data-table-link:hover,
+.poll-voter-link:hover {
+  text-decoration: underline;
+}
+
 .section-info-wrap {
   position: relative;
   flex-shrink: 0;
@@ -2269,6 +2465,10 @@ button.file-preview-trigger.workshop-thumb-placeholder {
   align-items: flex-start;
   gap: 10px;
   flex-wrap: wrap;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
 }
 
 .platform-feed-filters {
@@ -2451,21 +2651,6 @@ button.file-preview-trigger.workshop-thumb-placeholder {
 
 .exchange-hub-shell {
   min-width: 0;
-}
-
-.exchange-hub-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.exchange-hub-toolbar-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
 }
 
 .exchange-hub-grid {
@@ -4409,20 +4594,6 @@ a.feed-post-action {
   gap: 6px;
 }
 
-.poll-voter-link {
-  color: var(--accent-hover);
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.poll-voter-link:hover {
-  text-decoration: underline;
-}
-
-.poll-detail-shell {
-  min-width: 0;
-}
-
 .poll-results-list {
   list-style: none;
   padding: 0;
@@ -4455,65 +4626,8 @@ a.feed-post-action {
   white-space: nowrap;
 }
 
-.poll-admin-panel {
-  border-color: rgba(46, 125, 50, 0.2);
-  background: linear-gradient(180deg, #fff 0%, rgba(232, 245, 233, 0.35) 100%);
-}
-
-.poll-admin-panel-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.poll-admin-badge {
-  background: var(--accent-soft);
-  color: var(--accent-hover);
-  font-weight: 700;
-}
-
 .poll-admin-tabs {
   margin-top: 2px;
-}
-
-.poll-admin-tab-panel {
-  padding-top: 4px;
-}
-
-.poll-voter-table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: #fff;
-}
-
-.poll-voter-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.poll-voter-table th,
-.poll-voter-table td {
-  padding: 10px 12px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
-}
-
-.poll-voter-table th {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--muted);
-  background: var(--bg-subtle);
-}
-
-.poll-voter-table tbody tr:last-child td {
-  border-bottom: none;
 }
 
 .file-browse-tabbed {

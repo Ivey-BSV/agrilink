@@ -1,12 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ExchangeHubCard } from "@/components/exchange-hub-card";
 import { ExchangeHubDetailModal } from "@/components/exchange-hub-detail-modal";
 import { ExchangeHubListingModal } from "@/components/exchange-hub-listing-modal";
 import { ForumTagPicker } from "@/components/forum-tag-picker";
 import { PageSectionHeader } from "@/components/page-section-header";
+import { PlatformPageShell } from "@/components/platform-section";
 import {
   loadExchangeHubListings,
   loadFavoriteListingIds,
@@ -112,7 +112,7 @@ export default function ExchangeHubPage() {
   };
 
   return (
-    <motion.div className="content-card stack exchange-hub-shell" style={{ gap: 16 }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+    <PlatformPageShell className="exchange-hub-shell">
       <PageSectionHeader
         title="Exchange Hub"
         description="Share and discover community assets — equipment, tools, and resources farmers are willing to lend or offer. List the assets which you'd like to share with the community."
@@ -125,7 +125,7 @@ export default function ExchangeHubPage() {
         }
       />
 
-      <div className="exchange-hub-toolbar">
+      <div className="platform-toolbar exchange-hub-toolbar">
         <div className="platform-feed-filters">
           <button
             type="button"
@@ -144,7 +144,7 @@ export default function ExchangeHubPage() {
           </button>
         </div>
 
-        <div className="exchange-hub-toolbar-actions">
+        <div className="platform-toolbar-actions exchange-hub-toolbar-actions">
           <button type="button" className="btn btn-secondary platform-feed-tags-btn" onClick={() => setTagsOpen(true)}>
             Tags{selectedTags.length > 0 ? ` (${selectedTags.length})` : ""}
           </button>
@@ -222,6 +222,6 @@ export default function ExchangeHubPage() {
         onClose={() => setFormOpen(false)}
         onSaved={() => void reload()}
       />
-    </motion.div>
+    </PlatformPageShell>
   );
 }

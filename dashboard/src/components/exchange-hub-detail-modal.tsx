@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { UserAvatar } from "@/components/user-avatar";
+import { PlatformSectionIntro } from "@/components/platform-section";
 import {
   deleteExchangeHubListing,
   exchangeHubAuthorLabel,
@@ -151,7 +152,7 @@ export function ExchangeHubDetailModal({
 
           <div className="exchange-hub-detail-title">{listing.title}</div>
 
-          <div className="platform-post-meta-row" style={{ flexWrap: "wrap" }}>
+          <div className="platform-meta-row">
             {listing.location ? <span className="pill">{listing.location}</span> : null}
             {listing.condition ? <span className="pill">{listing.condition}</span> : null}
           </div>
@@ -167,8 +168,8 @@ export function ExchangeHubDetailModal({
           ) : null}
 
           {listing.description ? (
-            <div className="stack" style={{ gap: 6 }}>
-              <div style={{ fontWeight: 700 }}>Description</div>
+            <div className="stack" style={{ gap: 8 }}>
+              <PlatformSectionIntro title="Description" />
               <p className="subtle" style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>
                 {listing.description}
               </p>
@@ -177,7 +178,7 @@ export function ExchangeHubDetailModal({
 
           {specEntries.length > 0 ? (
             <div className="stack" style={{ gap: 8 }}>
-              <div style={{ fontWeight: 700 }}>Specifications</div>
+              <PlatformSectionIntro title="Specifications" />
               <ul className="exchange-hub-spec-list">
                 {specEntries.map(([label, value]) => (
                   <li key={label} className="exchange-hub-spec-line">

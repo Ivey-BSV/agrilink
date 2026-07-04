@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import { FarmDirectoryCard } from "@/components/farm-directory-card";
 import { MotionListItem } from "@/components/motion-list";
 import { PageSectionHeader } from "@/components/page-section-header";
+import { PlatformMetaRow, PlatformPageShell } from "@/components/platform-section";
 import { directoryEntrySearchText, loadDirectoryEntries, type DirectoryEntry } from "@/lib/farm-directory";
 
 export default function PlatformDirectoryPage() {
@@ -35,24 +35,25 @@ export default function PlatformDirectoryPage() {
   }, [entries, query]);
 
   return (
-    <motion.div className="content-card stack" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+    <PlatformPageShell>
       <PageSectionHeader
         title="Farm Directory"
         description="Search members by name, region, farm type, crops, activities, and other farm details to find people you may want to connect with."
       />
-      <div className="field" style={{ maxWidth: 430 }}>
-        <label htmlFor="directory-search">Search</label>
-        <input
-          id="directory-search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Name, location, crops, certification…"
-        />
-      </div>
-
-      <div className="platform-tag-row">
-        <span className="pill">{entries.length} profiles</span>
-        <span className="pill">{filtered.length} shown</span>
+      <div className="platform-toolbar">
+        <div className="field" style={{ flex: "1 1 16rem", maxWidth: 430, margin: 0 }}>
+          <label htmlFor="directory-search">Search</label>
+          <input
+            id="directory-search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Name, location, crops, certification…"
+          />
+        </div>
+        <PlatformMetaRow>
+          <span className="pill">{entries.length} profiles</span>
+          <span className="pill">{filtered.length} shown</span>
+        </PlatformMetaRow>
       </div>
 
       {error ? <p className="error">{error}</p> : null}
@@ -66,6 +67,6 @@ export default function PlatformDirectoryPage() {
           </MotionListItem>
         ))}
       </div>
-    </motion.div>
+    </PlatformPageShell>
   );
 }

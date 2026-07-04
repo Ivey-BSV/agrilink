@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { PageSectionHeader } from "@/components/page-section-header";
+import { PlatformPageShell, PlatformSectionCard } from "@/components/platform-section";
 import {
   formatGoalDeadlineLabel,
   joinCommunityProject,
@@ -202,14 +202,8 @@ export default function CollaborationProjectsPage() {
   const list = tab === "community" ? community : farm;
 
   return (
-    <motion.div
-      className="stack"
-      style={{ gap: 16 }}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="content-card stack" style={{ gap: 14 }}>
+    <PlatformPageShell variant="stack">
+      <PlatformSectionCard style={{ gap: 14 }}>
         <PageSectionHeader
           title="Projects"
           description="Community projects are open for others to join; farm projects stay on your account with milestones you check off over time. Start either kind here, then open a project to manage members and progress."
@@ -239,7 +233,7 @@ export default function CollaborationProjectsPage() {
             Farm projects
           </button>
         </div>
-      </div>
+      </PlatformSectionCard>
 
       {error ? (
         <div className="content-card">
@@ -353,6 +347,6 @@ export default function CollaborationProjectsPage() {
           </div>
         </div>
       ) : null}
-    </motion.div>
+    </PlatformPageShell>
   );
 }

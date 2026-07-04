@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   deletePollById,
@@ -18,6 +17,12 @@ import {
 } from "@/lib/polls";
 import { formatRelativeTime } from "@/lib/format";
 import { useMemberFacingStaffAccess } from "@/hooks/use-member-facing-staff-access";
+import {
+  PlatformMetaRow,
+  PlatformPageShell,
+  PlatformSectionCard,
+  PlatformSectionIntro,
+} from "@/components/platform-section";
 
 type SuperAdminTab = "breakdown" | "manage";
 
@@ -215,8 +220,8 @@ export default function PollDetailPage() {
     (poll.closes_at ? new Date(poll.closes_at).getTime() <= Date.now() : false);
 
   return (
-    <motion.div className="stack poll-detail-shell" style={{ gap: 16 }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-      <div className="content-card stack" style={{ gap: 12 }}>
+    <PlatformPageShell variant="stack">
+      <PlatformSectionCard>
         <Link href="/platform/collaboration/polls" className="btn btn-secondary" style={{ alignSelf: "flex-start" }}>
           ← All polls
         </Link>
@@ -224,24 +229,20 @@ export default function PollDetailPage() {
           {poll.title}
         </h2>
         {poll.description ? <p style={{ margin: 0, lineHeight: 1.55 }}>{poll.description}</p> : null}
-        <div className="platform-post-meta-row" style={{ flexWrap: "wrap" }}>
+        <PlatformMetaRow>
           <span className="pill">{poll.allows_multiple ? "Multiple answers" : "Single answer"}</span>
           <span className="pill">{ended ? "Closed" : "Open"}</span>
           <span className="subtle">{totalVotes} total vote{totalVotes === 1 ? "" : "s"}</span>
-        </div>
+        </PlatformMetaRow>
         {ok ? <p className="success">{ok}</p> : null}
         {error ? <p className="error">{error}</p> : null}
-      </div>
+      </PlatformSectionCard>
 
-      <div className="content-card stack" style={{ gap: 12 }}>
-        <div>
-          <h3 className="section-title" style={{ fontSize: "1.05rem", margin: 0 }}>
-            Results
-          </h3>
-          <p className="subtle" style={{ margin: "6px 0 0" }}>
-            Vote totals everyone can see. Individual choices stay private.
-          </p>
-        </div>
+      <PlatformSectionCard>
+        <PlatformSectionIntro
+          title="Results"
+          description="Vote totals everyone can see. Individual choices stay private."
+        />
         <ul className="poll-results-list">
           {poll.poll_options.map((o) => {
             const count = voteCounts[o.id] ?? 0;
@@ -261,18 +262,14 @@ export default function PollDetailPage() {
             );
           })}
         </ul>
-      </div>
+      </PlatformSectionCard>
 
       {!ended ? (
-        <div className="content-card stack" style={{ gap: 12 }}>
-          <div>
-            <h3 className="section-title" style={{ fontSize: "1.05rem", margin: 0 }}>
-              Your vote
-            </h3>
-            <p className="subtle" style={{ margin: "6px 0 0" }}>
-              {poll.allows_multiple ? "Pick one or more answers, then save." : "Pick one answer, then save."}
-            </p>
-          </div>
+        <PlatformSectionCard>
+          <PlatformSectionIntro
+            title="Your vote"
+            description={poll.allows_multiple ? "Pick one or more answers, then save." : "Pick one answer, then save."}
+          />
           <ul className="projects-milestone-list" style={{ listStyle: "none", padding: 0, margin: 0 }}>
             {poll.poll_options.map((o) => (
               <li key={o.id} className="projects-milestone-row">
@@ -292,22 +289,16 @@ export default function PollDetailPage() {
           <button type="button" className="btn btn-primary" disabled={saving} onClick={() => void onSave()}>
             {saving ? "Saving…" : "Save vote"}
           </button>
-        </div>
+        </PlatformSectionCard>
       ) : null}
 
       {isSuper ? (
-        <div className="content-card stack poll-admin-panel" style={{ gap: 14 }}>
-          <div className="poll-admin-panel-head">
-            <div>
-              <h3 className="section-title" style={{ fontSize: "1.05rem", margin: 0 }}>
-                Super admin
-              </h3>
-              <p className="subtle" style={{ margin: "6px 0 0" }}>
-                Extra tools for reviewing responses and managing this poll.
-              </p>
-            </div>
-            <span className="pill poll-admin-badge">Staff only</span>
-          </div>
+        <PlatformSectionCard className="platform-staff-panel poll-admin-panel">
+          <PlatformSectionIntro
+            title="Super admin"
+            description="Extra tools for reviewing responses and managing this poll."
+            action={<span className="pill platform-staff-badge poll-admin-badge">Staff only</span>}
+          />
 
           <div className="platform-profile-tabs poll-admin-tabs" role="tablist" aria-label="Super admin sections">
             <button
@@ -331,14 +322,14 @@ export default function PollDetailPage() {
           </div>
 
           {superAdminTab === "breakdown" ? (
-            <div className="poll-admin-tab-panel" role="tabpanel">
+            <div className="platform-staff-tab-panel poll-admin-tab-panel" role="tabpanel">
               {voters.length === 0 ? (
                 <p className="empty" style={{ margin: 0 }}>
                   No votes recorded yet.
                 </p>
               ) : (
-                <div className="poll-voter-table-wrap">
-                  <table className="poll-voter-table">
+                <div className="platform-data-table-wrap poll-voter-table-wrap">
+                  <table className="platform-data-table poll-voter-table">
                     <thead>
                       <tr>
                         <th scope="col">Member</th>
@@ -350,7 +341,7 @@ export default function PollDetailPage() {
                       {voterRowsForTable.map((row) => (
                         <tr key={`${row.user_id}-${row.option_id}-${row.created_at}`}>
                           <td>
-                            <Link href={`/platform/user/${row.user_id}`} className="poll-voter-link">
+                            <Link href={`/platform/user/${row.user_id}`} className="platform-data-table-link poll-voter-link">
                               {voterLabel(row)}
                             </Link>
                           </td>
@@ -364,7 +355,7 @@ export default function PollDetailPage() {
               )}
             </div>
           ) : (
-            <div className="poll-admin-tab-panel stack" style={{ gap: 12 }} role="tabpanel">
+            <div className="platform-staff-tab-panel poll-admin-tab-panel stack" style={{ gap: 12 }} role="tabpanel">
               <p className="subtle" style={{ margin: 0 }}>
                 Edit poll settings or replace answer choices. Replacing options clears all votes.
               </p>
@@ -418,9 +409,9 @@ export default function PollDetailPage() {
               </div>
             </div>
           )}
-        </div>
+        </PlatformSectionCard>
       ) : null}
-    </motion.div>
+    </PlatformPageShell>
   );
 }
 

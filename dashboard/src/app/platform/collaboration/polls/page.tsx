@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
 import { FormEvent, useEffect, useState } from "react";
 import { PageSectionHeader } from "@/components/page-section-header";
+import { PlatformMetaRow, PlatformPageShell } from "@/components/platform-section";
 import { formatDate } from "@/lib/format";
 import { createPollWithOptions, listPollsForWeb, type PollListRow } from "@/lib/polls";
 import { supabase } from "@/lib/supabase";
@@ -77,7 +77,7 @@ export default function PlatformPollsPage() {
   };
 
   return (
-    <motion.div className="content-card stack" style={{ gap: 16 }} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
+    <PlatformPageShell>
       <PageSectionHeader
         title="Polls"
         description="Run quick surveys: create a poll, collect votes while it is open, and review results when it closes. Anyone signed in can start a poll; organizers can edit or close their own."
@@ -92,21 +92,21 @@ export default function PlatformPollsPage() {
       {loading ? <p className="subtle">Loading polls…</p> : null}
       {error ? <p className="error">{error}</p> : null}
       {!loading && rows.length === 0 ? <p className="empty">No polls yet.</p> : null}
-      <ul className="list" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+      <ul className="platform-list-rows">
         {rows.map((p) => {
           const optCount = Array.isArray(p.poll_options) ? p.poll_options.length : 0;
           const closed = p.status === "closed";
           return (
-            <li key={p.id} className="list-item" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <Link href={`/platform/collaboration/polls/${p.id}`} className="workshop-line-title" style={{ textDecoration: "none", color: "inherit" }}>
+            <li key={p.id} className="platform-list-row">
+              <Link href={`/platform/collaboration/polls/${p.id}`} className="workshop-line-title">
                 {p.title}
               </Link>
               {p.description ? <span className="subtle" style={{ fontSize: "0.9rem" }}>{p.description}</span> : null}
-              <div className="platform-post-meta-row" style={{ flexWrap: "wrap" }}>
+              <PlatformMetaRow>
                 <span className="pill">{closed ? "Closed" : "Active"}</span>
                 <span className="subtle">{optCount} option{optCount === 1 ? "" : "s"}</span>
                 <span className="subtle">{formatDate(p.created_at)}</span>
-              </div>
+              </PlatformMetaRow>
             </li>
           );
         })}
@@ -160,6 +160,6 @@ export default function PlatformPollsPage() {
           </div>
         </div>
       ) : null}
-    </motion.div>
+    </PlatformPageShell>
   );
 }
