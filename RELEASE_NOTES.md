@@ -4,6 +4,27 @@ Use the **Short** version in Play Console when there’s a character limit (e.g.
 
 ---
 
+## 1.0.13 (build 26) — July 2026
+
+### Short (under 500 characters)
+
+**What's new in 1.0.13**
+
+• **Notifications** — Push alerts show who sent them; tap to open the chat, post, or poll  
+• **Polls** — Cleaner results view; vote privacy improvements on web  
+• **Exchange Hub** — Asset sharing on web (no pricing)  
+• **Stability** — Bug fixes and polish  
+
+Thank you for being part of CAP.
+
+### Full
+
+**What's new in 1.0.13**
+
+Richer push notifications with sender names and message previews. Tapping a notification opens the relevant chat, post, poll, or profile. Poll detail UX and vote privacy on web. Web Exchange Hub for community asset sharing. Dashboard design consistency across polls, directory, and notifications. Bug fixes and stability improvements.
+
+---
+
 ## 1.0.12 (build 25) — June 2026
 
 ### Short (under 500 characters)
