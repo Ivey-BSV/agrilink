@@ -131,6 +131,12 @@ export function ResourceFolderLibrary({
   const selectedFolder = selectedFolderId ? folders.find((f) => f.id === selectedFolderId) ?? null : null;
   const storageUrlMarker = `/${storageBucket}/`;
   const scopeRootLabel = scope === "repository" ? "Repository" : "Workshops";
+  const canManageSelectedFolder =
+    !!selectedFolder &&
+    (isStaff || (!!currentUserId && selectedFolder.created_by === currentUserId));
+
+  const canManageItem = (row: LibraryDocRow) =>
+    isStaff || (!!currentUserId && row.user_id === currentUserId);
 
   const syncFolderInUrl = useCallback(
     (folderId: string | null) => {
@@ -354,7 +360,10 @@ export function ResourceFolderLibrary({
   };
 
   const openRenameFolder = () => {
-    if (!selectedFolder) return;
+    if (!selectedFolder || !canManageSelectedFolder) {
+      setError("Only the folder creator or staff can rename this folder.");
+      return;
+    }
     setRenameFolderName(selectedFolder.name);
     setRenameFolderDescription(selectedFolder.description ?? "");
     setRenameFolderOpen(true);
@@ -362,7 +371,10 @@ export function ResourceFolderLibrary({
   };
 
   const saveFolderDetails = async () => {
-    if (!selectedFolderId) return;
+    if (!selectedFolderId || !canManageSelectedFolder) {
+      setError("Only the folder creator or staff can rename this folder.");
+      return;
+    }
     const name = renameFolderName.trim();
     if (!name) {
       setError("Folder name is required.");
@@ -393,7 +405,10 @@ export function ResourceFolderLibrary({
   };
 
   const deleteSelectedFolder = async () => {
-    if (!selectedFolderId || !selectedFolder) return;
+    if (!selectedFolderId || !selectedFolder || !canManageSelectedFolder) {
+      setError("Only the folder creator or staff can delete this folder.");
+      return;
+    }
     const name = selectedFolder.name;
     const count = items.filter((i) => i.folder_id === selectedFolderId).length;
     const confirmMsg =
@@ -590,8 +605,12 @@ export function ResourceFolderLibrary({
   };
 
   const remove = async (id: string) => {
-    if (!confirm(deleteConfirmMessage)) return;
     const row = items.find((i) => i.id === id);
+    if (!row || !canManageItem(row)) {
+      setError("You can only delete files you uploaded (or staff can delete any).");
+      return;
+    }
+    if (!confirm(deleteConfirmMessage)) return;
     if (row) {
       const storagePath = extractStoragePathFromPublicUrl(row.file_url, storageBucket);
       if (storagePath) {
@@ -607,11 +626,20 @@ export function ResourceFolderLibrary({
   };
 
   const startEdit = (row: LibraryDocRow) => {
+    if (!canManageItem(row)) {
+      setError("You can only edit files you uploaded (or staff can edit any).");
+      return;
+    }
     setEditingId(row.id);
     setDraftTitle(row.title);
   };
 
   const saveEdit = async (id: string) => {
+    const row = items.find((i) => i.id === id);
+    if (!row || !canManageItem(row)) {
+      setError("You can only edit files you uploaded (or staff can edit any).");
+      return;
+    }
     const { error: updateError } = await supabase.from(tableName).update({ title: draftTitle }).eq("id", id);
     if (updateError) {
       setError(updateError.message);
@@ -654,22 +682,26 @@ export function ResourceFolderLibrary({
               <button type="button" className="btn btn-secondary btn-primary-compact" onClick={backToFolders}>
                 All folders
               </button>
-              <button
-                type="button"
-                className="btn btn-secondary btn-primary-compact"
-                onClick={openRenameFolder}
-                disabled={deletingFolder}
-              >
-                Rename folder
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger btn-primary-compact"
-                onClick={() => void deleteSelectedFolder()}
-                disabled={deletingFolder}
-              >
-                {deletingFolder ? "Deleting…" : "Delete folder"}
-              </button>
+              {canManageSelectedFolder ? (
+                <>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-primary-compact"
+                    onClick={openRenameFolder}
+                    disabled={deletingFolder}
+                  >
+                    Rename folder
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger btn-primary-compact"
+                    onClick={() => void deleteSelectedFolder()}
+                    disabled={deletingFolder}
+                  >
+                    {deletingFolder ? "Deleting…" : "Delete folder"}
+                  </button>
+                </>
+              ) : null}
               <button type="button" className="btn btn-secondary btn-primary-compact" onClick={() => setLinkModalOpen(true)}>
                 Add link
               </button>
@@ -813,12 +845,16 @@ export function ResourceFolderLibrary({
                           <a href={item.file_url} target="_blank" rel="noreferrer" className="pill">
                             Open
                           </a>
-                          <button type="button" className="btn btn-secondary" onClick={() => startEdit(item)}>
-                            Edit
-                          </button>
-                          <button type="button" className="btn btn-danger" onClick={() => void remove(item.id)}>
-                            Delete
-                          </button>
+                          {canManageItem(item) ? (
+                            <>
+                              <button type="button" className="btn btn-secondary" onClick={() => startEdit(item)}>
+                                Edit
+                              </button>
+                              <button type="button" className="btn btn-danger" onClick={() => void remove(item.id)}>
+                                Delete
+                              </button>
+                            </>
+                          ) : null}
                         </>
                       )}
                     />
@@ -869,7 +905,7 @@ export function ResourceFolderLibrary({
                                   Cancel
                                 </button>
                               </>
-                            ) : (
+                            ) : canManageItem(item) ? (
                               <>
                                 <button type="button" className="btn btn-secondary" onClick={() => startEdit(item)}>
                                   Edit
@@ -878,7 +914,7 @@ export function ResourceFolderLibrary({
                                   Delete
                                 </button>
                               </>
-                            )}
+                            ) : null}
                           </div>
                         </MotionListItem>
                       ))}
@@ -952,7 +988,7 @@ export function ResourceFolderLibrary({
                                     Cancel
                                   </button>
                                 </>
-                              ) : (
+                              ) : canManageItem(item) ? (
                                 <>
                                   <button type="button" className="btn btn-secondary" onClick={() => startEdit(item)}>
                                     Edit
@@ -961,7 +997,7 @@ export function ResourceFolderLibrary({
                                     Delete
                                   </button>
                                 </>
-                              )}
+                              ) : null}
                             </div>
                           </MotionListItem>
                         );

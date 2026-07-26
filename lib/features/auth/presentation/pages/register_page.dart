@@ -92,6 +92,14 @@ class _RegisterPageState extends State<RegisterPage> {
       if (!mounted) return;
       if (errorMessage == null) {
         context.go('/');
+      } else if (errorMessage.toLowerCase().contains('confirmation link')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: AppTheme.primaryGreen,
+          ),
+        );
+        context.go('/login');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

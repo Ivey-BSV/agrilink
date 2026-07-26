@@ -193,29 +193,34 @@ export function SignInScreen() {
     }
 
     const session = data.session;
-    if (session) {
-      const { error: upErr } = await supabase.from("user_profiles").upsert(
-        {
-          id: user.id,
-          username: normalized,
-          full_name: fullName.trim(),
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "id" },
-      );
-      if (upErr) {
-        setError(upErr.message);
-        setLoading(false);
-        return;
+    // Require a confirmed email before entering the app. When Supabase Auth
+    // "Confirm email" is enabled, signUp returns no session until verified.
+    if (!session || !user.email_confirmed_at) {
+      if (session) {
+        await supabase.auth.signOut();
       }
-      router.replace(nextPath);
+      setInfo(
+        "Check your email for a confirmation link. After you confirm, return here and sign in with your email or username and password.",
+      );
+      setLoading(false);
       return;
     }
 
-    setInfo(
-      "Check your email for a confirmation link. After you confirm, return here and sign in with your email or username and password.",
+    const { error: upErr } = await supabase.from("user_profiles").upsert(
+      {
+        id: user.id,
+        username: normalized,
+        full_name: fullName.trim(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "id" },
     );
-    setLoading(false);
+    if (upErr) {
+      setError(upErr.message);
+      setLoading(false);
+      return;
+    }
+    router.replace(nextPath);
   };
 
   const heroTitle =

@@ -176,24 +176,38 @@ class AuthProvider extends ChangeNotifier {
     );
 
     final user = response.user;
-    if (user != null) {
-      await _profileProvider.ensureProfile(user.id, normalizedUsername,
-          fullName: fullName);
-
-      _isAuthenticated = true;
-      _userId = user.id;
-      _userName = normalizedUsername;
-      _userEmail = email;
-      _userAvatar = null;
-
-      await _profileProvider.loadProfile(user.id);
-
-      await _saveAuthState();
-      notifyListeners();
-      return null;
+    if (user == null) {
+      return 'Registration failed. Please try again.';
     }
 
-    return 'Registration failed. Please try again.';
+    // When "Confirm email" is enabled in Supabase Auth, signUp returns a user
+    // but no session until the address is verified. Do not treat as signed in.
+    if (response.session == null) {
+      return 'Check your email for a confirmation link, then sign in.';
+    }
+
+    // Defense in depth: never keep a session for an unconfirmed address.
+    if (user.emailConfirmedAt == null) {
+      try {
+        await supabase.auth.signOut();
+      } catch (_) {}
+      return 'Check your email for a confirmation link, then sign in.';
+    }
+
+    await _profileProvider.ensureProfile(user.id, normalizedUsername,
+        fullName: fullName);
+
+    _isAuthenticated = true;
+    _userId = user.id;
+    _userName = normalizedUsername;
+    _userEmail = email;
+    _userAvatar = null;
+
+    await _profileProvider.loadProfile(user.id);
+
+    await _saveAuthState();
+    notifyListeners();
+    return null;
   }
 
   Future<void> logout() async {
