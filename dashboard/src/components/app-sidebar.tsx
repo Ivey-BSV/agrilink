@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   communityNavItems,
   collaborationNavItems,
@@ -13,6 +13,35 @@ import {
 } from "@/components/app-sidebar-nav";
 import { useStaffAccess } from "@/components/staff-access-context";
 import { useStaffMemberPreview } from "@/hooks/use-staff-member-preview";
+
+function SidebarNavLink({
+  item,
+  pathname,
+  className,
+}: {
+  item: SidebarNavItem;
+  pathname: string | null;
+  className: string;
+}) {
+  const router = useRouter();
+  const active = linkActive(pathname, item.href);
+
+  return (
+    <Link
+      href={item.href}
+      className={className}
+      onClick={(e) => {
+        // Same-route clicks (e.g. Repository while inside a folder) must still
+        // clear ?folder= and return to the folder grid.
+        if (!active) return;
+        e.preventDefault();
+        router.push(item.href);
+      }}
+    >
+      {item.label}
+    </Link>
+  );
+}
 
 function NavBlock({
   label,
@@ -41,13 +70,12 @@ function NavBlock({
               {item.soonLabel ? <span className="platform-nav-soon">{item.soonLabel}</span> : null}
             </span>
           ) : (
-            <Link
+            <SidebarNavLink
               key={item.href}
-              href={item.href}
+              item={item}
+              pathname={pathname}
               className={`platform-nav-item${linkActive(pathname, item.href) ? " active" : ""}`}
-            >
-              {item.label}
-            </Link>
+            />
           ),
         )}
       </nav>
@@ -118,13 +146,12 @@ export function AppSidebarMobileNav() {
             {item.soonLabel ? <span className="platform-mobile-pill-soon">{item.soonLabel}</span> : null}
           </span>
         ) : (
-          <Link
+          <SidebarNavLink
             key={item.href}
-            href={item.href}
+            item={item}
+            pathname={pathname}
             className={`platform-mobile-pill${linkActive(pathname, item.href) ? " active" : ""}`}
-          >
-            {item.label}
-          </Link>
+          />
         ),
       )}
       {showStaffNav ? (

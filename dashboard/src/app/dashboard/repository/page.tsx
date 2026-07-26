@@ -15,9 +15,9 @@ export default function RepositoryFilesPage() {
       scope="repository"
       heading="Repository Files"
       memberHeading="My Repository Files"
-      description="Browse repository folders — each folder has a photo gallery, documents, and links for shared reference materials."
-      memberDescription="Open a folder to store guides, PDFs, images, and links. The gallery highlights pictures; documents and links have their own tabs."
-      emptyLibraryMessage="No repository folders yet. Create a folder to organize shared files."
+      description="Browse folders for shared guides, PDFs, photos, and links. Open a folder to upload or add a link. Click Repository in the sidebar anytime to return to all folders."
+      memberDescription="Open a folder to upload files or add links (YouTube, articles). Click Repository in the sidebar (or the breadcrumb) to go back to all folders."
+      emptyLibraryMessage="No repository folders yet. Create a folder first, then upload files or add links inside it."
       tableName="knowledge_repository_documents"
       storageBucket="knowledge-repository"
       docSelect={REPOSITORY_DOC_SELECT}

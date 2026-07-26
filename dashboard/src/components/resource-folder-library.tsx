@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
@@ -89,6 +90,8 @@ export function ResourceFolderLibrary({
   deleteConfirmMessage,
   initialFolderId = null,
 }: ResourceFolderLibraryProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [folders, setFolders] = useState<ResourceFolder[]>([]);
   const [items, setItems] = useState<LibraryDocRow[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(initialFolderId);
@@ -116,12 +119,29 @@ export function ResourceFolderLibrary({
   const [newFolderName, setNewFolderName] = useState("");
   const [newFolderDescription, setNewFolderDescription] = useState("");
   const [creatingFolder, setCreatingFolder] = useState(false);
+  const [renameFolderOpen, setRenameFolderOpen] = useState(false);
+  const [renameFolderName, setRenameFolderName] = useState("");
+  const [renameFolderDescription, setRenameFolderDescription] = useState("");
+  const [savingFolder, setSavingFolder] = useState(false);
+  const [deletingFolder, setDeletingFolder] = useState(false);
 
   const isStaff = isModeratorPlusEffective(staffAccess);
   const pageHeading = !accessResolved || isStaff ? heading : memberHeading;
   const pageDescription = !accessResolved || isStaff ? description : memberDescription;
   const selectedFolder = selectedFolderId ? folders.find((f) => f.id === selectedFolderId) ?? null : null;
   const storageUrlMarker = `/${storageBucket}/`;
+  const scopeRootLabel = scope === "repository" ? "Repository" : "Workshops";
+
+  const syncFolderInUrl = useCallback(
+    (folderId: string | null) => {
+      if (!pathname) return;
+      const next = folderId
+        ? `${pathname}?folder=${encodeURIComponent(folderId)}`
+        : pathname;
+      router.replace(next, { scroll: false });
+    },
+    [pathname, router],
+  );
 
   const loadData = useCallback(async () => {
     setError(null);
@@ -165,9 +185,7 @@ export function ResourceFolderLibrary({
   }, [loadData]);
 
   useEffect(() => {
-    if (initialFolderId) {
-      setSelectedFolderId(initialFolderId);
-    }
+    setSelectedFolderId(initialFolderId ?? null);
   }, [initialFolderId]);
 
   useEffect(() => {
@@ -330,8 +348,101 @@ export function ResourceFolderLibrary({
     setNewFolderDescription("");
     setFolderModalOpen(false);
     setSelectedFolderId(row.id);
-    setSuccess(`Folder “${row.name}” created.`);
+    syncFolderInUrl(row.id);
+    setSuccess(`Folder “${row.name}” created. You can upload files or add links now.`);
     setCreatingFolder(false);
+  };
+
+  const openRenameFolder = () => {
+    if (!selectedFolder) return;
+    setRenameFolderName(selectedFolder.name);
+    setRenameFolderDescription(selectedFolder.description ?? "");
+    setRenameFolderOpen(true);
+    setError(null);
+  };
+
+  const saveFolderDetails = async () => {
+    if (!selectedFolderId) return;
+    const name = renameFolderName.trim();
+    if (!name) {
+      setError("Folder name is required.");
+      return;
+    }
+    setSavingFolder(true);
+    setError(null);
+    const description = renameFolderDescription.trim() || null;
+    const { error: updateError } = await supabase
+      .from("resource_folders")
+      .update({ name, description })
+      .eq("id", selectedFolderId);
+
+    if (updateError) {
+      setError(updateError.message);
+      setSavingFolder(false);
+      return;
+    }
+
+    setFolders((prev) =>
+      prev
+        .map((f) => (f.id === selectedFolderId ? { ...f, name, description } : f))
+        .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name)),
+    );
+    setRenameFolderOpen(false);
+    setSuccess(`Folder renamed to “${name}”.`);
+    setSavingFolder(false);
+  };
+
+  const deleteSelectedFolder = async () => {
+    if (!selectedFolderId || !selectedFolder) return;
+    const name = selectedFolder.name;
+    const count = items.filter((i) => i.folder_id === selectedFolderId).length;
+    const confirmMsg =
+      count > 0
+        ? `Delete folder “${name}” and its ${count} file${count === 1 ? "" : "s"}/link${count === 1 ? "" : "s"}? This cannot be undone.`
+        : `Delete empty folder “${name}”? This cannot be undone.`;
+    if (!confirm(confirmMsg)) return;
+
+    setDeletingFolder(true);
+    setError(null);
+    setSuccess(null);
+
+    const folderItems = items.filter((i) => i.folder_id === selectedFolderId);
+    for (const row of folderItems) {
+      const storagePath = extractStoragePathFromPublicUrl(row.file_url, storageBucket);
+      if (storagePath) {
+        await supabase.storage.from(storageBucket).remove([storagePath]);
+      }
+    }
+
+    if (folderItems.length > 0) {
+      const { error: docsError } = await supabase
+        .from(tableName)
+        .delete()
+        .eq("folder_id", selectedFolderId);
+      if (docsError) {
+        setError(docsError.message);
+        setDeletingFolder(false);
+        return;
+      }
+    }
+
+    const { error: folderError } = await supabase
+      .from("resource_folders")
+      .delete()
+      .eq("id", selectedFolderId);
+
+    if (folderError) {
+      setError(folderError.message);
+      setDeletingFolder(false);
+      return;
+    }
+
+    setItems((prev) => prev.filter((i) => i.folder_id !== selectedFolderId));
+    setFolders((prev) => prev.filter((f) => f.id !== selectedFolderId));
+    setSelectedFolderId(null);
+    syncFolderInUrl(null);
+    setSuccess(`Folder “${name}” deleted.`);
+    setDeletingFolder(false);
   };
 
   const upload = async () => {
@@ -512,6 +623,7 @@ export function ResourceFolderLibrary({
 
   const openFolder = (folderId: string) => {
     setSelectedFolderId(folderId);
+    syncFolderInUrl(folderId);
     setSearch("");
     setEditingId(null);
     setError(null);
@@ -520,8 +632,10 @@ export function ResourceFolderLibrary({
 
   const backToFolders = () => {
     setSelectedFolderId(null);
+    syncFolderInUrl(null);
     setSearch("");
     setEditingId(null);
+    setRenameFolderOpen(false);
   };
 
   return (
@@ -539,6 +653,22 @@ export function ResourceFolderLibrary({
             <div className="resource-folder-header-actions">
               <button type="button" className="btn btn-secondary btn-primary-compact" onClick={backToFolders}>
                 All folders
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary btn-primary-compact"
+                onClick={openRenameFolder}
+                disabled={deletingFolder}
+              >
+                Rename folder
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger btn-primary-compact"
+                onClick={() => void deleteSelectedFolder()}
+                disabled={deletingFolder}
+              >
+                {deletingFolder ? "Deleting…" : "Delete folder"}
               </button>
               <button type="button" className="btn btn-secondary btn-primary-compact" onClick={() => setLinkModalOpen(true)}>
                 Add link
@@ -558,12 +688,16 @@ export function ResourceFolderLibrary({
       {selectedFolder ? (
         <p className="subtle resource-folder-breadcrumb">
           <button type="button" className="resource-folder-breadcrumb-link" onClick={backToFolders}>
-            Folders
+            {scopeRootLabel}
           </button>
           <span aria-hidden> / </span>
           <span>{selectedFolder.name}</span>
         </p>
-      ) : null}
+      ) : (
+        <p className="subtle" style={{ margin: "-4px 0 0" }}>
+          Tip: open a folder to upload files or add links. Use <strong>{scopeRootLabel}</strong> in the sidebar (or the breadcrumb) to return to all folders.
+        </p>
+      )}
 
       {error ? <p className="error">{error}</p> : null}
       {success ? <p className="success">{success}</p> : null}
@@ -942,6 +1076,38 @@ export function ResourceFolderLibrary({
             rows={2}
             value={newFolderDescription}
             onChange={(e) => setNewFolderDescription(e.target.value)}
+            placeholder="Short note about what belongs here"
+          />
+        </div>
+      </FileUploadModal>
+
+      <FileUploadModal
+        open={renameFolderOpen}
+        title="Rename folder"
+        submitting={savingFolder}
+        submitLabel="Save folder"
+        onClose={() => {
+          if (savingFolder) return;
+          setRenameFolderOpen(false);
+        }}
+        onSubmit={saveFolderDetails}
+      >
+        <div className="field">
+          <label htmlFor="rename-folder-name">Folder name</label>
+          <input
+            id="rename-folder-name"
+            value={renameFolderName}
+            onChange={(e) => setRenameFolderName(e.target.value)}
+            autoFocus
+          />
+        </div>
+        <div className="field">
+          <label htmlFor="rename-folder-desc">Description (optional)</label>
+          <textarea
+            id="rename-folder-desc"
+            rows={2}
+            value={renameFolderDescription}
+            onChange={(e) => setRenameFolderDescription(e.target.value)}
             placeholder="Short note about what belongs here"
           />
         </div>

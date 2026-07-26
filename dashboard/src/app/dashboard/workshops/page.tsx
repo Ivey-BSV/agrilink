@@ -15,9 +15,9 @@ export default function WorkshopsFilesPage() {
       scope="workshop"
       heading="Workshop Files"
       memberHeading="My Workshop Files"
-      description="Browse workshop folders — each folder has a photo gallery, documents, and links. Open a folder to view uploads or add new content."
-      memberDescription="Open a workshop folder to upload handouts, photos, and links. Images appear in the gallery; PDFs and URLs have their own tabs."
-      emptyLibraryMessage="No workshop folders yet. Create a folder for each session or event."
+      description="Browse workshop folders for session files, photos, and links. Open a folder to upload or add a link. Click Workshops in the sidebar anytime to return to all folders."
+      memberDescription="Open a workshop folder to upload handouts, photos, and links. Click Workshops in the sidebar (or the breadcrumb) to go back to all folders."
+      emptyLibraryMessage="No workshop folders yet. Create a folder for each session or event, then upload files inside it."
       tableName="workshop_documents"
       storageBucket="workshop-repository"
       docSelect={WORKSHOP_DOC_SELECT}
