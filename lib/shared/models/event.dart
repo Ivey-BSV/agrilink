@@ -55,7 +55,7 @@ class Event {
       title: row['title'] as String,
       category: row['category'] as String,
       description: row['description'] as String? ?? '',
-      eventDate: DateTime.parse(row['event_date'] as String),
+      eventDate: _parseEventDate(row['event_date'] as String),
       time: row['time'] as String,
       location: row['location'] as String,
       farmId: row['farm_id'] as String?,
@@ -73,6 +73,20 @@ class Event {
               [],
       imageUrl: row['image_url'] as String?,
     );
+  }
+
+  /// Date-only values (YYYY-MM-DD) as local calendar dates — avoids UTC
+  /// midnight shifting the day back in Canada/US timezones.
+  static DateTime _parseEventDate(String raw) {
+    final match = RegExp(r'^(\d{4})-(\d{2})-(\d{2})').firstMatch(raw.trim());
+    if (match != null) {
+      return DateTime(
+        int.parse(match.group(1)!),
+        int.parse(match.group(2)!),
+        int.parse(match.group(3)!),
+      );
+    }
+    return DateTime.parse(raw);
   }
 
   Map<String, dynamic> toJson() {

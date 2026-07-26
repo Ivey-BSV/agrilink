@@ -37,6 +37,7 @@ type EventRow = {
   location: string;
   description: string | null;
   image_url: string | null;
+  link_url: string | null;
 };
 
 type PlatformUserProfileViewProps = {
@@ -131,7 +132,7 @@ export function PlatformUserProfileView({ userId }: PlatformUserProfileViewProps
       setLoadingTab(true);
       const { data, error: e } = await supabase
         .from("events")
-        .select("id, title, category, event_date, time, location, description, image_url")
+        .select("id, title, category, event_date, time, location, description, image_url, link_url")
         .eq("user_id", userId)
         .order("event_date", { ascending: false });
       if (!cancelled) {

@@ -14,6 +14,7 @@ export type PlatformEventItem = {
   time: string;
   location: string;
   description?: string | null;
+  link_url?: string | null;
 };
 
 type PlatformEventCardProps = {
@@ -26,6 +27,7 @@ export function PlatformEventCard({ event }: PlatformEventCardProps) {
   const when = formatEventDateTimeLine(event.event_date, event.time);
   const location = event.location?.trim();
   const description = event.description?.trim();
+  const linkUrl = event.link_url?.trim();
 
   return (
     <article className="platform-event-card">
@@ -50,6 +52,16 @@ export function PlatformEventCard({ event }: PlatformEventCardProps) {
               📍
             </span>
             <span>{location}</span>
+          </li>
+        ) : null}
+        {linkUrl ? (
+          <li>
+            <span className="platform-event-meta-icon" aria-hidden>
+              🔗
+            </span>
+            <a href={linkUrl} target="_blank" rel="noreferrer">
+              Event link
+            </a>
           </li>
         ) : null}
       </ul>

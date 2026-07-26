@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
+import { formatEventDateAbbreviated, toEventDateInputValue } from "@/lib/event-format";
 import { insertAuditLog } from "@/lib/audit-log";
 import { useStaffAccess } from "@/components/staff-access-context";
 
@@ -18,6 +19,7 @@ type EventRow = {
   max_attendees: number | null;
   current_attendees: number | null;
   virtual_meeting_url: string | null;
+  link_url: string | null;
   registration_open: boolean | null;
   latitude: number | null;
   longitude: number | null;
@@ -50,7 +52,7 @@ export default function AdminAllEventsPage() {
     const { data, error: qErr } = await supabase
       .from("events")
       .select(
-        "id, user_id, title, category, description, event_date, time, location, max_attendees, current_attendees, virtual_meeting_url, registration_open, latitude, longitude, created_at",
+        "id, user_id, title, category, description, event_date, time, location, max_attendees, current_attendees, virtual_meeting_url, link_url, registration_open, latitude, longitude, created_at",
       )
       .order("event_date", { ascending: false })
       .limit(200);
@@ -112,11 +114,12 @@ export default function AdminAllEventsPage() {
       title: draft.title ?? row.title,
       category: draft.category ?? row.category,
       description: draft.description ?? row.description,
-      event_date: draft.event_date ?? row.event_date,
+      event_date: toEventDateInputValue((draft.event_date ?? row.event_date) as string),
       time: draft.time ?? row.time,
       location: draft.location ?? row.location,
       max_attendees: draft.max_attendees ?? row.max_attendees,
       virtual_meeting_url: draft.virtual_meeting_url ?? row.virtual_meeting_url,
+      link_url: draft.link_url ?? row.link_url,
       registration_open: draft.registration_open ?? row.registration_open,
       latitude: draft.latitude ?? row.latitude,
       longitude: draft.longitude ?? row.longitude,
@@ -147,6 +150,7 @@ export default function AdminAllEventsPage() {
       max_attendees: (merged.max_attendees as number | null) ?? null,
       current_attendees: row.current_attendees,
       virtual_meeting_url: (merged.virtual_meeting_url as string | null) ?? null,
+      link_url: (merged.link_url as string | null) ?? null,
       registration_open: (merged.registration_open as boolean | null) ?? null,
       latitude: (merged.latitude as number | null) ?? null,
       longitude: (merged.longitude as number | null) ?? null,
@@ -254,7 +258,7 @@ export default function AdminAllEventsPage() {
               <div>
                 <div style={{ fontWeight: 600 }}>{r.title}</div>
                 <div className="subtle">
-                  {formatDate(r.event_date)} · {r.time} · {r.category}
+                  {formatEventDateAbbreviated(r.event_date)} · {r.time} · {r.category}
                 </div>
                 <div className="subtle">{r.location}</div>
                 <div className="subtle">
@@ -301,7 +305,8 @@ export default function AdminAllEventsPage() {
                     Date
                     <input
                       className="input"
-                      value={draft.event_date ?? r.event_date}
+                      type="date"
+                      value={toEventDateInputValue(draft.event_date ?? r.event_date)}
                       onChange={(e) => setDraft((d) => ({ ...d, event_date: e.target.value }))}
                     />
                   </label>
@@ -333,6 +338,16 @@ export default function AdminAllEventsPage() {
                       className="input"
                       value={draft.virtual_meeting_url ?? r.virtual_meeting_url ?? ""}
                       onChange={(e) => setDraft((d) => ({ ...d, virtual_meeting_url: e.target.value || null }))}
+                    />
+                  </label>
+                  <label className="subtle stack" style={{ gap: 4 }}>
+                    Event link
+                    <input
+                      className="input"
+                      type="url"
+                      placeholder="https://… registration or more info"
+                      value={draft.link_url ?? r.link_url ?? ""}
+                      onChange={(e) => setDraft((d) => ({ ...d, link_url: e.target.value || null }))}
                     />
                   </label>
                   <label className="subtle stack" style={{ gap: 4 }}>

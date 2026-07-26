@@ -44,6 +44,7 @@ type EventRow = {
   location: string;
   description: string | null;
   image_url: string | null;
+  link_url: string | null;
   created_at: string;
 };
 
@@ -153,7 +154,7 @@ export default function PlatformProfilePage() {
       setLoadingEvents(true);
       const { data, error: ee } = await supabase
         .from("events")
-        .select("id, title, category, event_date, time, location, description, image_url, created_at")
+        .select("id, title, category, event_date, time, location, description, image_url, link_url, created_at")
         .eq("user_id", profile.id)
         .order("event_date", { ascending: false });
       if (cancelled) return;

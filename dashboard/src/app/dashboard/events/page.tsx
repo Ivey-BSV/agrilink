@@ -4,7 +4,12 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { formatDate } from "@/lib/format";
-import { formatEventCategory, formatEventDateTimeLine, isEventUpcoming } from "@/lib/event-format";
+import {
+  formatEventCategory,
+  formatEventDateTimeLine,
+  isEventUpcoming,
+  toEventDateInputValue,
+} from "@/lib/event-format";
 import { ContentThumbCell } from "@/components/content-thumb-cell";
 import { MotionListItem } from "@/components/motion-list";
 import { PageSectionHeader } from "@/components/page-section-header";
@@ -19,28 +24,43 @@ type EventRow = {
   created_at: string;
   description: string | null;
   image_url: string | null;
+  link_url: string | null;
 };
+
+type EventDraft = {
+  title: string;
+  category: string;
+  event_date: string;
+  time: string;
+  location: string;
+  description: string;
+  link_url: string;
+};
+
+const emptyCreateDraft = (): EventDraft => ({
+  title: "",
+  category: "Workshop",
+  event_date: "",
+  time: "09:00",
+  location: "",
+  description: "",
+  link_url: "",
+});
+
+function normalizeLinkUrl(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
 
 export default function EventsPage() {
   const [items, setItems] = useState<EventRow[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [draft, setDraft] = useState({
-    title: "",
-    category: "",
-    event_date: "",
-    time: "",
-    location: "",
-  });
+  const [draft, setDraft] = useState<EventDraft>(emptyCreateDraft());
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [createDraft, setCreateDraft] = useState({
-    title: "",
-    category: "Workshop",
-    event_date: "",
-    time: "09:00",
-    location: "",
-    description: "",
-  });
+  const [createDraft, setCreateDraft] = useState<EventDraft>(emptyCreateDraft());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,7 +79,7 @@ export default function EventsPage() {
 
     const { data, error: fetchError } = await supabase
       .from("events")
-      .select("id, title, category, event_date, time, location, description, image_url, created_at")
+      .select("id, title, category, event_date, time, location, description, image_url, link_url, created_at")
       .eq("user_id", user.id)
       .order("event_date", { ascending: false });
 
@@ -94,16 +114,17 @@ export default function EventsPage() {
         title: createDraft.title.trim(),
         category: createDraft.category.trim() || "General",
         description: createDraft.description.trim() || null,
-        event_date: createDraft.event_date,
+        event_date: toEventDateInputValue(createDraft.event_date),
         time: createDraft.time.trim() || "09:00",
         location: createDraft.location.trim() || "TBD",
+        link_url: normalizeLinkUrl(createDraft.link_url),
         max_attendees: 50,
         current_attendees: 0,
         is_co_hosted: false,
         co_host_ids: [],
         tags: [],
       })
-      .select("id, title, category, event_date, time, location, description, image_url, created_at")
+      .select("id, title, category, event_date, time, location, description, image_url, link_url, created_at")
       .single();
 
     if (insErr || !data) {
@@ -120,14 +141,7 @@ export default function EventsPage() {
 
     setItems((prev) => [row, ...prev]);
     setCreateOpen(false);
-    setCreateDraft({
-      title: "",
-      category: "Workshop",
-      event_date: "",
-      time: "09:00",
-      location: "",
-      description: "",
-    });
+    setCreateDraft(emptyCreateDraft());
     setCreating(false);
   };
 
@@ -149,24 +163,28 @@ export default function EventsPage() {
     setDraft({
       title: item.title,
       category: item.category,
-      event_date: item.event_date,
+      event_date: toEventDateInputValue(item.event_date),
       time: item.time,
       location: item.location,
+      description: item.description ?? "",
+      link_url: item.link_url ?? "",
     });
+    setError(null);
   };
 
   const saveEdit = async (id: string) => {
-    const { error: updateError } = await supabase
-      .from("events")
-      .update({
-        title: draft.title,
-        category: draft.category,
-        event_date: draft.event_date,
-        time: draft.time,
-        location: draft.location,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", id);
+    setError(null);
+    const payload = {
+      title: draft.title.trim(),
+      category: draft.category.trim() || "General",
+      event_date: toEventDateInputValue(draft.event_date),
+      time: draft.time.trim() || "09:00",
+      location: draft.location.trim() || "TBD",
+      description: draft.description.trim() || null,
+      link_url: normalizeLinkUrl(draft.link_url),
+      updated_at: new Date().toISOString(),
+    };
+    const { error: updateError } = await supabase.from("events").update(payload).eq("id", id);
     if (updateError) {
       setError(updateError.message);
       return;
@@ -176,14 +194,16 @@ export default function EventsPage() {
         p.id === id
           ? {
               ...p,
-              title: draft.title,
-              category: draft.category,
-              event_date: draft.event_date,
-              time: draft.time,
-              location: draft.location,
+              title: payload.title,
+              category: payload.category,
+              event_date: payload.event_date,
+              time: payload.time,
+              location: payload.location,
+              description: payload.description,
+              link_url: payload.link_url,
             }
-          : p
-      )
+          : p,
+      ),
     );
     setEditingId(null);
   };
@@ -197,7 +217,7 @@ export default function EventsPage() {
     >
       <PageSectionHeader
         title="My events"
-        description="Plan gatherings, set date and place, and add a cover image so members know what to expect and how to join."
+        description="Plan gatherings, set date and place, add a description and optional link, and share a cover image so members know what to expect."
         action={
           <button type="button" className="btn btn-primary btn-primary-compact" onClick={() => setCreateOpen(true)}>
             New event
@@ -243,6 +263,7 @@ export default function EventsPage() {
                 value={createDraft.time}
                 onChange={(e) => setCreateDraft((d) => ({ ...d, time: e.target.value }))}
                 disabled={creating}
+                placeholder="e.g. 10:00 - 15:00"
               />
             </div>
             <div className="field">
@@ -251,6 +272,16 @@ export default function EventsPage() {
                 value={createDraft.location}
                 onChange={(e) => setCreateDraft((d) => ({ ...d, location: e.target.value }))}
                 disabled={creating}
+              />
+            </div>
+            <div className="field">
+              <label>Link (optional)</label>
+              <input
+                type="url"
+                value={createDraft.link_url}
+                onChange={(e) => setCreateDraft((d) => ({ ...d, link_url: e.target.value }))}
+                disabled={creating}
+                placeholder="https://… registration or more info"
               />
             </div>
             <div className="field">
@@ -291,10 +322,7 @@ export default function EventsPage() {
                 <>
                   <div className="field">
                     <label>Title</label>
-                    <input
-                      value={draft.title}
-                      onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
-                    />
+                    <input value={draft.title} onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} />
                   </div>
                   <div className="field">
                     <label>Category</label>
@@ -306,16 +334,14 @@ export default function EventsPage() {
                   <div className="field">
                     <label>Date</label>
                     <input
+                      type="date"
                       value={draft.event_date}
                       onChange={(e) => setDraft((d) => ({ ...d, event_date: e.target.value }))}
                     />
                   </div>
                   <div className="field">
                     <label>Time</label>
-                    <input
-                      value={draft.time}
-                      onChange={(e) => setDraft((d) => ({ ...d, time: e.target.value }))}
-                    />
+                    <input value={draft.time} onChange={(e) => setDraft((d) => ({ ...d, time: e.target.value }))} />
                   </div>
                   <div className="field">
                     <label>Location</label>
@@ -324,12 +350,31 @@ export default function EventsPage() {
                       onChange={(e) => setDraft((d) => ({ ...d, location: e.target.value }))}
                     />
                   </div>
+                  <div className="field">
+                    <label>Link (optional)</label>
+                    <input
+                      type="url"
+                      value={draft.link_url}
+                      onChange={(e) => setDraft((d) => ({ ...d, link_url: e.target.value }))}
+                      placeholder="https://… registration or more info"
+                    />
+                  </div>
+                  <div className="field">
+                    <label>Description</label>
+                    <textarea
+                      rows={4}
+                      value={draft.description}
+                      onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
+                    />
+                  </div>
                 </>
               ) : (
                 <>
                   <div className="workshop-line-title">{item.title}</div>
                   <div className="workshop-line-meta platform-event-inline-meta">
-                    <span className={`platform-event-inline-status${isEventUpcoming(item.event_date) ? " is-upcoming" : " is-past"}`}>
+                    <span
+                      className={`platform-event-inline-status${isEventUpcoming(item.event_date) ? " is-upcoming" : " is-past"}`}
+                    >
                       {isEventUpcoming(item.event_date) ? "Upcoming" : "Past"}
                     </span>
                     <span className="platform-event-inline-sep" aria-hidden>
@@ -339,8 +384,15 @@ export default function EventsPage() {
                   </div>
                   <div className="workshop-line-meta">{formatEventDateTimeLine(item.event_date, item.time)}</div>
                   {item.location?.trim() ? <div className="workshop-line-meta">{item.location.trim()}</div> : null}
+                  {item.link_url?.trim() ? (
+                    <div className="workshop-line-meta">
+                      <a href={item.link_url.trim()} target="_blank" rel="noreferrer" className="pill">
+                        Open link
+                      </a>
+                    </div>
+                  ) : null}
                   {item.description ? (
-                    <div className="workshop-line-meta" style={{ maxHeight: 72, overflow: "hidden" }}>
+                    <div className="workshop-line-meta" style={{ whiteSpace: "pre-wrap" }}>
                       {item.description}
                     </div>
                   ) : null}
@@ -351,7 +403,7 @@ export default function EventsPage() {
             <div className="actions">
               {editingId === item.id ? (
                 <>
-                  <button type="button" className="btn btn-primary" onClick={() => saveEdit(item.id)}>
+                  <button type="button" className="btn btn-primary" onClick={() => void saveEdit(item.id)}>
                     Save
                   </button>
                   <button type="button" className="btn btn-secondary" onClick={() => setEditingId(null)}>
@@ -363,7 +415,7 @@ export default function EventsPage() {
                   <button type="button" className="btn btn-secondary" onClick={() => startEdit(item)}>
                     Edit
                   </button>
-                  <button type="button" className="btn btn-danger" onClick={() => remove(item.id)}>
+                  <button type="button" className="btn btn-danger" onClick={() => void remove(item.id)}>
                     Delete
                   </button>
                 </>

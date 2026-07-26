@@ -1,3 +1,28 @@
+/** Calendar date (YYYY-MM-DD) without UTC timezone shift. */
+export function parseEventCalendarDate(value: string | null | undefined): Date | null {
+  if (!value?.trim()) return null;
+  const raw = value.trim();
+  const dateOnly = /^(\d{4})-(\d{2})-(\d{2})/.exec(raw);
+  if (dateOnly) {
+    const y = Number(dateOnly[1]);
+    const m = Number(dateOnly[2]);
+    const d = Number(dateOnly[3]);
+    const local = new Date(y, m - 1, d);
+    if (local.getFullYear() !== y || local.getMonth() !== m - 1 || local.getDate() !== d) {
+      return null;
+    }
+    return local;
+  }
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+/** Normalize DB/date strings for `<input type="date">`. */
+export function toEventDateInputValue(value: string | null | undefined): string {
+  if (!value?.trim()) return "";
+  const match = /^(\d{4}-\d{2}-\d{2})/.exec(value.trim());
+  return match ? match[1] : value.trim();
+}
 
 export function formatEventCategory(raw: string | null | undefined): string {
   const t = (raw ?? "").trim();
@@ -5,11 +30,10 @@ export function formatEventCategory(raw: string | null | undefined): string {
   return t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-
 export function formatEventDateAbbreviated(value: string | null | undefined): string {
   if (!value?.trim()) return "Date TBD";
-  const d = new Date(value.trim());
-  if (Number.isNaN(d.getTime())) return value.trim();
+  const d = parseEventCalendarDate(value);
+  if (!d) return value.trim();
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
@@ -20,14 +44,9 @@ export function formatEventDateTimeLine(eventDate: string | null | undefined, ti
 }
 
 export function isEventUpcoming(eventDate: string | null | undefined): boolean {
-  if (!eventDate?.trim()) return false;
-  const ev = new Date(eventDate.trim());
-  if (Number.isNaN(ev.getTime())) return false;
+  const ev = parseEventCalendarDate(eventDate);
+  if (!ev) return false;
   const now = new Date();
-  return (
-    ev > now ||
-    (ev.getFullYear() === now.getFullYear() &&
-      ev.getMonth() === now.getMonth() &&
-      ev.getDate() === now.getDate())
-  );
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return ev.getTime() >= today.getTime();
 }
