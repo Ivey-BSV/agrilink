@@ -18,3 +18,10 @@ export function buildResourceStoragePath(folderId: string, userId: string, fileN
   const safeName = fileName.replaceAll("/", "_");
   return `${folderId}/${userId}/${Date.now()}_${safeName}`;
 }
+
+/** Use the filename (without extension) when the user leaves Title blank. */
+export function titleFromFileName(fileName: string): string {
+  const base = fileName.replace(/^.*[/\\]/, "").trim();
+  const withoutExt = base.replace(/\.[^.]+$/, "").trim();
+  return withoutExt || base || "Untitled";
+}

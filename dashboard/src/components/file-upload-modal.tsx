@@ -9,6 +9,7 @@ type FileUploadModalProps = {
   onSubmit: () => void | Promise<void>;
   submitting?: boolean;
   submitLabel?: string;
+  error?: string | null;
   children: ReactNode;
 };
 
@@ -19,6 +20,7 @@ export function FileUploadModal({
   onSubmit,
   submitting = false,
   submitLabel = "Upload",
+  error = null,
   children,
 }: FileUploadModalProps) {
   if (!open) return null;
@@ -37,6 +39,7 @@ export function FileUploadModal({
             {title}
           </h3>
           {children}
+          {error ? <p className="error" style={{ margin: 0 }}>{error}</p> : null}
           <div className="file-upload-modal-actions">
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={submitting}>
               Cancel

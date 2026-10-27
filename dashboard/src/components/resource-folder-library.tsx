@@ -19,6 +19,7 @@ import {
 import {
   buildResourceStoragePath,
   RESOURCE_FOLDER_SELECT,
+  titleFromFileName,
   type ResourceFolder,
   type ResourceScope,
 } from "@/lib/resource-folders";
@@ -468,14 +469,12 @@ export function ResourceFolderLibrary({
     setError(null);
     setSuccess(null);
 
-    if (!uploadTitle.trim()) {
-      setError("Please enter a title for the file.");
-      return;
-    }
     if (uploadFiles.length === 0) {
       setError("Please choose one or more files to upload.");
       return;
     }
+
+    const customTitle = uploadTitle.trim();
 
     setUploading(true);
     const {
@@ -492,6 +491,11 @@ export function ResourceFolderLibrary({
 
     for (const file of uploadFiles) {
       const filePath = buildResourceStoragePath(selectedFolderId, user.id, file.name);
+      const fileTitle = customTitle
+        ? uploadFiles.length > 1
+          ? `${customTitle} - ${file.name}`
+          : customTitle
+        : titleFromFileName(file.name);
 
       const { error: storageError } = await supabase.storage.from(storageBucket).upload(filePath, file, {
         cacheControl: "3600",
@@ -510,10 +514,10 @@ export function ResourceFolderLibrary({
       const payload: Record<string, unknown> = {
         folder_id: selectedFolderId,
         user_id: user.id,
-        title: uploadFiles.length > 1 ? `${uploadTitle.trim()} - ${file.name}` : uploadTitle.trim(),
+        title: fileTitle,
         file_name: file.name,
         file_url: publicUrl,
-        mime_type: file.type || null,
+        mime_type: file.type || "application/octet-stream",
         approval_status: "approved",
         visibility_rules: {},
       };
@@ -705,7 +709,14 @@ export function ResourceFolderLibrary({
               <button type="button" className="btn btn-secondary btn-primary-compact" onClick={() => setLinkModalOpen(true)}>
                 Add link
               </button>
-              <button type="button" className="btn btn-primary btn-primary-compact" onClick={() => setUploadOpen(true)}>
+              <button
+                type="button"
+                className="btn btn-primary btn-primary-compact"
+                onClick={() => {
+                  setError(null);
+                  setUploadOpen(true);
+                }}
+              >
                 Upload file
               </button>
             </div>
@@ -731,7 +742,9 @@ export function ResourceFolderLibrary({
         </p>
       )}
 
-      {error ? <p className="error">{error}</p> : null}
+      {error && !uploadOpen && !linkModalOpen && !folderModalOpen && !renameFolderOpen ? (
+        <p className="error">{error}</p>
+      ) : null}
       {success ? <p className="success">{success}</p> : null}
       {loading ? <p className="subtle">Loading…</p> : null}
 
@@ -1015,9 +1028,11 @@ export function ResourceFolderLibrary({
         open={uploadOpen}
         title={uploadModalTitle}
         submitting={uploading}
+        error={uploadOpen ? error : null}
         onClose={() => {
           if (uploading) return;
           setUploadOpen(false);
+          setError(null);
         }}
         onSubmit={upload}
       >
@@ -1027,12 +1042,12 @@ export function ResourceFolderLibrary({
           </p>
         ) : null}
         <div className="field">
-          <label htmlFor="folder-upload-title">Title</label>
+          <label htmlFor="folder-upload-title">Title (optional)</label>
           <input
             id="folder-upload-title"
             value={uploadTitle}
             onChange={(e) => setUploadTitle(e.target.value)}
-            placeholder="e.g., Session handout"
+            placeholder="Leave blank to use the file name"
           />
         </div>
         <div className="field">
@@ -1041,7 +1056,10 @@ export function ResourceFolderLibrary({
             id="folder-upload-file"
             type="file"
             multiple
-            onChange={(e) => setUploadFiles(Array.from(e.target.files ?? []))}
+            onChange={(e) => {
+              setUploadFiles(Array.from(e.target.files ?? []));
+              setError(null);
+            }}
           />
         </div>
       </FileUploadModal>
@@ -1051,9 +1069,11 @@ export function ResourceFolderLibrary({
         title="Add link"
         submitting={addingLink}
         submitLabel="Add link"
+        error={linkModalOpen ? error : null}
         onClose={() => {
           if (addingLink) return;
           setLinkModalOpen(false);
+          setError(null);
         }}
         onSubmit={addLink}
       >
